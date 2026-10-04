@@ -1,0 +1,31 @@
+import { module } from './_cat.js';
+
+// Generic Fletcher checksum over `wbits`-wide words (shared by the Fletcher-8/16/32/64 variants).
+// Returns the combined hex string directly: hex(s2) + hex(s1), each padded to wbits/4 digits, which
+// is equivalent to formatting the Python reference's (s2 << wbits) | s1 as hex.
+export function fletcher(data, wbits) {
+  const mod = 2 ** wbits - 1;
+  const nbytes = Math.max(Math.floor(wbits / 8), 1);
+  let s1 = 0, s2 = 0;
+  const words = [];
+  if (wbits === 4) {
+    for (const b of data) words.push(b & 15, b >> 4);
+  } else {
+    const padLen = (nbytes - (data.length % nbytes)) % nbytes;
+    const padded = new Uint8Array(data.length + padLen);
+    padded.set(data);
+    for (let i = 0; i < padded.length; i += nbytes) {
+      let w = 0;
+      for (let j = nbytes - 1; j >= 0; j--) w = w * 256 + padded[i + j];
+      words.push(w);
+    }
+  }
+  for (const w of words) {
+    s1 = (s1 + w) % mod;
+    s2 = (s2 + s1) % mod;
+  }
+  const hexLen = wbits / 4;
+  return s2.toString(16).padStart(hexLen, '0') + s1.toString(16).padStart(hexLen, '0');
+}
+
+module('Fletcher-8 Checksum', 'Fletcher checksum over 4-bit words.', [], (data) => fletcher(data, 4));
