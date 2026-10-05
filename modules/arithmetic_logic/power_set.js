@@ -3,26 +3,16 @@ import { A } from '../../core/registry.js';
 
 function unescape(s) { return s.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '\r'); }
 
-function* combinations(items, r) {
-  const n = items.length;
-  if (r > n) return;
-  const idx = Array.from({ length: r }, (_, i) => i);
-  yield idx.map(i => items[i]);
-  while (true) {
-    let i = r - 1;
-    while (i >= 0 && idx[i] === i + n - r) i--;
-    if (i < 0) return;
-    idx[i]++;
-    for (let j = i + 1; j < r; j++) idx[j] = idx[j - 1] + 1;
-    yield idx.map(k => items[k]);
-  }
-}
-
 module('Power Set', 'All subsets of a set.', [A.string('Item delimiter', ',')],
   (t, idl) => {
     idl = unescape(idl);
-    const items = t.split(idl);
+    const items = t.split(idl).filter(a => a);
+    if (!items.length) return '';
+    const n = items.length;
     const out = [];
-    for (let r = 0; r <= items.length; r++) for (const c of combinations(items, r)) out.push(c.join(idl));
-    return out.join('\n');
+    for (let m = 0; m < 2 ** n; m++) {
+      const bits = m.toString(2).padStart(n, '0');
+      out.push(items.filter((_, i) => bits[i] === '1').join(idl));
+    }
+    return out.sort((a, b) => a.length - b.length).map(s => `${s}\n`).join('');
   }, { text: true });
