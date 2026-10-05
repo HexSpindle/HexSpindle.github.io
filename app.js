@@ -251,6 +251,27 @@ function addOp(name, args, at) {
   const o = newOp(name, args); at == null ? S.recipe.push(o) : S.recipe.splice(at, 0, o);
   S.stepTo = null; S.inspect = null; if (innerWidth <= 1100) setPane('recipe'); commit(); const box = $('#recipeList'); setTimeout(() => { box.scrollTop = at == null ? box.scrollHeight : box.scrollTop; }, 30);
 }
+function selectOptions(options, selected) {
+  return options.map(o => {
+    if (typeof o === 'string') {
+      return el('option', {
+        value: o,
+        selected: o === selected,
+      }, o);
+    }
+
+    return el(
+      'optgroup',
+      { label: o.label },
+      o.options.map(value =>
+        el('option', {
+          value,
+          selected: value === selected,
+        }, value)
+      )
+    );
+  });
+}
 
 function argField(op, spec, i) {
   const set = v => { op.args[i] = v; S.stepTo = null; persist(); commitArg(); scheduleBake(); };
@@ -260,7 +281,16 @@ function argField(op, spec, i) {
     case 'boolean':
       return el('div', { class: 'arg bool' }, el('label', {}, spec.name), el('label', { class: 'switch' }, el('input', { type: 'checkbox', checked: !!v, onchange: e => set(e.target.checked) }), el('i')));
     case 'select':
-      return el('div', { class: 'arg' }, el('label', {}, spec.name), el('select', { onchange: e => set(e.target.value) }, spec.options.map(o => el('option', { value: o, selected: o === v }, o))));
+		return el(
+			'div',
+			{ class: 'arg' },
+			el('label', {}, spec.name),
+			el(
+			'select',
+			{ onchange: e => set(e.target.value) },
+			selectOptions(spec.options, v)
+			)
+		);
     case 'number':
       return el('div', { class: 'arg' }, el('label', {}, spec.name), el('input', { type: 'number', value: v, min: spec.min ?? false, max: spec.max ?? false, step: spec.step || 1, oninput: e => set(e.target.value === '' ? spec.value : Number(e.target.value)) }));
     case 'area':

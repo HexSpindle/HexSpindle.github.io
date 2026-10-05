@@ -10,7 +10,191 @@ import {
   GB18030_GBCHARS,
 } from './_encoding_tables.js';
 
-export const ENCODINGS = ["UTF-8","UTF-8-SIG","UTF-16LE","UTF-16BE","UTF-16","UTF-32LE","UTF-32BE","UTF-32","UTF-7","UTF-7-IMAP","CESU-8","SCSU","BOCU-1","UTF-EBCDIC","ASCII","ISO-8859-1 (Latin1)","ISO-8859-2","ISO-8859-3","ISO-8859-4","ISO-8859-5","ISO-8859-6","ISO-8859-7","ISO-8859-8","ISO-8859-8-I","ISO-8859-9","ISO-8859-10","ISO-8859-11","ISO-8859-13","ISO-8859-14","ISO-8859-15","ISO-8859-16","x-user-defined","Windows-874","Windows-1250","Windows-1251","Windows-1252","Windows-1253","Windows-1254","Windows-1255","Windows-1256","Windows-1257","Windows-1258","KOI8-R","KOI8-U","KOI8-RU","KOI8-T","KZ1048","PTCP154","TIS-620","ARMSCII-8","TCVN","VISCII","Georgian-Academy","Georgian-PS","HP-ROMAN8","ISO-646-CN","ISO-646-JP","Shift_JIS","Shift_JIS-2004","Shift_JISX0213","EUC-JP","EUC-JIS-2004","EUC-JISX0213","ISO-2022-JP","ISO-2022-JP-1","ISO-2022-JP-2","ISO-2022-JP-2004","ISO-2022-JP-3","ISO-2022-JP-EXT","GBK","GB18030","GB2312","HZ-GB-2312","ISO-2022-CN","ISO-2022-CN-EXT","Big5","Big5-HKSCS","EUC-KR","ISO-2022-KR","Johab (CP1361)","CP273","CP420","CP424","CP437","CP720","CP737","CP775","CP808","CP850","CP852","CP855","CP856","CP857","CP858","CP860","CP861","CP862","CP863","CP864","CP865","CP866","CP869","CP875","CP922","CP1006","CP1026","CP1046","CP1124","CP1125","CP1129","CP1133","CP1140","CP1161","CP1162","CP1163","IBM EBCDIC (CP037)","IBM EBCDIC (CP500)","MacRoman","x-Mac-Cyrillic","MacCroatian","MacGreek","MacIcelandic","MacLatin2","MacRomania","MacThai","MacTurkish","MacUkraine"];
+export const ENCODING_GROUPS = [
+  {
+    label: 'Unicode',
+    options: [
+      'UTF-8',
+      'UTF-8-SIG',
+      'UTF-16LE',
+      'UTF-16BE',
+      'UTF-16',
+      'UTF-32LE',
+      'UTF-32BE',
+      'UTF-32',
+      'UTF-7',
+      'UTF-7-IMAP',
+      'CESU-8',
+      'SCSU',
+      'BOCU-1',
+      'UTF-EBCDIC',
+    ],
+  },
+
+  {
+    label: 'ISO / ASCII',
+    options: [
+      'ASCII',
+      'ISO-8859-1 (Latin1)',
+      'ISO-8859-2',
+      'ISO-8859-3',
+      'ISO-8859-4',
+      'ISO-8859-5',
+      'ISO-8859-6',
+      'ISO-8859-7',
+      'ISO-8859-8',
+      'ISO-8859-8-I',
+      'ISO-8859-9',
+      'ISO-8859-10',
+      'ISO-8859-11',
+      'ISO-8859-13',
+      'ISO-8859-14',
+      'ISO-8859-15',
+      'ISO-8859-16',
+      'ISO-646-CN',
+      'ISO-646-JP',
+    ],
+  },
+
+  {
+    label: 'Windows / Browser',
+    options: [
+      'Windows-874',
+      'Windows-1250',
+      'Windows-1251',
+      'Windows-1252',
+      'Windows-1253',
+      'Windows-1254',
+      'Windows-1255',
+      'Windows-1256',
+      'Windows-1257',
+      'Windows-1258',
+      'x-user-defined',
+    ],
+  },
+
+  {
+    label: 'Regional / Legacy',
+    options: [
+      'KOI8-R',
+      'KOI8-U',
+      'KOI8-RU',
+      'KOI8-T',
+      'KZ1048',
+      'PTCP154',
+      'TIS-620',
+      'ARMSCII-8',
+      'TCVN',
+      'VISCII',
+      'Georgian-Academy',
+      'Georgian-PS',
+      'HP-ROMAN8',
+    ],
+  },
+
+  {
+    label: 'Japanese',
+    options: [
+      'Shift_JIS',
+      'Shift_JIS-2004',
+      'Shift_JISX0213',
+      'EUC-JP',
+      'EUC-JIS-2004',
+      'EUC-JISX0213',
+      'ISO-2022-JP',
+      'ISO-2022-JP-1',
+      'ISO-2022-JP-2',
+      'ISO-2022-JP-2004',
+      'ISO-2022-JP-3',
+      'ISO-2022-JP-EXT',
+    ],
+  },
+
+  {
+    label: 'Chinese',
+    options: [
+      'GBK',
+      'GB18030',
+      'GB2312',
+      'HZ-GB-2312',
+      'ISO-2022-CN',
+      'ISO-2022-CN-EXT',
+      'Big5',
+      'Big5-HKSCS',
+    ],
+  },
+
+  {
+    label: 'Korean',
+    options: [
+      'EUC-KR',
+      'ISO-2022-KR',
+      'Johab (CP1361)',
+    ],
+  },
+
+  {
+    label: 'DOS / IBM / EBCDIC',
+    options: [
+      'CP273',
+      'CP420',
+      'CP424',
+      'CP437',
+      'CP720',
+      'CP737',
+      'CP775',
+      'CP808',
+      'CP850',
+      'CP852',
+      'CP855',
+      'CP856',
+      'CP857',
+      'CP858',
+      'CP860',
+      'CP861',
+      'CP862',
+      'CP863',
+      'CP864',
+      'CP865',
+      'CP866',
+      'CP869',
+      'CP875',
+      'CP922',
+      'CP1006',
+      'CP1026',
+      'CP1046',
+      'CP1124',
+      'CP1125',
+      'CP1129',
+      'CP1133',
+      'CP1140',
+      'CP1161',
+      'CP1162',
+      'CP1163',
+      'IBM EBCDIC (CP037)',
+      'IBM EBCDIC (CP500)',
+    ],
+  },
+
+  {
+    label: 'Macintosh',
+    options: [
+      'MacRoman',
+      'x-Mac-Cyrillic',
+      'MacCroatian',
+      'MacGreek',
+      'MacIcelandic',
+      'MacLatin2',
+      'MacRomania',
+      'MacThai',
+      'MacTurkish',
+      'MacUkraine',
+    ],
+  },
+];
+
+// Flat version remains available for code that needs a simple list.
+export const ENCODINGS = ENCODING_GROUPS.flatMap(group => group.options);
 
 const WHATWG_LABELS = {
   'ISO-8859-2': 'iso-8859-2',
@@ -1280,5 +1464,10 @@ export function encodeText(text, name, strict = false) {
   }
 }
 
-module('Encode text', 'Converts text (UTF-8 input) to bytes in another character encoding.', [A.select('Encoding', ENCODINGS)],
-  (t, enc) => encodeText(t, enc, false), { text: true });
+module(
+  'Encode text',
+  'Converts text (UTF-8 input) to bytes in another character encoding.',
+  [A.select('Encoding', ENCODING_GROUPS, 'UTF-8')],
+  (t, enc) => encodeText(t, enc, false),
+  { text: true }
+);

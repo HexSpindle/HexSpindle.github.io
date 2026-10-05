@@ -49,7 +49,32 @@ export const A = {
   regex: (name, value = '', hint = '') => ({ name, type: 'regex', value, hint }),
   number: (name, value = 0, min = null, max = null, step = 1) => ({ name, type: 'number', value, min, max, step }),
   boolean: (name, value = false) => ({ name, type: 'boolean', value }),
-  select: (name, options, value = null) => { options = [...options]; return { name, type: 'select', options, value: value ?? options[0] }; },
+  select: (name, options, value = null) => {
+  options = options.map(o =>
+    typeof o === 'string'
+      ? o
+      : { label: o.label, options: [...o.options] }
+  );
+
+  let first = '';
+  for (const o of options) {
+    if (typeof o === 'string') {
+      first = o;
+      break;
+    }
+    if (o.options?.length) {
+      first = o.options[0];
+      break;
+    }
+  }
+
+  return {
+    name,
+    type: 'select',
+    options,
+    value: value ?? first,
+  };
+},
   combo: (name, presets, value = null) => { presets = presets.map(p => [...p]); return { name, type: 'combo', presets, value: value ?? presets[0][1] }; },
   toggle: (name, value = '', options = null, option = null) => { options = options || TOGGLE_ENCODINGS; return { name, type: 'toggle', value, options, option: option || options[0] }; },
 };
