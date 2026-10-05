@@ -9,5 +9,5 @@ function variance(n, ddof) {
   return n.reduce((s, x) => s + (x - mean) ** 2, 0) / (n.length - ddof);
 }
 
-module('Standard Deviation', 'Sample or population standard deviation.', [A.select('Delimiter', DELIMS, 'Line feed'), A.select('Type', ['Sample', 'Population'])],
+module('Standard Deviation', 'Sample or population standard deviation.', [A.select('Delimiter', DELIMS, 'Line feed'), A.select('Type', ['Population', 'Sample'])],
   (t, d, kind) => String(Math.sqrt(variance(parseNumbers(t, d), kind === 'Population' ? 0 : 1))), { text: true });
