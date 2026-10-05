@@ -2,7 +2,7 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
 const MAPS = {
-  'Bold (𝐀)': [0x1d400, 0x1d41a], 'Italic (𝐴)': [0x1d434, 0x1d44e], 'Bold Italic': [0x1d468, 0x1d482], 'Script': [0x1d49c, 0x1d4b6],
+  'Bold (𝐀)': [0x1d400, 0x1d41a], 'Italic (𝐴)': [0x1d434, 0x1d44e], 'Bold Italic': [0x1d468, 0x1d482], 'Script': [0x1d4c9, 0x1d4be, 0x1d4c8, 0x1d4c9],
   'Fraktur': [0x1d504, 0x1d51e], 'Double-struck': [0x1d538, 0x1d552], 'Sans-serif': [0x1d5a0, 0x1d5ba], 'Monospace': [0x1d670, 0x1d68a],
 };
 
