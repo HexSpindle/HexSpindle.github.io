@@ -13,6 +13,10 @@ function includesBytes(hay, needle) {
   return false;
 }
 
+function utf8OrLatin1(b) {
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(b); } catch { return decodeLatin1(b); }
+}
+
 module('XOR Brute Force', 'Tries every 1 or 2 byte XOR key on a sample of the input.',
   [A.select('Key length', ['1', '2']), A.number('Sample length', 100, 1), A.number('Sample offset', 0, 0),
    A.select('Scheme', ['Standard', 'Input differential', 'Output differential', 'Cascade']),
@@ -24,13 +28,14 @@ module('XOR Brute Force', 'Tries every 1 or 2 byte XOR key on a sample of the in
     const total = Math.pow(256, kl);
     const cribBytes = crib ? encodeUtf8(crib) : null;
     const out = [];
-    for (let k = 0; k < total; k++) {
+    // Key 0 is skipped (it's the input unchanged), as in CyberChef.
+    for (let k = 1; k < total; k++) {
       const key = new Uint8Array(kl);
       let v = k;
       for (let i = kl - 1; i >= 0; i--) { key[i] = v & 255; v = Math.floor(v / 256); }
       const res = xorBytes(sample, key, scheme, nullp);
       if (cribBytes && !includesBytes(res, cribBytes)) continue;
-      const txt = fmt === 'Hex' ? bytesToHex(res) : decodeLatin1(res);
+      const txt = fmt === 'Hex' ? bytesToHex(res) : utf8OrLatin1(res);
       out.push((show ? `Key = ${bytesToHex(key)}: ` : '') + txt);
     }
     return out.join('\n');

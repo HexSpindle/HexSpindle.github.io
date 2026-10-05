@@ -1,22 +1,6 @@
-// QR code decoder (ISO/IEC 18004), the reverse of _qr.js's encoder. Reuses _qr.js's GF(256)
-// tables, Reed-Solomon block-size table, mask functions and format/version-info constants rather
-// than re-deriving them.
-//
-// Pipeline: binarize the image -> find the three finder patterns by run-length pattern matching ->
-// derive the module grid size/version from their spacing -> sample every module through an affine
-// transform built from the three finder centres -> read+correct the format info -> undo the data
-// mask -> walk the same zig-zag order the encoder used to recover the codeword bitstream ->
-// de-interleave into Reed-Solomon blocks -> correct errors (syndrome decoding: Berlekamp-Massey +
-// Chien search + Forney) -> decode the data-codeword bitstream per its mode indicator(s).
-//
-// Scope: handles translation/rotation/scale/shear (a full affine fit from the 3 finder centres),
-// but NOT keystone/perspective distortion (a photo taken at a sharp angle) - that would need a
-// 4-point projective transform anchored on a detected alignment pattern, which this decoder does
-// not attempt. Byte/Numeric/Alphanumeric modes are supported; Kanji mode is not.
 import { ECC_TABLE, FORMAT_INFO, VERSION_INFO, EC_BITS, GF_EXP, GF_LOG, gfMul, MASK_FUNCS, buildFunctionPatterns, zigzagPositions } from './_qr.js';
 import { decodeUtf8 } from '../../core/util.js';
 
-// ---------------------------------------------------------------- image -> binary bitmap
 function toGrayscale(data, width, height) {
   const gray = new Uint8ClampedArray(width * height);
   for (let i = 0, p = 0; p < gray.length; i += 4, p++) gray[p] = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) | 0;
@@ -47,9 +31,6 @@ function otsuThreshold(gray) {
 function binarize(rgba, width, height) {
   const gray = toGrayscale(rgba, width, height);
   const t = otsuThreshold(gray);
-  // <=, not <: a clean image can be perfectly bimodal (pure 0 and 255), which makes the
-  // variance-maximizing threshold come out as exactly 0 - with a strict "<" test nothing would
-  // ever classify as dark.
   const bits = new Uint8Array(gray.length);
   for (let i = 0; i < gray.length; i++) bits[i] = gray[i] <= t ? 1 : 0;
   return bits;

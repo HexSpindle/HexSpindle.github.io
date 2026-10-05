@@ -1,7 +1,3 @@
-// Perceptual image hashing (aHash/dHash/pHash/wHash) - visually similar images produce hashes
-// that differ in only a few bits, unlike a cryptographic hash. Each hash is computed on a small
-// grayscale downscale of the image, so exact resampling-filter differences versus other
-// implementations don't matter for near-duplicate detection.
 import { loadImage } from './_img.js';
 
 async function toGrayArray(data, width, height = width) {

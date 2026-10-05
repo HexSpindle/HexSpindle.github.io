@@ -1,8 +1,3 @@
-// Container sniffing and metadata parsers shared by Extract Audio Metadata. A from-scratch, narrower
-// port of CyberChef's AudioMetaSchema.mjs/AudioParsers.mjs: MP3 tag parsing is delegated to the
-// existing Extract ID3 code; WAV/FLAC/OGG parsing below is new and intentionally covers only the
-// common cases (see extract_audio_metadata.js for exactly what's out of scope).
-
 function ascii(bytes, start, len) {
   return new TextDecoder('latin1').decode(bytes.subarray(start, Math.min(bytes.length, start + len)));
 }

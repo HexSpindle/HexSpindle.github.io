@@ -5,9 +5,7 @@ import { RECORD_DELIMITERS, FIELD_DELIMITERS, getScatterValues, getScatterValues
 
 module('Scatter chart',
   'Plots two-variable (x, y) data as points on a graph. Input is one record per line, fields ' +
-  'separated by the chosen delimiter (e.g. "1,2" per line for simple x,y data). CyberChef renders ' +
-  'this with D3 as an SVG; this port draws it directly onto a canvas and rasterises it to PNG instead, ' +
-  'so the output is a static image rather than an SVG with hover tooltips.',
+  'separated by the chosen delimiter (e.g. "1,2" per line for simple x,y data).',
   [
     A.select('Record delimiter', Object.keys(RECORD_DELIMITERS)),
     A.select('Field delimiter', Object.keys(FIELD_DELIMITERS)),

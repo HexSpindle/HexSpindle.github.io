@@ -193,7 +193,6 @@ export const ENCODING_GROUPS = [
   },
 ];
 
-// Flat version remains available for code that needs a simple list.
 export const ENCODINGS = ENCODING_GROUPS.flatMap(group => group.options);
 
 const WHATWG_LABELS = {
@@ -312,7 +311,6 @@ function encodeUtf8Sig(text) {
   return out;
 }
 
-// RFC 2152 UTF-7.
 const UTF7_B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 function isUtf7Direct(cc) {
   return cc === 9 || cc === 10 || cc === 13 ||
@@ -374,7 +372,6 @@ function decodeUtf7(data) {
   return out;
 }
 
-// IMAP modified UTF-7 (RFC 3501): '&' shift character and ',' instead of '/' in Base64.
 const IMAP_B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+,';
 function encodeImapUtf7(text) {
   const out = [];
@@ -434,7 +431,6 @@ function decodeImapUtf7(data) {
   return out;
 }
 
-// CESU-8 encodes UTF-16 code units separately, so supplementary characters become two 3-byte sequences.
 function encodeCesu8(text) {
   const out = [];
   for (let i = 0; i < text.length; i++) {
@@ -468,9 +464,6 @@ function decodeCesu8(data) {
   return out;
 }
 
-// SCSU decoder plus a deliberately simple, standards-valid encoder. The encoder uses SQU for
-// BMP non-ASCII characters and Unicode mode for supplementary characters; it favors correctness
-// and interoperability rather than maximum compression.
 const SCSU_STATIC = [0x0000,0x0080,0x0100,0x0300,0x2000,0x2080,0x2100,0x3000];
 const SCSU_INITIAL = [0x0080,0x00c0,0x0400,0x0600,0x0900,0x3040,0x30a0,0xff00];
 const SCSU_FIXED = [0x00c0,0x0250,0x0370,0x0530,0x3040,0x30a0,0xff60];
@@ -562,7 +555,6 @@ function encodeScsu(text) {
   return new Uint8Array(out);
 }
 
-// BOCU-1 (UTS #6 / ICU algorithm).
 const BOCU_MIN = 0x21, BOCU_MIDDLE = 0x90, BOCU_MAX_LEAD = 0xfe;
 const BOCU_TRAIL_COUNT = 243, BOCU_SINGLE = 64;
 const BOCU_RP1 = BOCU_SINGLE - 1, BOCU_RN1 = -BOCU_SINGLE;
@@ -674,7 +666,6 @@ function decodeBocu1(data) {
   return out;
 }
 
-// UTF-EBCDIC (UTR #16). First convert Unicode to/from the I8 form, then apply the EBCDIC permutation.
 const I8_TO_EBCDIC = [0,1,2,3,55,45,46,47,22,5,21,11,12,13,14,15,16,17,18,19,60,61,50,38,24,25,63,39,28,29,30,31,64,90,127,123,91,108,80,125,77,93,92,78,107,96,75,97,240,241,242,243,244,245,246,247,248,249,122,94,76,126,110,111,124,193,194,195,196,197,198,199,200,201,209,210,211,212,213,214,215,216,217,226,227,228,229,230,231,232,233,173,224,189,95,109,121,129,130,131,132,133,134,135,136,137,145,146,147,148,149,150,151,152,153,162,163,164,165,166,167,168,169,192,79,208,161,7,32,33,34,35,36,37,6,23,40,41,42,43,44,9,10,27,48,49,26,51,52,53,54,8,56,57,58,59,4,20,62,255,65,66,67,68,69,70,71,72,73,74,81,82,83,84,85,86,87,88,89,98,99,100,101,102,103,104,105,106,112,113,114,115,116,117,118,119,120,128,138,139,140,141,142,143,144,154,155,156,157,158,159,160,170,171,172,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,190,191,202,203,204,205,206,207,218,219,220,221,222,223,225,234,235,236,237,238,239,250,251,252,253,254];
 const EBCDIC_TO_I8 = [0,1,2,3,156,9,134,127,151,141,142,11,12,13,14,15,16,17,18,19,157,10,8,135,24,25,146,143,28,29,30,31,128,129,130,131,132,133,23,27,136,137,138,139,140,5,6,7,144,145,22,147,148,149,150,4,152,153,154,155,20,21,158,26,32,160,161,162,163,164,165,166,167,168,169,46,60,40,43,124,38,170,171,172,173,174,175,176,177,178,33,36,42,41,59,94,45,47,179,180,181,182,183,184,185,186,187,44,37,95,62,63,188,189,190,191,192,193,194,195,196,96,58,35,64,39,61,34,197,97,98,99,100,101,102,103,104,105,198,199,200,201,202,203,204,106,107,108,109,110,111,112,113,114,205,206,207,208,209,210,211,126,115,116,117,118,119,120,121,122,212,213,214,91,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,93,230,231,123,65,66,67,68,69,70,71,72,73,232,233,234,235,236,237,125,74,75,76,77,78,79,80,81,82,238,239,240,241,242,243,92,244,83,84,85,86,87,88,89,90,245,246,247,248,249,250,48,49,50,51,52,53,54,55,56,57,251,252,253,254,255,159];
 function encodeUtfEbcdic(text) {
@@ -870,8 +861,6 @@ function nativeByteReverse(label, includeEucJpPlane2 = false) {
 function encodeNativeCjk(text, name, strict) {
   const label = NATIVE_CJK[name];
   const map = nativeByteReverse(label, name === 'EUC-JP');
-  // WHATWG Shift_JIS has two encoder-only compatibility mappings. The decoder
-  // still follows browser semantics (0x5C -> backslash, 0x7E -> tilde).
   if (name === 'Shift_JIS') {
     const compat = new Map(map);
     compat.set('\u00a5', [0x5c]);
@@ -926,8 +915,6 @@ function encodeMapped(text, name, strict) {
   return encodeWithStringMap(text, reverse, strict, reverse.get('?') || [0x3f]);
 }
 
-// Strict repertoire masks for legacy standards whose browser/EUC superset decoders accept
-// additional byte positions. Each mask covers the 94x94 row/cell grid (0x21..0x7E).
 function decode94Mask(b64) {
   const raw = atob(b64), out = new Uint8Array(raw.length);
   for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
@@ -983,7 +970,6 @@ function staticJisPlane(tableName, planeNo, validMask = null) {
     else if (planeNo === 2 && b.length === 3 && b[0] === 0x8f && b[1] >= 0xa1 && b[1] <= 0xfe && b[2] >= 0xa1 && b[2] <= 0xfe)
       pair = ((b[1] - 0x80) << 8) | (b[2] - 0x80);
     if (pair !== null && (!validMask || pairAllowed(validMask, pair))) {
-      // JIS X 0213:2000 plane 2 differs from the EUC-JISX0213 mapping at 0x7D3B.
       const str = tableName === 'EUC-JISX0213' && planeNo === 2 && pair === 0x7d3b ? '\u9b1c' : s;
       addPlaneEntry(p, pair, str);
     }
@@ -1016,7 +1002,6 @@ function gb2312Plane() {
   for (let r = 0x21; r <= 0x77; r++) for (let c = 0x21; c <= 0x7e; c++) {
     const pair = (r << 8) | c;
     if (!pairAllowed(GB2312_VALID_MASK, pair)) continue;
-    // WHATWG GBK intentionally differs from strict GB2312 at these two positions.
     const str = pair === 0x2124 ? '\u30fb' : pair === 0x212a ? '\u2015' : raw.decode.get(pair);
     if (str !== undefined) addPlaneEntry(p, pair, str);
   }
@@ -1320,7 +1305,7 @@ function decodeIso2022Cn(data, extended) {
       }
       if (a === 0x24 && c === 0x2a && d === 0x48) { g2 = 'CNS2'; i += 3; continue; }
       if (extended && a === 0x24 && c === 0x2b && d >= 0x49 && d <= 0x4d) {
-        g3 = d - 0x46; i += 3; continue; // I..M => planes 3..7
+        g3 = d - 0x46; i += 3; continue;
       }
       out += '\ufffd'; continue;
     }

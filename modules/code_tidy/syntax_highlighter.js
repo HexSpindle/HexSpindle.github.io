@@ -2,14 +2,6 @@ import { module } from './_cat.js';
 import { A, Html } from '../../core/registry.js';
 import { tokenize } from './_jstok.js';
 
-// CyberChef's "Syntax highlighter" wraps highlight.js, which supports ~190 languages plus
-// auto-detection. Vendoring highlight.js (or an equivalent) wasn't judged worth it just for this
-// one operation, so this instead reuses this project's own tokenizers - full-fidelity for
-// JavaScript (shared with the JS beautify/minify ops), and small purpose-built ones for a few other
-// common formats - to highlight a documented, practical subset of languages. There is no auto-detect
-// and no handling of embedded languages (e.g. <script>/<style> blocks inside HTML are not
-// highlighted as JS/CSS). Output uses highlight.js's own `hljs-*` class names (for drop-in
-// familiarity) with a small embedded stylesheet, since this app has no global hljs theme.
 const LANGS = ['JavaScript', 'JSON', 'CSS', 'XML / HTML', 'SQL'];
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

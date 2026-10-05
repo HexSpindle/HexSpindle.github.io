@@ -1,10 +1,3 @@
-// Bombe machine: the WWII electromechanical device used at Bletchley Park (building on Polish
-// work) to recover Enigma rotor settings from a crib (known plaintext). Ported line-for-line from
-// CyberChef's src/core/lib/Bombe.mjs, including its performance optimisations (a SharedScrambler
-// that caches the route through the slow/middle rotors + reflector, since the vast majority of
-// the 26^n trial settings share that state) — without these the 4-rotor case is impractically
-// slow, so they are kept rather than simplified away.
-
 import { Rotor, Plugboard, a2i, i2a, mod } from './_enigma_lib.js';
 
 class CopyRotor extends Rotor {

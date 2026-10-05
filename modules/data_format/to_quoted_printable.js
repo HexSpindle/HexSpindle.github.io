@@ -1,6 +1,5 @@
 import { module } from './_cat.js';
 
-// every line break becomes CRLF, trailing whitespace is escaped, and soft line breaks keep lines to 76 chars.
 function mimeEncode(buffer) {
     const ranges = [
         [0x09],
@@ -45,7 +44,6 @@ function addQPSoftLinebreaks(mimeEncodedStr, lineLengthMax) {
         match, code, line,
         result = "";
 
-    // insert soft linebreaks where needed
     while (pos < len) {
         line = mimeEncodedStr.substr(pos, lineLengthMax);
         if ((match = line.match(/\r\n/))) {
@@ -56,30 +54,25 @@ function addQPSoftLinebreaks(mimeEncodedStr, lineLengthMax) {
         }
 
         if (line.substr(-1) === "\n") {
-            // nothing to change here
             result += line;
             pos += line.length;
             continue;
         } else if ((match = line.substr(-lineMargin).match(/\n.*?$/))) {
-            // truncate to nearest line break
             line = line.substr(0, line.length - (match[0].length - 1));
             result += line;
             pos += line.length;
             continue;
         } else if (line.length > lineLengthMax - lineMargin && (match = line.substr(-lineMargin).match(/[ \t.,!?][^ \t.,!?]*$/))) {
-            // truncate to nearest space
             line = line.substr(0, line.length - (match[0].length - 1));
         } else if (line.substr(-1) === "\r") {
             line = line.substr(0, line.length - 1);
         } else {
             if (line.match(/=[\da-f]{0,2}$/i)) {
 
-                // push incomplete encoding sequences to the next line
                 if ((match = line.match(/=[\da-f]{0,1}$/i))) {
                     line = line.substr(0, line.length - match[0].length);
                 }
 
-                // ensure that utf-8 sequences are not split
                 while (line.length > 3 && line.length < len - pos && !line.match(/^(?:=[\da-f]{2}){1,4}$/i) && (match = line.match(/=[\da-f]{2}$/ig))) {
                     code = parseInt(match[0].substr(1, 2), 16);
                     if (code < 128) {

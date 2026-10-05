@@ -20,7 +20,6 @@ export function genericDecode(t, alphabet) {
   return new Uint8Array(pad ? out.slice(0, out.length - pad) : out);
 }
 
-// Standard Ascii85 (base64.a85decode equivalent), with 'z' shorthand for a zero 4-byte group.
 export function a85Decode(t) {
   const idx = new Map([...STD].map((c, i) => [c, i]));
   const out = [];

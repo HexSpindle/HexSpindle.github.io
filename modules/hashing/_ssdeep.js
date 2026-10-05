@@ -1,14 +1,3 @@
-// SSDEEP fuzzy/context-triggered-piecewise hash, ported line-for-line from the `ssdeep.js` npm
-// package (the exact library CyberChef's "SSDEEP"/"Compare SSDEEP hashes" operations delegate to -
-// src/core/operations/SSDEEP.mjs imports `ssdeepjs` and calls .digest()/.similarity()). This is a
-// simplified, from-scratch reimplementation of Kornblum's CTPH algorithm (not a port of the
-// original ssdeep C/libfuzzy source), with its own FNV seed and block-size search, genuinely
-// distinct from the `ctph.js` package CyberChef's separate "CTPH" operation uses (see _ctph.js) -
-// different FNV offset basis, different rolling-hash formula, different block-size search, and a
-// different output format (ssdeep.js's output has a 64/32-character max length per signature half
-// like real ssdeep; ctph.js has no such cap and encodes the block-size index as a single base64
-// character rather than a decimal number). Verified byte-for-byte against ssdeep.js 0.0.3 itself
-// across a range of input lengths crossing its block-size doubling thresholds.
 const HASH_PRIME = 16777619;
 const HASH_INIT = 671226215;
 const ROLLING_WINDOW = 7;

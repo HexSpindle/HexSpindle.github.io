@@ -1,7 +1,3 @@
-// Shared byte-level helpers for the compression category's hand-rolled formats.
-
-// Mirrors Python's `s.encode().decode("unicode_escape").encode("latin-1")`, used to turn an
-// argument default like "\0NEWDATA\0" (typed as literal backslash-zero) into real bytes.
 export function unescapeLatin1(s) {
   const out = [];
   for (let i = 0; i < s.length; i++) {

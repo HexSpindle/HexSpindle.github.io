@@ -9,7 +9,7 @@ module('Randomize Colour Palette',
   'original colour, every pixel that shared a colour still shares a (new, scrambled) colour afterwards ' +
   '- so shapes/edges/text stay visible while the actual colours are randomised, which can reveal text ' +
   "or symbols hidden in a colour very similar to their surroundings (a Steganography technique). " +
-  "Ported from CyberChef's Jimp-based implementation, which works the same way on any image - it " +
+  "Ported from Jimp-based implementation, which works the same way on any image - it " +
   'does not require or build an actual indexed colour palette, despite the name - but always sets the ' +
   'output alpha to fully opaque, discarding the original alpha channel; this port matches that.',
   [A.string('Seed', '')],

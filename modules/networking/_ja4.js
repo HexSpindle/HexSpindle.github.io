@@ -1,11 +1,3 @@
-// TLS ClientHello/ServerHello parsing and string-building for JA4/JA4Server Fingerprint.
-// JA4 needs more detail per field than _tls.js's parseHello() (used by JA3/JA3S): each cipher's
-// and extension's raw hex, the signature_algorithms list, the ALPN first value's raw bytes, and
-// the highest offered/negotiated version from the supported_versions extension - so this is a
-// separate, richer parser rather than a reuse of parseHello(). Mirrors CyberChef's TLS.mjs +
-// JA4.mjs (JA4 spec by FoxIO, BSD-3-Clause) field for field, including its exact quirks (e.g. the
-// "original" extension list keeps SNI/ALPN but the "sorted" one drops them; JA4S's extension count
-// and raw list include GREASE, unlike JA4's).
 const GREASE = new Set();
 for (let h = 0; h < 16; h++) { const hex = h.toString(16); GREASE.add(parseInt(`${hex}a${hex}a`, 16)); }
 
@@ -42,8 +34,6 @@ function sigAlgsHexList(edata) {
   return hexStr;
 }
 
-/** Parses a ClientHello (type 1) or ServerHello (type 2) into the fields JA4/JA4S need. Accepts a
- * raw TLS record (with 5-byte record header) or a bare handshake message. */
 export function parseHelloForJa4(data) {
   let b = data;
   if (b.length > 5 && b[0] === 0x16) {
@@ -150,9 +140,6 @@ export async function ja4Strings(info) {
   const sortedCiphersRaw = sortedCiphersList.join(',');
   const originalCiphersRaw = originalCiphersList.join(',');
 
-  // The "original" extension list keeps SNI (0000) and ALPN (0010) - they're already captured in
-  // the a-section above; the sorted list drops them so the b-section is identical whether or not
-  // the destination/ALPN changes.
   const originalExtensionsList = info.extensions.filter(e => !e.grease).map(e => e.hex);
   const sortedExtensionsList = originalExtensionsList.filter(h => h !== '0000' && h !== '0010').sort();
   const sortedExtensionsRaw = sortedExtensionsList.join(',') + '_' + info.sigAlgsHex;

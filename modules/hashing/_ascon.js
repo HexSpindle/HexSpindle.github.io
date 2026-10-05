@@ -1,17 +1,3 @@
-// Private helper: the Ascon permutation and the Ascon-Hash256 / Ascon-Mac constructions as
-// standardised in NIST SP 800-232 (https://csrc.nist.gov/pubs/sp/800/232/final). Hand-ported from
-// the Ascon team's own reference C (github.com/ascon/ascon-c, crypto_hash/asconhash256/ref and
-// crypto_auth/asconmacv13/ref: round.h, permutations.h, constants.h, hash.c, prf.c) - the 5x64-bit
-// state, the 12-round permutation (round-constant schedule 0xf0-r*0x10+r, the chi-like S-box, and
-// the fixed rotation amounts per word), and the two IVs (encoding variant id / round counts / tag
-// size / rate into the first 64-bit word) are reproduced byte-for-byte from that source rather than
-// from the NIST document prose. NIST SP 800-232 is a new (2025) standard unrelated to the older
-// "Ascon v1.2" CAESAR-era algorithm that the `ascon` PyPI package implements, so that package is
-// *not* usable as a cross-check here. Instead this was verified against the Ascon team's own
-// published Known-Answer-Test vectors (LWC_HASH_KAT_128_256.txt and LWC_MAC_KAT_128_128.txt in the
-// ascon-c repo above) across the first several KAT entries (lengths 0, 1, 2, ... bytes, spanning
-// multiple permutation calls), and additionally cross-checked against the `js-ascon` npm package
-// (used by CyberChef's own "Ascon Hash" operation) for the empty-message and "abc" hashes.
 const MASK = 0xffffffffffffffffn;
 function rotr(x, n) { x &= MASK; return ((x >> n) | (x << (64n - n))) & MASK; }
 

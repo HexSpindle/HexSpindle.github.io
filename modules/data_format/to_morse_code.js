@@ -13,8 +13,6 @@ export const MORSE = { A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.
 const LETTER_DELIMS = ['Space', 'Line feed', 'CRLF', 'Forward slash', 'Backslash', 'Comma', 'Semi-colon', 'Colon'];
 const WORD_DELIMS = ['Line feed', 'CRLF', 'Forward slash', 'Backslash', 'Comma', 'Semi-colon', 'Colon'];
 
-// each input line is encoded separately, words are split on runs of spaces, and a
-// character with no Morse code becomes an empty letter (so its delimiters are kept).
 module('To Morse Code', 'Translates text into International Morse Code.', [A.select('Format options', ['-/.', '_/.', 'Dash/Dot', 'DASH/DOT', 'dash/dot']), A.select('Letter delimiter', LETTER_DELIMS), A.select('Word delimiter', WORD_DELIMS)],
   (t, fmt, ld, wd) => {
     const [dash, dot] = fmt.split('/');

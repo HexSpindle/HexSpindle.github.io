@@ -1,15 +1,3 @@
-// SIGABA (ECM Mark II): the US WW2 cipher machine with 15 rotors in three banks — 5 cipher
-// rotors, 5 control rotors and 5 index rotors — whose stepping logic is far more complex than
-// Enigma's. Ported line-for-line from CyberChef's src/core/lib/SIGABA.mjs.
-//
-// Each encipher step: the control-rotor bank is driven by 4 fixed inputs (F, G, H, I), its 4
-// letter outputs are grouped into 1 to 4 digits 1-9, those digits pass through the 10-contact
-// index rotors to produce final digits 0-9, and each resulting digit determines which one of the
-// 5 cipher rotors advances (rotor 0 <- {0,9}, rotor 1 <- {7,8}, rotor 2 <- {5,6}, rotor 3 <-
-// {3,4}, rotor 4 <- {1,2}). The control bank itself steps similarly to an odometer: one rotor
-// every letter, the next once the first reaches "O" (offset 14), and the third once the second
-// also reaches "O".
-
 export const NUMBERS = '0123456789'.split('');
 
 export function convToUpperCase(letter) {
@@ -193,8 +181,6 @@ export class SigabaMachine {
   }
 }
 
-// Example rotor wirings (no genuine SIGABA wirings are public; CyberChef ships, and we
-// reproduce, the same randomised examples).
 export const CR_ROTOR_PRESETS = [
   ['Example 1', 'SRGWANHPJZFXVIDQCEUKBYOLMT'],
   ['Example 2', 'THQEFSAZVKJYULBODCPXNIMWRG'],

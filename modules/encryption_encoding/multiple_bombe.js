@@ -7,8 +7,6 @@ function rotorsFormat(rotors, s, n) {
   return rotors.slice(s, n).map(r => r[1]).join('\n');
 }
 
-// Mirrors CyberChef's "Standard Enigmas" populateMultiOption presets (main rotors / 4th rotor /
-// reflectors), used here to fill in the three textareas when left blank.
 const PRESETS = {
   'German Service Enigma (First - 3 rotor)': [rotorsFormat(ROTORS, 0, 5), '', rotorsFormat(REFLECTORS, 0, 1)],
   'German Service Enigma (Second - 3 rotor)': [rotorsFormat(ROTORS, 0, 8), '', rotorsFormat(REFLECTORS, 0, 2)],

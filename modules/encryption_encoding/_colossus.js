@@ -1,12 +1,3 @@
-// Colossus: the world's first electronic computer, built at Dollis Hill in 1943 to help break the
-// Lorenz SZ40/42 ("Tunny") cipher by computing statistical scores (not a full automated crack) -
-// counting how often a chosen combination of Z/Chi/Psi "Q-bus" bits, optionally filtered through
-// the "K Rack" conditional/addition logic, matches as Colossus steps a chosen pair of wheels
-// through every relative setting. A high count at a given setting ("de-chi"/delta-Z statistics)
-// points at the likely wheel start position. Ported line-for-line from CyberChef's
-// src/core/lib/Colossus.mjs (the ColossusComputer class) and src/core/operations/Colossus.mjs
-// (argument handling), reusing this project's own ITA2/wheel-pattern tables from _lorenz.js
-// instead of duplicating them.
 import { ITA2_TABLE, ROTOR_SIZES, INIT_PATTERNS } from './_lorenz.js';
 
 function bits(str) { return [...str].map(Number); }

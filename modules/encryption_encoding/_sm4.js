@@ -39,11 +39,6 @@ export const CK = new Uint32Array([
   0x10171e25, 0x2c333a41, 0x484f565d, 0x646b7279
 ]);
 
-// SM4 (Chinese national standard, GB/T 32907-2016), ported directly from OpenSSL's
-// crypto/sm4/sm4.c reference (non-lookup-table) formulation: S-box + linear transforms,
-// rather than the precomputed SM4_SBOX_T0..T3 speed tables (equivalent, smaller to carry).
-// SBOX, FK, CK are extracted verbatim from sm4.c above.
-
 function u32be(b, o) { return (((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0); }
 function putU32be(v, out, o) { out[o] = (v >>> 24) & 0xff; out[o + 1] = (v >>> 16) & 0xff; out[o + 2] = (v >>> 8) & 0xff; out[o + 3] = v & 0xff; }
 function rotl(x, n) { return (((x << n) | (x >>> (32 - n))) >>> 0); }

@@ -2,37 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { tokenize } from './_jstok.js';
 
-// CyberChef's "JavaScript Parser" wraps esprima to produce a full ESTree AST for arbitrary valid
-// JavaScript. There's no such full parser in this codebase (and vendoring one - esprima, acorn,
-// etc. - felt like overkill for one operation), so this is a small hand-written recursive-descent
-// parser over the same tokenizer the JS beautify/minify operations use (./_jstok.js), covering a
-// practical subset of the language and producing ESTree-shaped node objects.
-//
-// Supported: all statement forms you'd meet in typical code - var/let/const (simple identifier
-// declarators only, with an initializer), if/else, for, for-in, for-of, while, do-while, function
-// declarations/expressions, arrow functions (incl. single-bare-param and concise bodies), return,
-// break/continue (with labels), throw, try/catch/finally, switch/case/default, labeled statements,
-// classes (extends, constructor/method/get/set, static), and blocks. Expressions: the full operator
-// precedence chain (assignment, conditional, nullish/logical/bitwise, equality, relational,
-// shift, additive, multiplicative, exponent, unary incl. await, postfix/prefix ++/--, new, calls,
-// member access incl. optional chaining ?., computed members, array/object literals (with shorthand,
-// computed and method/getter/setter properties and spread), sequence (comma) expressions, template
-// literals and regex/string/number literals.
-//
-// NOT supported, and will either throw a clear error or (for template interpolation) a documented
-// simplification rather than silently mis-parsing:
-//  - Destructuring patterns, anywhere (array/object patterns in declarations, params, or
-//    assignment targets) - only plain identifiers are accepted as binding targets.
-//  - Default/rest parameters ARE supported; object/array destructured parameters are not.
-//  - Generators (`function*`, `yield`) and class fields/private `#fields`/static blocks.
-//  - import/export declarations, JSX and decorators.
-//  - `${...}` expressions inside template literals are not parsed into sub-expressions - the whole
-//    template literal (including its interpolations) is emitted as a single Literal-like
-//    TemplateLiteral node with just its raw source text, not ESTree's quasis/expressions split.
-//  - Automatic Semicolon Insertion: statements must end with `;` (or a block's `}` and newline are
-//    accepted at a statement boundary); this does not implement the full ASI spec's edge cases.
-//  - No error-recovery/"tolerant" mode: the first unsupported or invalid construct throws, with the
-//    line/column it was found at.
 class ParseError extends Error {}
 
 function lex(src) {

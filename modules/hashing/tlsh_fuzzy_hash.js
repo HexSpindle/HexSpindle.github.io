@@ -1,14 +1,5 @@
 import { module } from './_cat.js';
 
-// TLSH (Trend Micro Locality Sensitive Hash), hand-ported from the reference implementation
-// (trendmicro/tlsh: src/tlsh_impl.cpp + src/tlsh_util.cpp) at its default build settings - 128
-// effective buckets, a 1-byte checksum, a 5-byte sliding window, the "T1" hash format - which is
-// what the `tlsh` Python package's tlsh.hash() uses. Implements the Pearson-hash (v_table) bucket
-// mapping over 5-byte windows, the quartile-based 2-bit-per-bucket code, and the length bucketing
-// (l_capturing, via its precomputed `topval` lookup table rather than the log()-based formula it
-// replaces). Verified byte-for-byte against the `tlsh` package across input lengths from 50 bytes
-// (the minimum) up into the thousands, including inputs it correctly rejects as "TNULL" (too
-// short or too low in byte variety).
 const V_TABLE = new Uint8Array([
   1, 87, 49, 12, 176, 178, 102, 166, 121, 193, 6, 84, 249, 230, 44, 163,
   14, 197, 213, 181, 161, 85, 218, 80, 64, 239, 24, 226, 236, 142, 38, 200,

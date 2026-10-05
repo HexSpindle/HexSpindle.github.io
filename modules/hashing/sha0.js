@@ -1,9 +1,5 @@
 import { module } from './_cat.js';
 
-// SHA-0 (FIPS 180, 1993): identical to SHA-1 except it omits the single left-rotate by 1 in the
-// message-schedule expansion (the flaw that led to SHA-1). Verified against the port's own Python
-// reference (sha0("") = f96cea198ad1dd5617ac084a3d92c6107708c0ef,
-// sha0("abc") = 0164b8a914cd2a5e74c4f7ff082c4d97f1edf880).
 function lrot(x, n) { return ((x << n) | (x >>> (32 - n))) >>> 0; }
 
 function sha0(u8) {

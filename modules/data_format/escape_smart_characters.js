@@ -1,7 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// Matches CyberChef's "Escape Smart Characters" SMART_MAP exactly.
 const SMART_MAP = {
   '“': '"', '”': '"', '„': '"', '‟': '"', '″': '"',
   '‘': "'", '’': "'", '‚': "'", '‛': "'", '′': "'",

@@ -1,22 +1,3 @@
-// Action Message Format (AMF0 / AMF3) codec, implemented directly against Adobe's AMF0/AMF3
-// specifications (used by CyberChef's "AMF Encode"/"AMF Decode", which wrap the third-party
-// @astronautlabs/amf npm package around the same wire formats).
-//
-// Scope notes (see amf_encode.js/amf_decode.js for the user-facing write-up):
-//  - Encode always emits literal (non-referenced) complex values for both AMF0 and AMF3.
-//    The real CyberChef dependency *sometimes* collapses structurally-identical AMF0
-//    objects/arrays into a byte-saving Reference, but it does so inconsistently (depending on
-//    whether the duplicate sits inside an array field or an object-property field, which is an
-//    artefact of that library's own context-propagation bug, not a stable/documented behaviour),
-//    so it is not replicated here.
-//  - Decode fully supports AMF0/AMF3 References (for object/array/string/trait back-references)
-//    per spec, since that is well-defined and needed to read real-world AMF produced elsewhere.
-//  - AMF3 numbers are always encoded as Double (marker 0x05), matching the actual dependency's
-//    dispatch logic (it maps every JS `number` to its Double type, never Integer) - this one
-//    quirk is intentionally replicated since it is simple, deterministic and affects byte output.
-//  - AMF3 Vector/Dictionary/externalizable-object/XML-with-CDATA types are not supported on
-//    decode (they are rare and not reachable from JSON input on encode).
-
 import { encodeUtf8, decodeUtf8, bytesToHex } from '../../core/util.js';
 
 /* ---------------- AMF0 ---------------- */

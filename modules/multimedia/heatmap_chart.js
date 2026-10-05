@@ -7,7 +7,7 @@ module('Heatmap chart',
   'Bins (x, y) data into a grid of rectangular cells and colours each cell by how many points fall ' +
   'inside it, from Min colour (empty) to Max colour (most populated). Input is one record per line, ' +
   'fields separated by the chosen delimiter. Rendered directly onto a canvas and rasterised to PNG ' +
-  "(CyberChef renders this with D3 as SVG); colours are interpolated in linear RGB rather than D3's " +
+  "colours are interpolated in linear RGB rather than D3's " +
   'Lab colour space, so gradients will look slightly different even for identical data.',
   [
     A.select('Record delimiter', Object.keys(RECORD_DELIMITERS)),

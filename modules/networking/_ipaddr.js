@@ -1,8 +1,3 @@
-// Minimal hand-rolled stand-in for Python's ipaddress module (IPv4/IPv6 parsing, CIDR math,
-// range summarization, collapsing and exclusion), shared by the networking ops that need it.
-// Addresses and networks are represented as plain objects: {version, val} (BigInt) for an
-// address, {version, prefixlen, net} (BigInt network address, already masked) for a network.
-
 export function maxBits(version) { return version === 4 ? 32 : 128; }
 
 function parseOctet(s) {

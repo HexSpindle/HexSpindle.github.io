@@ -2,9 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { canvasToPng } from './_img.js';
 
-// Accepts Decimal Degrees ("-0.1278"), Degrees Decimal Minutes ("51 30.43 N") and Degrees Minutes
-// Seconds ("51 30 26 N" / "51°30'26\"N"), with or without °/'/" unit symbols, and with the
-// direction letter leading or trailing.
 function parseCoordPart(str) {
   let s = str.trim();
   let dir = '';
@@ -30,15 +27,14 @@ function parseLatLon(input) {
 
 module('Show on map',
   "Renders a latitude/longitude coordinate as a marker on a plain, labelled lat/lon grid, output as a " +
-  "standalone PNG. This is a deliberately simplified stand-in for CyberChef's 'Show on map', which " +
+  "standalone PNG. This is a deliberately simplified stand-in for 'Show on map', which " +
   'embeds an interactive Leaflet map with live OpenStreetMap tiles in the browser - that requires a ' +
   'network connection and an actual map/tile library, neither of which is practical to reproduce ' +
   'headlessly or offline here, and OSM tiles cannot be vendored into this project. There is no real ' +
   'coastline or geography drawn, just an equirectangular degree grid with the point marked on it. ' +
-  'Coordinate parsing is also narrower than CyberChef\'s: only Decimal Degrees (DD) and Degrees ' +
+  'Coordinate parsing is also narrower: only Decimal Degrees (DD) and Degrees ' +
   "[Decimal] Minutes [Seconds] (DDM/DMS, with N/S/E/W suffixes or signed numbers) are supported - " +
-  "Geohash, MGRS, OSNG and UTM (which CyberChef supports via a dedicated coordinate-conversion " +
-  "library) are not implemented; convert those to decimal degrees first (e.g. with another tool).",
+  "Geohash, MGRS, OSNG and UTM are not implemented; convert those to decimal degrees first (e.g. with another tool).",
   [A.number('Grid line spacing (degrees)', 30, 5, 90), A.number('Image size (px)', 500, 200, 2000)],
   (input, gridSpacing, size) => {
     if (!input.replace(/\s+/g, '')) throw new Error('No input. Provide a latitude/longitude pair, e.g. "51.5074, -0.1278".');

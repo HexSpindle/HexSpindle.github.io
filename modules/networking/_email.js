@@ -1,11 +1,3 @@
-// Minimal RFC 822/2822 header parsing helpers, mirroring just enough of Python's `email` package
-// (compat32 header folding, email.utils.parseaddr/parsedate_to_datetime) for the two header-reading
-// networking ops. Values are kept exactly as the real parser would hand them to a module that never
-// decodes RFC 2047 encoded-words (that decoding only happens under email.policy.default, which
-// mime_decoding.js replicates separately for its own, fuller MIME parse).
-
-/** Splits a raw message into its header block and body, the way the email package's feedparser
- * stops consuming headers at the first blank line. */
 export function splitMessage(text) {
   const norm = text.replace(/\r\n/g, '\n');
   const idx = norm.indexOf('\n\n');
@@ -13,8 +5,6 @@ export function splitMessage(text) {
   return { headersBlock: norm.slice(0, idx), body: norm.slice(idx + 2) };
 }
 
-/** Unfolds a header block into [name, value] pairs, preserving embedded continuation
- * newlines/whitespace exactly as compat32's Message.__getitem__ would return them. */
 export function splitHeaders(block) {
   const lines = block.split('\n');
   const headers = [];

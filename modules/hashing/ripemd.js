@@ -1,11 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// Hand-rolled RIPEMD-160 - no browser API provides this. Dual-pipeline design: a left and a right
-// line of 80 steps each run over the same message, then combined into the running hash state.
-// Verified against Python's hashlib.new('ripemd160') (ripemd160("") = 9c1185a5c5e9fc54612808977ee8f548b2258d31,
-// ripemd160("abc") = 8eb208f7e05d987a9b044a8e98c6b087f15a0bfc, and a 1,000,000-byte run of "a" =
-// 52783243c1697bdbe16d37f97f68f08325dc1528).
 function rotl(x, n) { return ((x << n) | (x >>> (32 - n))) >>> 0; }
 
 const ZL = [

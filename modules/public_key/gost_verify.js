@@ -6,8 +6,6 @@ import { ALGORITHMS } from './gost_sign.js';
 
 const ALGO_INFO = { 'GOST R 34.12 (Magma, 2015)': { algo: 'Magma', blockBytes: 8 }, 'GOST R 34.12 (Kuznyechik, 2015)': { algo: 'Kuznyechik', blockBytes: 16 } };
 
-// See gost_sign.js: this checks the symmetric GOST MAC ("imitovstavka") produced by that op, not
-// an asymmetric signature. Scope: GOST R 34.12-2015 (Magma/Kuznyechik) only.
 module('GOST Verify', 'Verifies the GOST MAC ("imitovstavka") of a message produced by GOST Sign. Enter the MAC in the MAC field; this checks a symmetric checksum, not an asymmetric signature.',
   [
     A.toggle('Key (32 bytes)', '', ['Hex', 'UTF8', 'Latin1', 'Base64'], 'Hex'),

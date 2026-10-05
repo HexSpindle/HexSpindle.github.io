@@ -1,14 +1,8 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// CyberChef's RAKE stop word list (its own comment attributes it to the NLTK python package's
-// English stop words). Copied verbatim, including upstream's own typos ("itsef", and "does'"
-// which is missing its trailing "t") - using a different list changes which tokens break phrases
-// and therefore changes every score, so these quirks are part of "matching CyberChef's behaviour".
 const DEFAULT_STOPWORDS = "i,me,my,myself,we,our,ours,ourselves,you,you're,you've,you'll,you'd,your,yours,yourself,yourselves,he,him,his,himself,she,she's,her,hers,herself,it,it's,its,itsef,they,them,their,theirs,themselves,what,which,who,whom,this,that,that'll,these,those,am,is,are,was,were,be,been,being,have,has,had,having,do,does',did,doing,a,an,the,and,but,if,or,because,as,until,while,of,at,by,for,with,about,against,between,into,through,during,before,after,above,below,to,from,up,down,in,out,on,off,over,under,again,further,then,once,here,there,when,where,why,how,all,any,both,each,few,more,most,other,some,such,no,nor,not,only,own,same,so,than,too,very,s,t,can,will,just,don,don't,should,should've,now,d,ll,m,o,re,ve,y,ain,aren,aren't,couldn,couldn't,didn,didn't,doesn,doesn't,hadn,hadn't,hasn,hasn't,haven,haven't,isn,isn't,ma,mightn,mightn't,mustn,mustn't,needn,needn't,shan,shan't,shouldn,shouldn't,wasn,wasn't,weren,weren't,won,won't,wouldn,wouldn't";
 
-// Order-preserving dedupe, mirroring CyberChef's Array.prototype.unique() (works on arrays of
-// strings, or - for the phrase list - arrays of string arrays, keyed by their joined form).
 function unique(arr) {
   const seen = new Set(), out = [];
   for (const x of arr) {
@@ -22,7 +16,7 @@ module('RAKE', [
   'Rapid Automatic Keyword Extraction (Rose et al., 2010): splits the text into candidate keyword',
   'phrases by cutting on stop words and sentence boundaries, scores each distinct phrase by the',
   'degree/frequency ratio of its words\' co-occurrences, and lists phrases ranked highest-scoring first.',
-  'Stop word list and scoring approach match CyberChef\'s RAKE operation (itself based on the NLTK',
+  'Stop word list and scoring approach RAKE operation (itself based on the NLTK',
   'English stop words).',
 ].join(' '),
   [A.string('Word delimiter (regex)', '\\s'), A.string('Sentence delimiter (regex)', '\\.\\s|\\n'), A.area('Stop words', DEFAULT_STOPWORDS)],
@@ -53,13 +47,6 @@ module('RAKE', [
       phrases.push(words.slice(start));
     }
 
-    // Word frequencies above count every occurrence in the document; phrases are deduped (CyberChef
-    // does this too) before being used to build the co-occurrence matrix below, so a phrase that
-    // appears several times only contributes to word "degree" once - this is CyberChef's own
-    // deliberate deviation from the plain RAKE paper (which scores every occurrence), so a score
-    // cross-check against a reference implementation that doesn't dedupe phrases will disagree on
-    // exactly the words/phrases that repeat; see this op's write-up for a from-scratch reproduction
-    // that matches CyberChef's numbers exactly.
     phrases = unique(phrases.filter(p => p.length > 0));
 
     const n = tokens.length;

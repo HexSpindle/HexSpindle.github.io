@@ -1,18 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// Real YARA matching: _libyara.mjs is the actual VirusTotal `libyara` C engine compiled to
-// WebAssembly (vendored from the `libyara-wasm` npm package - see that file's header for details),
-// the same engine CyberChef itself uses for this operation. This gets the real thing - full rule
-// syntax (text/hex/regex strings with modifiers, tags, meta, boolean conditions, "N of ($a,$b)",
-// string counts/offsets with #x/@x, for-loops, filesize, etc.) - rather than a hand-rolled subset,
-// entirely offline (the compiled WASM is embedded in the vendored file; nothing is fetched over the
-// network).
-//
-// Known gap: this build only exposes the string/condition matching core, not YARA's optional
-// modules (`pe`, `elf`, `math`, `hash`, `cuckoo`, ...). A rule that references one of those modules
-// will fail to compile here with an "undefined identifier" error, exactly as upstream libyara would
-// if built without that module. Everything else is the real engine, not an approximation of it.
 let yaraPromise = null;
 function getYara() {
   if (!yaraPromise) yaraPromise = import('./_libyara.mjs').then((m) => m.default());

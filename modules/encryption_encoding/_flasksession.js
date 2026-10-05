@@ -1,15 +1,3 @@
-// Private helper: the itsdangerous URLSafeTimedSerializer construction the Python ops use
-// directly (`itsdangerous.URLSafeTimedSerializer(secret, salt="cookie-session")`), reimplemented
-// from the itsdangerous source (signer.py/timed.py/url_safe.py/_json.py):
-//  - key derivation: "django-concat" (the library default) -> SHA-1(salt + b"signer" + secret)
-//  - signing algorithm: HMAC-SHA1 (the library default)
-//  - payload: compact JSON (no sort_keys, separators ",:" ), zlib-deflated when that's shorter,
-//    base64url (no padding) encoded, with a "." prefix when compressed
-//  - token shape: <payload>.<timestamp>.<signature>, each base64url (no padding); the timestamp is
-//    the current Unix time as a minimal big-endian byte string
-// Note this mirrors what these specific Python ops do (plain itsdangerous over raw JSON), not
-// Flask's own session cookie format, which layers its TaggedJSONSerializer on top - matching the
-// Python module's actual (narrower) behavior.
 import { encodeUtf8, decodeUtf8, concatBytes, bytesEqual } from '../../core/util.js';
 
 function b64uEncode(u8) {
@@ -51,10 +39,6 @@ async function hmacSha1(key, msg) {
   return new Uint8Array(await crypto.subtle.sign('HMAC', hk, msg));
 }
 
-// Minimal raw-deflate (zlib) compressor/decompressor via the browser/node built-in CompressionStream
-// when available; falls back to "never compress" (always store the uncompressed payload) when it
-// isn't, which itsdangerous handles equally correctly (compression is purely a size optimization -
-// it only kicks in when the compressed form is shorter, and is always decodable either way).
 async function zlibDeflate(bytes) {
   if (typeof CompressionStream === 'undefined') return null;
   const cs = new CompressionStream('deflate');

@@ -1,9 +1,3 @@
-// Shared Enigma primitives, ported from CyberChef's src/core/lib/Enigma.mjs. Used by the Bombe /
-// Multiple Bombe ports (modules/encryption_encoding/_bombe.js), which need object identity /
-// mutable-state semantics (rotor.pos mutated in place, maps shared across cloned rotors) matching
-// CyberChef's own implementation closely enough that its Bombe optimisations (shared/cloned
-// rotor state) port over unchanged.
-
 export const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 export const mod = (n, m) => ((n % m) + m) % m;
 

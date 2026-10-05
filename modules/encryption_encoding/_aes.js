@@ -1,18 +1,6 @@
-// Private helper: a small self-contained AES (Rijndael) block cipher supporting 128/192/256-bit
-// keys, used only where the Web Crypto API can't do the job directly:
-//  - AES Key Wrap/Unwrap (RFC 3394) needs raw single-block AES-ECB encrypt *and* decrypt for
-//    arbitrary multiples of 8 bytes of key material; SubtleCrypto's native "AES-KW" only wraps
-//    standard 128/192/256-bit payloads and Web Crypto exposes no raw ECB/no-padding mode at all,
-//    so there's no way to get a bare block decrypt out of it for this.
-//  - AES-XTS has no Web Crypto mode; it needs raw per-block AES-ECB encrypt (and, for decryption,
-//    raw block decrypt) plus its own GF(2^128) tweak handling (see _xts.js).
-// Standard, textbook Rijndael - FIPS-197 S-box/round structure, no proprietary shortcuts.
-
 const SBOX = new Uint8Array(256);
 const INV_SBOX = new Uint8Array(256);
 (function initSbox() {
-  // Multiplicative inverse in GF(2^8) (poly 0x11b, reduction byte 0x1b) via exp/log tables,
-  // composed with the standard AES affine transform.
   const exp = new Uint8Array(512), log = new Uint8Array(256);
   let x = 1;
   for (let i = 0; i < 255; i++) {

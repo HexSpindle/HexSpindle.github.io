@@ -3,9 +3,6 @@ import { A } from '../../core/registry.js';
 import { bytesToHex } from '../../core/util.js';
 import { sm2Encrypt, sm2PublicKeyFromXY } from './_sm2.js';
 
-// CyberChef's SM2 Encrypt op takes the public key as two plain hex strings (not a toggleString)
-// and always outputs plain lowercase hex (hexC1X + hexC1Y + c3/c2 or c2/c3) - see
-// src/core/operations/SM2Encrypt.mjs / src/core/lib/SM2.mjs.
 module('SM2 Encrypt', 'Encrypts a message with the SM2 public-key cryptosystem (GB/T 32918), the Chinese national standard elliptic-curve cryptosystem, over the sm2p256v1 curve. Public Key X/Y are each 32 bytes (64 hex characters). Output is C1 || C3 || C2 (or C1 || C2 || C3) as hex.',
   [
     A.string('Public Key X', 'DEADBEEF'),

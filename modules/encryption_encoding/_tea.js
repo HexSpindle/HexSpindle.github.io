@@ -1,10 +1,3 @@
-// TEA / XTEA family: block ciphers built from the same Feistel round with delta=0x9E3779B9.
-// Ported directly from core/tea.py (ECB mode, zero-padded to a multiple of 8 bytes).
-// Intermediate values are kept in explicit named 32-bit steps (each truncated with >>> 0)
-// rather than one-line transcriptions of the Python expressions, to avoid JS/Python operator-
-// precedence mismatches; mod-2^32 truncation at each +/^ step is equivalent to Python's single
-// mask at the end, since both addition and XOR commute with "take low 32 bits".
-
 const DELTA = 0x9e3779b9;
 const MASK = 0xffffffff;
 

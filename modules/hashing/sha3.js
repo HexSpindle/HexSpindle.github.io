@@ -3,8 +3,6 @@ import { A } from '../../core/registry.js';
 import { bytesToHex } from '../../core/util.js';
 import { keccakSponge } from './keccak.js';
 
-// FIPS 202 SHA-3: same Keccak-f[1600] sponge as keccak.js, but with the NIST domain-separation
-// suffix '01' folded into the padding byte (0x06) instead of plain Keccak's 0x01.
 export function sha3(data, digestBits) {
   const digestBytes = digestBits / 8;
   const rate = 200 - 2 * digestBytes;

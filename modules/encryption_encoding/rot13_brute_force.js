@@ -11,7 +11,7 @@ module('ROT13 Brute Force', 'Shows the input rotated by every amount 1-25 (optio
     for (let n = 1; n < 26; n++) {
       const r = rot(s, n, lo, up, nums);
       if (crib && !r.toLowerCase().includes(crib.toLowerCase())) continue;
-      out.push((show ? `Amount = ${n}: ` : '') + r);
+      out.push((show ? `Amount = ${String(n).padStart(2, ' ')}: ` : '') + r);
     }
     return out.join('\n');
   }, { text: true });

@@ -18,12 +18,6 @@ export const PITABLE = new Uint8Array([
   0xc5, 0xf3, 0xdb, 0x47, 0xe5, 0xa5, 0x9c, 0x77, 0x0a, 0xa6, 0x20, 0x68, 0xfe, 0x7f, 0xc1, 0xad
 ]);
 
-// RC2 / ARC2 (RFC 2268). Key schedule and round structure verified against a known-good pure
-// Python RC2 implementation (itself cross-checked against pycryptodome's Crypto.Cipher.ARC2),
-// using effective-key-bits == actual key length in bits (which is what core/cipher.py forces
-// for RC2 via `effective_keylen=len(key)*8`, matching OpenSSL/node-forge/RFC 2268 defaults for
-// a key that isn't artificially shortened).
-
 function rol16(x, n) { return (((x << n) | (x >>> (16 - n))) & 0xffff); }
 function ror16(x, n) { return (((x >>> n) | (x << (16 - n))) & 0xffff); }
 

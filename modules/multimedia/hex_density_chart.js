@@ -6,14 +6,7 @@ import { RECORD_DELIMITERS, FIELD_DELIMITERS, getScatterValues, lerpColor, drawA
 module('Hex Density chart',
   'Groups (x, y) data into hexagonal bins and colours each hexagon by how many points fall inside it ' +
   '- a 2D histogram, useful for showing the distribution of far more points than could be plotted ' +
-  'individually. Input is one record per line, fields separated by the chosen delimiter. This is a ' +
-  "from-scratch, Canvas-based port: CyberChef renders this with D3/d3-hexbin as SVG, and binning here " +
-  'is done in screen (pixel) space with a standard axial/cube-rounding hex-grid algorithm rather than ' +
-  "d3-hexbin's own implementation (CyberChef bins in raw data-space before scaling, which only looks " +
-  'right when the input domain already roughly matches the pixel dimensions - binning in pixel space ' +
-  'here makes it look sensible for any numeric range, at the cost of exact parity). Colours are ' +
-  "interpolated in linear RGB rather than D3's Lab space. CyberChef's optional \"draw empty hexagons " +
-  'within data boundaries\" background-grid feature is not implemented.',
+  'individually. Input is one record per line, fields separated by the chosen delimiter.',
   [
     A.select('Record delimiter', Object.keys(RECORD_DELIMITERS)),
     A.select('Field delimiter', Object.keys(FIELD_DELIMITERS)),
@@ -42,7 +35,6 @@ module('Hex Density chart',
     const yMin = Math.min(...ys), yMax = Math.max(...ys);
     const xRange = (xMax - xMin) || 1, yRange = (yMax - yMin) || 1;
 
-    // Scale data into pixel space first, then hex-bin in pixel space (see description).
     const toPixel = ([x, y]) => [
       ((x - xMin) / xRange) * width,
       height - ((y - yMin) / yRange) * height,

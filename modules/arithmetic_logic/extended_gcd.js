@@ -7,7 +7,6 @@ function parseBig(s, name) {
   throw new Error(`${name} must be decimal or hex (0x...)`);
 }
 
-// Iterative, so huge (crypto-sized) values can't overflow the stack.
 function egcd(a, b) {
   let [oldR, r, oldS, s, oldT, t] = [a, b, 1n, 0n, 0n, 1n];
   while (r !== 0n) {
@@ -19,7 +18,6 @@ function egcd(a, b) {
   return [oldR, oldS, oldT];
 }
 
-// A and B come from the arguments; an empty argument is read from the input.
 module('Extended GCD', 'Computes gcd(A, B) and the Bézout coefficients x, y such that A*x + B*y = gcd(A, B). An empty A or B is taken from the input.', [A.string('A', ''), A.string('B', '')],
   (t, aS, bS) => {
     const aP = (aS ?? '').trim(), bP = (bS ?? '').trim(), inp = (t ?? '').trim();

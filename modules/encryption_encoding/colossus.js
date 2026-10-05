@@ -12,14 +12,6 @@ function readSwitch(v, label) {
   return v;
 }
 
-// Colossus: the world's first electronic computer, built to attack the Lorenz cipher by computing
-// statistical scores (delta-Z/wheel-setting counts) over Lorenz-enciphered ITA2 traffic, rather
-// than performing a full automated break. Ported from CyberChef's Colossus operation/library (see
-// ./_colossus.js). The "Select Program"/"Program to run" convenience presets from CyberChef's UI
-// (which just pre-fill the K Rack switches below for a few well-known programs) are out of scope -
-// set the K Rack switches directly instead; see CyberChef's wiki page on this operation for the
-// switch settings of those presets (e.g. "Letter Count" is simply Counter=1 on R1 with every
-// Q-switch left blank).
 module('Colossus',
   'Emulates the Colossus computer used at Bletchley Park to attack the Lorenz SZ40/42 cipher by ' +
   'statistically scoring wheel settings (e.g. "de-chi"/delta-Z counts), not by fully automating a ' +

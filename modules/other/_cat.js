@@ -1,11 +1,6 @@
 import { makeModule } from '../../core/registry.js';
 export const module = makeModule('other');
 
-// JSON.parse() collapses `42` and `42.0` to the same JS number, but Python's json.loads() keeps
-// them as int vs float (based on the literal's spelling), and some ports (php_serialize,
-// rison_encode) need that distinction to pick the right output type. This minimal parser preserves
-// it by tagging float literals with the Flt wrapper; plain JS numbers are ints, Map is used for
-// objects so key order survives even when keys look numeric (plain JS objects would reorder those).
 export class Flt { constructor(value) { this.value = value; } }
 
 export function parseJsonTyped(s) {

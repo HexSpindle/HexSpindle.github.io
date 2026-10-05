@@ -1,7 +1,5 @@
 import { module } from './_cat.js';
 
-// Inverse of citrix_ctx1_encode.js - mirrors CyberChef's CitrixCTX1Decode.mjs exactly (processing
-// the reversed byte array two letters/one decoded byte at a time), then UTF-16LE-decodes the result.
 function utf16leDecode(bytes) {
   let s = '';
   for (let i = 0; i + 1 < bytes.length; i += 2) s += String.fromCharCode(bytes[i] | (bytes[i + 1] << 8));

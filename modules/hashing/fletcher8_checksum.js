@@ -1,8 +1,5 @@
 import { module } from './_cat.js';
 
-// Generic Fletcher checksum over `wbits`-wide words (shared by the Fletcher-8/16/32/64 variants).
-// Returns the combined hex string directly: hex(s2) + hex(s1), each padded to wbits/4 digits, which
-// is equivalent to formatting the Python reference's (s2 << wbits) | s1 as hex.
 export function fletcher(data, wbits) {
   const mod = 2 ** wbits - 1;
   const nbytes = Math.max(Math.floor(wbits / 8), 1);
@@ -34,4 +31,4 @@ export function fletcher8(data) {
   return ((b << 4) | a).toString(16).padStart(2, '0');
 }
 
-module('Fletcher-8 Checksum', 'Fletcher-8 checksum (bytes summed modulo 15, as in CyberChef).', [], (data) => fletcher8(data));
+module('Fletcher-8 Checksum', 'Fletcher-8 checksum (bytes summed modulo 15).', [], (data) => fletcher8(data));

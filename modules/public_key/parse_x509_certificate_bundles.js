@@ -1,11 +1,6 @@
 import { module } from './_cat.js';
 import { parseX509ToText } from './parse_x509_certificate.js';
 
-// Ported from CyberChef's src/core/operations/ParseX509CertificateBundles.mjs: walks a PEM file
-// containing one or more concatenated "-----BEGIN/END CERTIFICATE-----" blocks (only that exact
-// PEM label is accepted - not generic loadDerOrPem sniffing), rejecting anything but whitespace
-// between/around the blocks, and parses each certificate with the same logic as the single-cert
-// 'Parse X.509 certificate' op (reused here as parseX509ToText).
 const BEGIN = '-----BEGIN CERTIFICATE-----';
 const END = '-----END CERTIFICATE-----';
 const PEM_BODY_RE = /^[A-Za-z0-9+/=\s]+$/;

@@ -2,13 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { bytesToHex } from '../../core/util.js';
 
-// scrypt (RFC 7914): Salsa20/8 core + BlockMix + ROMix, with PBKDF2-HMAC-SHA256 scaffolding done
-// via the browser's native Web Crypto (deriveBits) since that part has no need to be hand-rolled.
-// Verified against Python's hashlib.scrypt with small N/r/p (and against the RFC 7914 test vector
-// password="pleaseletmein", salt="SodiumChloride", N=16384, r=8, p=1, dkLen=64 ->
-// 7023bdcb3afd7348461c06cd81fd38ebfda8fbba904f8e3ea9b543f6545da1f2d5432955613f0fcf62d49705242a9af
-// 9e61e85dc0d651e40dfcf017b45575887).
-
 function salsa20_8(input) {
   const x = input.slice();
   const rotl = (a, b) => (a << b) | (a >>> (32 - b));

@@ -3,15 +3,6 @@ import { A } from '../../core/registry.js';
 import { detect } from '../../core/filetypes.js';
 import { base64Encode } from '../../core/util.js';
 
-// Unlike every other operation in this app, this one needs the network: it dynamically imports the
-// small (~60KB) worker-management glue vendored as _tesseract.mjs (see that file's header), which
-// then fetches the actual OCR engine - a multi-megabyte WebAssembly Tesseract core plus a 10MB+
-// English trained-data file - from the jsdelivr CDN the first time it runs (the browser then caches
-// them via IndexedDB, so repeat use is offline-ish, but the very first run per browser is not).
-// Vendoring those pieces was judged impractical: they're large, there's one trained-data file per
-// supported language, and they're version-locked to the exact tesseract.js build, so bundling them
-// would bloat this otherwise fully offline, dependency-light app for a single operation. This is the
-// same "practical middle ground" this app already uses for e.g. DNS over HTTPS (net: true).
 const OEM_MODES = ['Tesseract only', 'LSTM only', 'Tesseract/LSTM combined'];
 let tesseractPromise = null;
 function getTesseract() {

@@ -1,10 +1,3 @@
-// Shared CSV-ish parsing, colour and small drawing helpers for the chart operations (Hex Density
-// chart, Scatter chart, Series chart, Heatmap chart). CyberChef renders these with D3 as SVG; this
-// project has no bundler and doesn't vendor D3 or d3-hexbin, so they're drawn directly onto an
-// OffscreenCanvas instead. Axis/tick rendering here is a plain approximation of D3's axis
-// generators, not a port of them, and colour gradients are interpolated in linear RGB rather than
-// D3's Lab space, so exact pixel-for-pixel parity with CyberChef's output is not the goal.
-
 export const RECORD_DELIMITERS = { 'Line feed': '\n', 'CRLF': '\r\n' };
 export const FIELD_DELIMITERS = { 'Space': ' ', 'Comma': ',', 'Semi-colon': ';', 'Colon': ':', 'Tab': '\t' };
 
@@ -70,8 +63,6 @@ export function getSeriesValues(input, recordDelim, fieldDelim) {
   return { xValues, series };
 }
 
-// Resolves any CSS colour (name, hex, rgb()/rgba()) to {r,g,b} using the canvas's own colour
-// parser, so the same colour names/strings CyberChef/D3 accept (e.g. "mediumseagreen") work here.
 let probeCtx = null;
 export function cssColorToRgb(str) {
   if (!probeCtx) probeCtx = new OffscreenCanvas(1, 1).getContext('2d');
@@ -83,8 +74,6 @@ export function cssColorToRgb(str) {
   return { r, g, b };
 }
 
-// Linear RGB interpolation between two CSS colours (CyberChef/D3 interpolates in Lab space for a
-// perceptually smoother gradient; this is a simpler approximation).
 export function lerpColor(a, b, t) {
   t = Math.max(0, Math.min(1, t));
   const ca = cssColorToRgb(a), cb = cssColorToRgb(b);
@@ -142,11 +131,6 @@ export function drawAxes(ctx, { x0, y0, width, height, xDomain, yDomain, xLabel,
   ctx.restore();
 }
 
-// --- Hexagonal binning -----------------------------------------------------------------------
-// A standard axial/cube-rounding hex-grid assignment (the "pixel to hex" algorithm, as popularised
-// by Red Blob Games), used instead of porting d3-hexbin's own (offset-row) implementation. Both
-// produce genuine hexagonal tilings; the bin centres/ids won't match d3-hexbin's exactly, but the
-// visual result (points grouped into a honeycomb of hexagons) is the same idea.
 function cubeRound(x, y, z) {
   let rx = Math.round(x), ry = Math.round(y), rz = Math.round(z);
   const xDiff = Math.abs(rx - x), yDiff = Math.abs(ry - y), zDiff = Math.abs(rz - z);

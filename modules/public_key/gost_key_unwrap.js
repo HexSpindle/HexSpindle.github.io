@@ -6,8 +6,6 @@ import { ALGORITHMS } from './gost_sign.js';
 
 const ALGO_INFO = { 'GOST R 34.12 (Magma, 2015)': { algo: 'Magma', blockBytes: 8 }, 'GOST R 34.12 (Kuznyechik, 2015)': { algo: 'Kuznyechik', blockBytes: 16 } };
 
-// Inverse of gost_key_wrap.js - see that file for the scope limitations (ported from and verified
-// against the @wavesenterprise/crypto-gost-js engine).
 module('GOST Key Unwrap', 'Unwraps a content-encryption key (CEK) that was wrapped with GOST Key Wrap, verifying its integrity MAC.',
   [
     A.toggle('Key (KEK, 32 bytes)', '', ['Hex', 'UTF8', 'Latin1', 'Base64'], 'Hex'),

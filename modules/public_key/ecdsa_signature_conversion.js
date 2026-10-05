@@ -4,19 +4,6 @@ import { parseOneDer, derSequence, derInteger, parseSeq } from './_asn1.js';
 import { bytesToBigInt } from './_bignum.js';
 import { parseHex, bytesToHex, base64Encode, base64Decode, decodeLatin1 } from '../../core/util.js';
 
-// Converts an ECDSA signature between ASN.1 DER, the fixed-width "P1363"/JOSE raw r||s encoding,
-// a JSON Web Signature (base64url of the P1363 bytes) and a {r,s} JSON object.
-//
-// Ported from CyberChef's ECDSASignatureConversion.mjs, which itself delegates to jsrsasign's
-// KJUR.crypto.ECDSA helpers (hexRSSigToASN1Sig/concatSigToASN1Sig, asn1SigToConcatSig,
-// parseSigHexInHexRS). Those helpers infer r/s byte widths purely from the hex-string lengths
-// involved (no explicit curve parameter), including jsrsasign's slightly quirky padding rules
-// for DER -> P1363 (a dedicated branch for P-521's 65-67 byte integers, and an off-by-one-byte
-// fixup for every other curve size) - replicated here verbatim rather than "fixed", since the
-// goal is byte-for-byte compatibility with CyberChef's actual output. Verified against
-// CyberChef's real P-256 test fixtures (tests/operations/tests/ECDSA.mjs): every one of the 4x4
-// cross-format conversions between its ASN.1/P1363/JWS/JSON vectors round-trips correctly.
-
 const FORMATS = ['Auto', 'ASN.1 HEX', 'P1363 HEX', 'JSON Web Signature', 'Raw JSON'];
 const OUT_FORMATS = ['ASN.1 HEX', 'P1363 HEX', 'JSON Web Signature', 'Raw JSON'];
 

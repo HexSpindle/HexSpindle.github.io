@@ -3,22 +3,6 @@ import { A } from '../../core/registry.js';
 import { bytesToHex } from '../../core/util.js';
 import { RC, C0, C1, C2, C3, C4, C5, C6, C7 } from './_whirlpool_tables.js';
 
-// Whirlpool (the final, 2003 "W" revision - the version standardised in ISO/IEC 10118-3 and used
-// by Python's hashlib-adjacent `pip install pysha3`-era libraries and PHP's hash('whirlpool', ...))
-// a 512-bit Miyaguchi-Preneel hash built from a dedicated 8x8-byte-state block cipher ("W") with a
-// 10-round AES-like SPN. Only this final variant is implemented (not the older, S-box-flawed
-// Whirlpool-0/2000 or Whirlpool-T/2001 revisions CyberChef also exposes as separate options).
-//
-// Table provenance: C0..C7 (the combined S-box+diffusion lookup tables) and the 11 round constants
-// are extracted programmatically (see _whirlpool_tables.js) from php-src's ext/hash implementation
-// rather than hand-typed, the same approach streebog.js uses for its S-box table.
-//
-// Verified against PHP 8.3's built-in hash('whirlpool', ...) (a mature, independent C
-// implementation, from the same php-src tree the tables above come from, re-derived here rather
-// than trusted blindly): empty string, 'a', 'abc', 'message digest', the lowercase alphabet, 1000x
-// 'a', and 'a' repeated 63/64/65/127/128 times (to exercise the padding logic right at, just below,
-// and just above the 64-byte block boundary) - all twelve match byte-for-byte.
-
 const MASK = 0xffffffffffffffffn;
 
 function transform(state, block, rounds) {
@@ -50,8 +34,6 @@ function transform(state, block, rounds) {
 export function whirlpool(data, rounds = 10) {
   const msgLen = data.length;
   const bitLen = BigInt(msgLen) * 8n;
-  // Pad so total length (incl. the 0x80 byte) is 32 bytes short of a multiple of 64, then append a
-  // 32-byte big-endian bit-length field (only the low 64 bits are ever nonzero here).
   let padLen = 64 - ((msgLen + 1) % 64);
   if (padLen < 32) padLen += 64;
   padLen -= 32;
@@ -75,6 +57,6 @@ export function whirlpool(data, rounds = 10) {
   return out;
 }
 
-module('Whirlpool', 'Whirlpool (ISO/IEC 10118-3): a 512-bit cryptographic hash designed by Barreto and Rijmen, built from a dedicated AES-like block cipher. Implements the final (2003) revision; the "Rounds" option can reduce the block cipher below its standard 10 rounds, matching CyberChef.',
+module('Whirlpool', 'Whirlpool (ISO/IEC 10118-3): a 512-bit cryptographic hash designed by Barreto and Rijmen, built from a dedicated AES-like block cipher. Implements the final (2003) revision; the "Rounds" option can reduce the block cipher below its standard 10 rounds.',
   [A.number('Rounds', 10, 1, 10)],
   (data, rounds) => bytesToHex(whirlpool(data, Math.floor(rounds))));

@@ -13,7 +13,6 @@ function adapt(delta, numPoints, firstTime) {
   return k + Math.floor(((BASE - TMIN + 1) * delta) / (delta + SKEW));
 }
 
-// RFC 3492 Punycode (same algorithm as Python's str.encode('punycode') / .decode('punycode')).
 export function punyEncode(input) {
   const codePoints = [...input].map(c => c.codePointAt(0));
   let n = INITIAL_N, delta = 0, bias = INITIAL_BIAS;
@@ -49,9 +48,6 @@ export function punyEncode(input) {
   return output.join('');
 }
 
-// ToASCII (RFC 3490), ASCII-only label fast path plus the punycode-encoding path. The "nameprep"
-// step (RFC 3491) is approximated with Unicode NFKC normalisation + lower-casing: the full
-// stringprep prohibited-character/bidi checks and the "map to nothing" table are not implemented.
 function toAsciiLabel(label) {
   if (/^[\x00-\x7f]*$/.test(label)) return label;
   const prepped = label.normalize('NFKC').toLowerCase();

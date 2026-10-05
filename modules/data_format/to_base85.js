@@ -24,7 +24,6 @@ export function genericEncode(data, alphabet) {
   return pad ? r.slice(0, r.length - pad) : r;
 }
 
-// Standard Ascii85 (base64.a85encode equivalent): 'z' shorthand for a full zero 4-byte group.
 export function a85Encode(data) {
   const pad = (4 - (data.length % 4)) % 4;
   const padded = new Uint8Array(data.length + pad);

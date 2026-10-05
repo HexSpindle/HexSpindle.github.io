@@ -1,9 +1,5 @@
 import { module } from './_cat.js';
 
-// Citrix CTX1: a simple XOR-with-running-state obfuscation used to hide Citrix ICA password-field
-// hashes (not a real cipher - no key, trivially reversible). Mirrors CyberChef's CitrixCTX1Encode.mjs:
-// the input string is first UTF-16LE-encoded (Windows codepage 1200), then each byte is XORed with a
-// fixed 0xa5 and the previous output byte, and the result nibble-split into two 'A'-'P' letters.
 function utf16leEncode(s) {
   const out = new Uint8Array(s.length * 2);
   for (let i = 0; i < s.length; i++) {

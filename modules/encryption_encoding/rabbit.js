@@ -2,9 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { parseHex, decodeLatin1, bytesToHex } from '../../core/util.js';
 
-// Rabbit, eSTREAM-portfolio stream cipher (Boesgaard, Vesterager, Pedersen, Christiansen, Scavenius),
-// defined in RFC 4503. 128-bit key, optional 64-bit IV. Ported from CyberChef's own hand-rolled
-// Rabbit.mjs (RFC 4503's test vectors use its "Big" endianness; "Little" matches Crypto++'s variant).
 function counterUpdate(C, A, b) {
   let carry = b;
   for (let j = 0; j < 8; j++) {

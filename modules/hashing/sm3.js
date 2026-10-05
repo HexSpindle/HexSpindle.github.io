@@ -1,9 +1,6 @@
 import { module } from './_cat.js';
 import { bytesToHex } from '../../core/util.js';
 
-// Hand-rolled SM3 (GB/T 32905-2016), the Chinese national standard hash. Structurally similar to
-// SHA-256 (Merkle-Damgard, 64-byte blocks, big-endian words) but with its own IV, message-expansion
-// recurrence, boolean functions and permutations - not SHA-2 underneath.
 const IV = [0x7380166f, 0x4914b2b9, 0x172442d7, 0xda8a0600, 0xa96f30bc, 0x163138aa, 0xe38dee4d, 0xb0fb0e4e];
 const rotl = (x, n) => ((x << n) | (x >>> (32 - n))) >>> 0;
 const T = (j) => (j < 16 ? 0x79cc4519 : 0x7a879d8a);

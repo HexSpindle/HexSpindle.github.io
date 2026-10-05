@@ -1,14 +1,3 @@
-// Microsoft XPRESS (MS-XCA) decompression: the two variants documented in
-// https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-xca/ section 2.1 (plain LZ77)
-// and section 2.2 (LZ77+Huffman). Decompress-only, matching CyberChef's two ops.
-//
-// Ported line-for-line from CyberChef's src/core/lib/XPRESS.mjs and verified against CyberChef's
-// own test vectors (MS-XCA worked examples plus edge cases for the shared-nibble/raw-length
-// encoding and the Huffman bitstream), including the official MS-XCA section 3.1 worked examples
-// for both variants.
-
-/** Maximum output per call (Windows sizes XPRESS blocks at up to 32 MiB for WIM chunks and up to
- * 1 MiB for WOF chunks). */
 const MAX_DECOMPRESSED = 32 * 1024 * 1024;
 
 /**

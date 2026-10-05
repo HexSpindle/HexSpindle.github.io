@@ -1,8 +1,3 @@
-// A small, pragmatic MIME/RFC 2047 parser for mime_decoding.js, mirroring Python's
-// `email.message_from_string(t, policy=policy.default)` closely enough for real-world messages:
-// RFC 2047 encoded-word header decoding, multipart walking, and per-part
-// base64/quoted-printable/charset body decoding. It does not attempt every RFC 2231/5322 edge case
-// (folded parameter continuations, comments in structured headers, etc).
 import { base64Decode } from '../../core/util.js';
 
 export function asciiReplace(bytes) {

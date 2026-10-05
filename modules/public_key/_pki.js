@@ -1,6 +1,3 @@
-// Shared key-loading/parsing helpers built on _asn1.js: PKCS8/SPKI structure, OID -> key-kind
-// mapping, DSA/RSA raw-number extraction (for the algorithms Web Crypto can't do natively), DER
-// ECDSA/DSA signature <-> raw r||s conversion, and PKCS#8 "ENCRYPTED PRIVATE KEY" (PBES2) decryption.
 import { parseSeq, parseOneDer, derUint, decodeOid, derSequence, derInteger, derOid, derNull, derBitString, derOctetString } from './_asn1.js';
 import { findPem } from './_pem.js';
 import { bigIntToBytes } from './_bignum.js';

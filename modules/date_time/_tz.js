@@ -1,6 +1,3 @@
-// Time zone resolution shared by the date/time modules that take an input/output zone, plus the
-// small set of built-in strptime/strftime format presets they offer. A time zone is either a
-// fixed UTC offset or an IANA name resolved (including DST) via the browser/runtime's Intl data.
 import { pad2 } from './_strptime.js';
 
 export const FORMATS = ['%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S%z', '%a, %d %b %Y %H:%M:%S %Z', '%d/%m/%Y %H:%M:%S', '%m/%d/%Y %H:%M:%S', '%Y-%m-%d', '%H:%M:%S', '%Y%m%d%H%M%S'];

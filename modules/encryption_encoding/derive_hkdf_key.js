@@ -5,19 +5,6 @@ import { md5, sha224 } from './_hashes.js';
 import { has160 } from '../hashing/has160.js';
 import { whirlpool } from '../hashing/whirlpool.js';
 
-// CyberChef's "Derive HKDF key" op (src/core/operations/DeriveHKDFKey.mjs) is the same RFC 5869
-// HKDF algorithm as this project's own HKDF op (./hkdf.js), just with CyberChef's own argument
-// names/shape: a 3-way "Extract mode" (with salt / no salt / skip the extract step entirely and
-// treat the input as an already-extracted PRK) instead of an implicit "no salt means zero salt",
-// and a much longer hash-function menu. Rather than duplicate hkdf.js's HKDF-extract/expand logic,
-// scope here is widened by building a small generic HMAC over whichever digest is selected.
-// CyberChef offers 19 hash choices via the crypto-api library; only the 8 below have a safely
-// reusable, unambiguous fixed-blocksize implementation already in this codebase (MD5/SHA224 are
-// hand-rolled in ./_hashes.js for the same reason hkdf.js needs them; SHA1/256/384/512 go through
-// Web Crypto; HAS-160/Whirlpool export plain digest functions from modules/hashing/). MD2, MD4,
-// SHA0, SHA512/224, SHA512/256, the RIPEMD-128/256/320 variants, Snefru (whose block size is
-// output-size-dependent, so it has no single well-defined HMAC block size) and the Whirlpool-0/
-// Whirlpool-T S-box variants are out of scope.
 const BLOCK_SIZE = { MD5: 64, SHA224: 64, SHA1: 64, SHA256: 64, SHA384: 128, SHA512: 128, HAS160: 64, Whirlpool: 64 };
 const HASHES = Object.keys(BLOCK_SIZE);
 

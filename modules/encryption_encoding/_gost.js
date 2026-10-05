@@ -1,15 +1,3 @@
-// Private helper: GOST R 34.12-2015 block ciphers ('Kuznechik', 128-bit block, and 'Magma',
-// 64-bit block) plus the GOST R 34.13-2015 modes of operation (ECB/CBC/CFB/OFB/CTR, padding
-// mode 1 = zero padding), hand-rolled since no browser-native equivalent exists.
-//
-// Ported from the `gostcrypto` Python package (gostcrypto/gostcipher/gost_34_12_2015.py and
-// gost_34_13_2015.py), the library used by the Python side of this tool (via
-// `import gostcrypto.gostcipher as gc`). The S-boxes, the GF(2^8) linear-transform coefficient
-// vector and the Magma nibble S-boxes below were extracted verbatim from that package with a
-// small script (dump the tables to JSON) rather than hand-typed, then cross-checked: the
-// coefficient vector was verified to reproduce gostcrypto's full 16x256 `_GF` multiplication
-// table exactly under GF(2^8) multiplication with reduction byte 0xC3, and the two S-box tables
-// were verified to be exact inverses of one another.
 import { KUZ_SBOX, KUZ_SBOX_INV, KUZ_LCOEFF, MAGMA_SBOX } from './_gost_tables.js';
 
 function xorBytes(a, b) {

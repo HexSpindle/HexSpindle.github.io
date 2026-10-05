@@ -1,13 +1,3 @@
-// Lorenz SZ40/42 ("Tunny") cipher attachment: a WW2 German online rotor cipher that XORed a
-// 5-bit ITA2-encoded pseudorandom key stream onto teleprinter traffic. Ported line-for-line from
-// CyberChef's src/core/lib/Lorenz.mjs (lookup tables / wheel patterns) and the run() logic of
-// src/core/operations/Lorenz.mjs (the actual encipher/decipher + ITA2 conversion algorithm).
-//
-// The machine has two groups of five wheels: the chi (X) wheels, which step every character, and
-// the psi (S) wheels, which step only intermittently, held up or released by two further "motor"
-// wheels (M37, M61) depending on the model (SZ40 / SZ42a / SZ42b) and whether the "KT-Schalter"
-// limitation switch is engaged.
-
 export const VALID_ITA2 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ34589+-./';
 
 export const ITA2_TABLE = {
@@ -22,8 +12,6 @@ export const ROTOR_SIZES = { S1: 43, S2: 47, S3: 51, S4: 53, S5: 59, M37: 37, M6
 
 const Z = (n) => new Array(n).fill(0);
 
-// Initial rotor (lug) patterns, 0 = inactive ('.'), 1 = active ('x'). Values copied verbatim from
-// CyberChef's INIT_PATTERNS. M[1] is the 61-pin motor wheel, M[2] the 37-pin motor wheel.
 export const INIT_PATTERNS = {
   'No Pattern': {
     X: { 1: Z(41), 2: Z(31), 3: Z(29), 4: Z(26), 5: Z(23) },
@@ -169,13 +157,6 @@ export function convertFromITA2(input, outtype, mode) {
   return result;
 }
 
-/**
- * Run the Lorenz SZ40/42 cipher over `input`, ported directly from CyberChef's Lorenz.run().
- * `opts` holds: model, pattern (lug source: a preset name or 'Custom'), kt (boolean), mode
- * ('Send'|'Receive'), intype/outtype ('Plaintext'|'ITA2'), format ('5/8/9'|'+/-/.'),
- * start positions s1..s5/m37/m61/x1..x5, and (when pattern==='Custom') lug strings
- * lugs1..lugs5/lugm37/lugm61/lugx1..lugx5.
- */
 export function lorenzCrypt(input, opts) {
   const { model, pattern, kt, mode, intype, outtype, format } = opts;
   let { s1, s2, s3, s4, s5, m37, m61, x1, x2, x3, x4, x5 } = opts;

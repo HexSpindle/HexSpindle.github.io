@@ -6,10 +6,9 @@ import { RECORD_DELIMITERS, FIELD_DELIMITERS, getSeriesValues } from './_charts.
 module('Series chart',
   'Draws one or more time/line series as connected points. Input is one record per line of ' +
   '"series name, x value, y value" (fields separated by the chosen delimiter) - x values are treated ' +
-  'as categorical labels (shared across series) rather than a numeric axis, matching CyberChef. Each ' +
+  'as categorical labels (shared across series) rather than a numeric axis. Each ' +
   'series gets its own small sub-chart stacked vertically. Rendered directly onto a canvas and ' +
-  'rasterised to PNG (CyberChef renders this with D3 as SVG with hover tooltips, which a static PNG ' +
-  'cannot reproduce).',
+  'rasterised to PNG',
   [
     A.select('Record delimiter', Object.keys(RECORD_DELIMITERS)),
     A.select('Field delimiter', Object.keys(FIELD_DELIMITERS)),
@@ -38,10 +37,8 @@ module('Series chart',
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, svgWidth, svgHeight);
 
-    // Categorical x scale (d3.scalePoint equivalent): evenly spaced points across seriesWidth.
     const xScale = i => xValues.length > 1 ? (seriesWidth * i) / (xValues.length - 1) : seriesWidth / 2;
 
-    // X axis: a handful of tick labels (first, middle, last), consistent with CyberChef's choice.
     ctx.fillStyle = '#333';
     ctx.font = '11px sans-serif';
     ctx.textAlign = 'center';
@@ -63,8 +60,6 @@ module('Series chart',
 
       const top = xAxisHeight + interSeriesPadding + seriesIndex * (seriesHeight + interSeriesPadding);
 
-      // Connect consecutive points that both have data (mirrors CyberChef, which skips any gap
-      // where either endpoint is missing rather than interpolating across it).
       ctx.strokeStyle = colour;
       ctx.lineWidth = 1;
       ctx.beginPath();

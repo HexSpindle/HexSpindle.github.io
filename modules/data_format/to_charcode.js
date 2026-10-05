@@ -5,7 +5,6 @@ import { intToBase } from '../../core/codec.js';
 
 const DIGITS = '0123456789abcdefghijklmnopqrstuvwxyz';
 
-// base-16 codes are zero-padded to 2, 4, 6 or 8 hex digits by magnitude.
 function hexPad(n) {
   const w = n < 256 ? 2 : n < 65536 ? 4 : n < 16777216 ? 6 : n < 4294967296 ? 8 : 2;
   return n.toString(16).padStart(w, '0');

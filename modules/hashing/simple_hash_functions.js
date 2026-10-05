@@ -1,8 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// A collection of small, classic non-cryptographic hash functions, ported line-for-line from the
-// Python source (including its deterministic Fisher-Yates-style shuffle for the Pearson table).
 const FUNCS = ['DJB2', 'DJB2a (xor variant)', 'SDBM', 'PJW / ELF hash', 'FNV-0 (32-bit)', 'FNV-1 (32-bit)', 'FNV-1a (32-bit)',
   'FNV-1 (64-bit)', 'FNV-1a (64-bit)', 'Jenkins one-at-a-time', 'Pearson (8-bit)', 'AP hash', 'BKDR hash'];
 

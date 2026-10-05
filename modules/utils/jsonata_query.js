@@ -1,51 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-/*
- * CyberChef's Jsonata Query wraps the real "jsonata" npm package (a ~300KB CJS/UMD bundle with no
- * native ESM build). HexSpindle has no bundler and vendors no third-party code anywhere in the
- * project; its precedent for a query language it can't fully implement (see jpath_expression.js,
- * jpath_query.js, xpath_expression.js) is a hand-written, explicitly-scoped practical subset. This
- * is that subset for JSONata (jsonata.org), built and verified against the real `jsonata` npm
- * package (v2.2.2) as ground truth for every rule below - not guessed from the spec prose.
- *
- * Supported:
- *   - Path navigation: a.b.c, bracket field names a["b c"]/a.`b c`
- *   - Array indexing/predicates: a[0], a[-1] (from the end), a[cond] (boolean filter, evaluated
- *     per element with that element as the focus - bare names inside the predicate refer to ITS
- *     fields, not the array's), a[arrayOfIndices]
- *   - Wildcards: a.* (all values at that level), ** (all descendants, any depth)
- *   - Implicit sequence flattening: a path step applied across more than one context item
- *     flattens one level and collapses to a bare value when exactly one result remains, or to
- *     undefined when none do - the central "everything is a sequence" JSONata behaviour. A plain
- *     field read off a SINGLE object returns its JSON value verbatim (arrays stay arrays).
- *   - Operators: + - * / % (numeric), & (string concat), = != < <= > >= (equality is deep,
- *     ordering needs two numbers or two strings), and or in, ?: ternary, unary -, .. (integer
- *     range), ~> (pipes its left value in as the first argument of a $function(...) call)
- *   - Array/object constructors: [a, b, c], {"key": expr, ...} (applied once per context item,
- *     like a map - see note below)
- *   - Context: $ (current item), $$ (the original root input)
- *   - Blocks/variables: ($x := expr; ...; finalExpr)
- *   - Functions: $count $sum $max $min $average $sort (default comparator only) $reverse
- *     $distinct $append $join $exists $not $boolean $string $number $uppercase $lowercase $trim
- *     $substring $substringBefore $substringAfter $length $split $contains $replace (literal
- *     strings only, no regex) $pad $keys $lookup $merge $type
- *
- * NOT supported (documented gap, not a silent approximation):
- *   - Function literals (function($x){...}) and anything needing one: $map $filter $reduce $each
- *     $sift $single, and $sort/$replace with a custom comparator/replacer function
- *   - Regular-expression literals (/re/) and regex-based $match/$split/$replace
- *   - "{}" as a true group-by aggregator: this subset evaluates it as a per-item map, which is
- *     only observably different from real JSONata when the key expression produces duplicate
- *     keys across items (real JSONata would group those into one entry with an array of values)
- *   - Positional ("#$i") and context ("@$v") bindings, parent-context "%", partial application
- *     ("?"), transform ("|...|") and sort ("^(...)") operators, date/time functions, $error/
- *     $assert, and user-defined functions
- * Any of the above raises a clear "not supported" error rather than mis-evaluating.
- */
-
-// ---------- Lexer ----------
-
 function tokenize(src) {
   const toks = [];
   let i = 0;
@@ -114,8 +69,6 @@ function unescapeChar(src, j) {
   return map[c] !== undefined ? map[c] : c;
 }
 
-// ---------- Parser ----------
-// Pratt parser. Binary operator binding powers (higher binds tighter).
 const BIN_BP = { or: 10, and: 20, in: 30, '=': 40, '!=': 40, '<': 40, '<=': 40, '>': 40, '>=': 40, '..': 50, '+': 60, '-': 60, '*': 70, '/': 70, '%': 70, '&': 80, '~>': 90 };
 const UNSUPPORTED_OPS = { '@': 'context binding (@)', '#': 'positional binding (#)', '%': 'parent-context reference (%, as a standalone operator)', '^': 'the sort operator (^(...))', '|': 'the transform operator (|...|)' };
 
@@ -184,9 +137,6 @@ function parse(src) {
         if (peek().t === 'op' && peek().v === ']') { next(); expr = { type: 'singletonArray', of: expr }; continue; }
         const pred = parseExpr(0);
         expectOp(']');
-        // A predicate attaches to the path STEP immediately to its left (field/wildcard/
-        // descendant), not to its fully-resolved value: see the long comment on `applyPredicate`
-        // for why "a.b[0]" and "a[0]" need different scoping even though both end in "[0]".
         if (expr.type === 'field' || expr.type === 'wildcard' || expr.type === 'descendant') {
           expr = { ...expr, preds: [...(expr.preds || []), pred] };
         } else {
@@ -325,20 +275,12 @@ function deepEqual(a, b) {
   return false;
 }
 
-// Collapses a JS array built up while mapping a step across a sequence: 0 items -> undefined,
-// 1 item -> that item (unwrapped), 2+ -> the array. This is JSONata's core "sequence" rule.
 function collapse(out) {
   if (out.length === 0) return undefined;
   if (out.length === 1) return out[0];
   return out;
 }
 
-// Generic path-step helper. `fn` is applied to each item of `current` (wrapping a non-array
-// `current` into a singleton list first); results are pushed flat (one level) into the output
-// sequence, then collapsed. When `bypassWhenSingle` is set and `current` isn't an array, `fn` is
-// instead called once on `current` directly and its result returned as-is (no flatten/collapse) -
-// this is what makes a plain field read return a real JSON array value verbatim instead of
-// unwrapping it; wildcards/descendants/predicates/object-construction always collapse.
 function mapStep(current, fn, bypassWhenSingle) {
   if (current === undefined) return undefined;
   const wasArray = Array.isArray(current);
@@ -367,11 +309,6 @@ function collectDescendants(value, out) {
   }
 }
 
-// Array indexing/filter predicate, verified against real jsonata: the predicate is evaluated once
-// per item (with that item as focus). A numeric result N selects the item whose own position
-// equals N (negative N counts from the end) - this is how plain `arr[2]` indexing and expressions
-// like `arr[$count(arr)-1]` both fall out of the same rule. An array-of-numbers result selects
-// every position it names. Any other result is used as a boolean filter.
 function applyPredicate(current, predAst, evalFn) {
   if (current === undefined) return undefined;
   const wasArray = Array.isArray(current);
@@ -393,8 +330,6 @@ function applyPredicate(current, predAst, evalFn) {
   return collapse(out);
 }
 
-// Applies brackets chained directly onto one path step (e.g. the two sets of brackets in
-// `a[x>1][0]`) in sequence, each re-indexing/filtering the previous bracket's result.
 function applyLocalPreds(value, preds, focus, scope) {
   if (!preds) return value;
   for (const predAst of preds) value = applyPredicate(value, predAst, (p, item) => evaluate(p, item, scope));
@@ -464,9 +399,6 @@ function evaluate(node, focus, scope) {
       }, false);
     }
     case 'array': {
-      // Array construction flattens each item expression's result by one level (same push-or-
-      // spread rule as mapStep) but - unlike a path step - never collapses a single leftover
-      // item back down to a bare scalar, and silently drops an item that evaluates to undefined.
       const out = [];
       for (const it of node.items) {
         const v = evaluate(it, focus, scope);

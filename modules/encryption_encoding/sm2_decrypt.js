@@ -3,8 +3,6 @@ import { A } from '../../core/registry.js';
 import { parseHex } from '../../core/util.js';
 import { sm2Decrypt } from './_sm2.js';
 
-// Mirrors sm2_encrypt.js / CyberChef's SM2 Decrypt op: Private Key is a plain 32-byte hex string
-// (not a toggleString), input is the hex ciphertext produced by SM2 Encrypt.
 module('SM2 Decrypt', 'Decrypts a message produced by SM2 Encrypt with the matching 32-byte (64 hex character) private key.',
   [
     A.string('Private Key', 'DEADBEEF'),

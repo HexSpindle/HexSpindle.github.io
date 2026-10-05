@@ -1,7 +1,3 @@
-// Hand-rolled raw-RSA PKCS#1 v1.5 and PSS sign/verify (RFC 8017), used so that:
-//  - MD5 can be used as the digest (Web Crypto's RSASSA-PKCS1-v1_5/RSA-PSS only accept SHA-*), and
-//  - PSS "verify with auto-detected salt length" (what cryptography's padding.PSS.AUTO does) works,
-//    which Web Crypto's RSA-PSS verify can't do since it requires the exact salt length up front.
 import { bigIntToBytes, bytesToBigInt, modExp } from './_bignum.js';
 import { derSequence, derOid, derNull, derOctetString } from './_asn1.js';
 import { concatBytes } from '../../core/util.js';

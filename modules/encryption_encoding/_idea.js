@@ -1,13 +1,3 @@
-
-// IDEA (International Data Encryption Algorithm): 8 rounds built from addition mod 2^16,
-// multiplication mod 2^16+1, and XOR, plus a final output transform. No S-boxes/tables needed.
-// Decryption is implemented as the direct algebraic inverse of each stage (rather than running
-// the forward algorithm with a separately-derived key schedule), which is simpler to verify:
-// per round, Q1^Q2 and Q3^Q4 (the round's own output words) cancel the "i"/"j" MA-structure
-// terms and recover e/f directly, from which the round's key-less intermediates and then its
-// inputs can be recovered using the same round keys (multiplicative/additive inverses).
-// Verified byte-for-byte against the `cryptography` package's IDEA implementation.
-
 const Q = 65537; // 2^16 + 1 (prime)
 
 // IDEA "multiplication": 0 represents 2^16 (=65536) by convention.

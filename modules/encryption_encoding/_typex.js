@@ -1,20 +1,3 @@
-// Typex machine: the British WW2 5-rotor Enigma variant used by the RAF and Commonwealth
-// militaries. Ported line-for-line from CyberChef's src/core/lib/Typex.mjs, which itself
-// reuses most of src/core/lib/Enigma.mjs (Rotor transform/step math, the pair-map base class
-// behind the reflector, and the EnigmaBase.crypt() step-then-substitute loop).
-//
-// Key differences from a plain 3/4-rotor Enigma, preserved here exactly:
-//  - 5 rotors are fitted, but only the three *leftmost* (slowest) step, using Enigma's classic
-//    double-stepping logic; the two rightmost rotors never move.
-//  - Each rotor can individually be fitted "reversed", which re-derives its wiring via a mirror
-//    transform before use.
-//  - The input plugboard is an arbitrary 26-letter substitution (not just switched pairs like
-//    Enigma's), and Typex wires its input backwards vs Enigma, which CyberChef implements by
-//    mirroring the configured wiring through the alphabet before building the rotor.
-//  - The reflector is still a classic 13-pair involution (Enigma.Reflector equivalent).
-//  - An optional "keyboard emulation" layer recodes punctuation/digits (which the real Typex
-//    produced via a shift mechanism using Z/X/V as shift-letters) to/from plain text.
-
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export const mod = (n, m) => ((n % m) + m) % m;
 
@@ -200,8 +183,6 @@ export function parseRotorStr(rotor, i) {
   return [rotor.slice(0, idx), rotor.slice(idx + 1)];
 }
 
-// Example rotor/reflector wirings. No genuine Typex rotor wirings are public; CyberChef ships
-// (and we reproduce) the same randomised examples so recipes/tests are interchangeable.
 export const TYPEX_ROTOR_PRESETS = [
   ['Example 1', 'MCYLPQUVRXGSAOWNBJEZDTFKHI<BFHNQUW'],
   ['Example 2', 'KHWENRCBISXJQGOFMAPVYZDLTU<BFHNQUW'],

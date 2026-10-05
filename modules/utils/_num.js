@@ -1,6 +1,3 @@
-// Mirrors Python's repr(float) closely enough for round numbers and typical values: integral
-// floats get a trailing ".0", everything else uses the shortest round-tripping decimal form.
-// Scoped to the utils unit-conversion ops only.
 export function pyFloatRepr(n) {
   if (!Number.isFinite(n)) return n > 0 ? 'inf' : (n < 0 ? '-inf' : 'nan');
   if (Number.isInteger(n) && Math.abs(n) < 1e16) return (Object.is(n, -0) ? '-0' : String(n)) + '.0';

@@ -1,8 +1,3 @@
-// Minimal strptime/strftime engine (JS has neither natively) supporting the subset of Python's
-// format directives actually used by this category's modules: %Y %y %m %d %H %I %M %S %f %z %Z
-// %a %A %b %B %p %%. Mirrors CPython's _strptime regex-per-directive approach closely enough to
-// parse the same inputs, and strftime mirrors the matching output formatting.
-
 export const MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 export const MONTHS_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 export const DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];

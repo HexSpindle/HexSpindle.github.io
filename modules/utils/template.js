@@ -1,24 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// CyberChef's Template wraps the real "handlebars" npm package. HexSpindle has no bundler and
-// doesn't vendor third-party libraries (see modules/utils/jpath_expression.js / jpath_query.js /
-// xpath_expression.js for the project's established answer to "what to do instead": implement a
-// practical, documented subset by hand). This is that subset for Handlebars/Mustache:
-//   {{path.to.value}}            HTML-escaped interpolation (dotted property access; "this"/"."
-//                                 refer to the current context)
-//   {{{path}}} / {{&path}}       unescaped interpolation
-//   {{#each arr-or-obj}}...{{/each}}   iterates an array (binds @index/@first/@last) or an
-//                                 object's own properties (binds @key too); {{#each}}...{{else}}
-//                                 renders when the collection is empty
-//   {{#if cond}}...{{else}}...{{/if}}   0, "", null, undefined, [] and {} are falsy (matching
-//                                 Handlebars, not plain JS truthiness)
-//   {{#unless cond}}...{{/unless}}
-//   {{#with obj}}...{{/with}}     rebinds the context for its body
-//   {{! comment }} / {{!-- comment --}}
-// NOT supported (unlike real Handlebars): helpers other than the five above, subexpressions,
-// "../" parent-context lookups, partials, and custom helpers/decorators. An unsupported block
-// helper or a dangling {{else}}/{{/block}} raises a clear error rather than silently misrendering.
 module('Template', 'Renders a template against JSON input, substituting {{placeholder}} variables - a practical subset of Handlebars/Mustache syntax (see source comment for exactly what is supported).',
   [A.area('Template', 'Hello {{name}}!')],
   (jsonText, templateStr) => {
@@ -38,8 +20,6 @@ function stringify(v) {
 }
 
 function truthy(v) {
-  // Matches Handlebars.Utils.isEmpty: an empty array is falsy, but an object (even with no own
-  // keys) is truthy - only arrays get an emptiness check, objects don't.
   if (Array.isArray(v)) return v.length > 0;
   return !!v;
 }

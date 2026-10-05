@@ -1,8 +1,5 @@
 import { module } from './_cat.js';
 
-// Mirrors CyberChef's CetaceanCipherDecode.mjs: a literal space in the input is treated as the
-// 16-bit pattern "0000000000100000" (0x20, i.e. a space character) rather than being passed through
-// literally, so " " and "EEEEEEEEEEeEEEEE" decode the same way.
 const SPACE_BITS = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0];
 
 export function cetaceanDecode(input) {

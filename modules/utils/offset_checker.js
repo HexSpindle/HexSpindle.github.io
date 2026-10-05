@@ -4,13 +4,6 @@ import { A, Html } from '../../core/registry.js';
 const HTML_CHARS = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '`': '&#x60;' };
 const escapeHtml = s => s.replace(/[&<>"'`]/g, c => HTML_CHARS[c]);
 
-// Direct port of CyberChef's Offset checker: splits the input into samples on the delimiter, then
-// walks character-by-character through the FIRST sample only (samples[0].length bounds the main
-// loop) wrapping any column where every sample has the same character in a highlight span. Once a
-// sample runs out of characters it just stops getting highlighted further; once the loop passes
-// the end of sample 0, each sample's remaining tail (if it has one) is appended verbatim with no
-// further comparison - that asymmetry (comparison window is always sample 0's length) is upstream's
-// actual behaviour, not a simplification.
 module('Offset checker', 'Compares multiple inputs (separated by the sample delimiter) and highlights the characters that are identical, at the same position, across every sample.',
   [A.string('Sample delimiter', '\\n\\n')],
   (t, sdRaw) => {

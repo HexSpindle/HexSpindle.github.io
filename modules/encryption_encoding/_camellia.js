@@ -188,11 +188,6 @@ export const SIGMA = new Uint32Array([
   0x54ff53a5, 0xf1d36f1c, 0x10e527fa, 0xde682d1d, 0xb05688c2, 0xb3e6c1fd
 ]);
 
-// Camellia block cipher (RFC 3713 / ISO 18033-3), ported directly from OpenSSL's
-// crypto/camellia/camellia.c reference implementation (key schedule + 6-round Feistel groups
-// with FL/FL^-1 diffusion layers between groups). S-box tables and SIGMA constants above are
-// extracted verbatim from that same source file.
-
 function GETU32(b, o) {
   return (((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0);
 }
@@ -201,9 +196,6 @@ function PUTU32(v, out, o) {
 }
 function leftRotate1(x) { return (((x << 1) | (x >>> 31)) >>> 0); }
 
-// Rotates the 128-bit value represented by the 4 registers (a,b,c,d) left by n<32 bits,
-// mirroring OpenSSL's RotLeft128(_s0,_s1,_s2,_s3,_n) macro exactly (including the way
-// callers reorder which variable is "s0" to get free +32-bit rotations between calls).
 function rot4(a, b, c, d, n) {
   const t0 = a >>> (32 - n);
   const na = (((a << n) | (b >>> (32 - n))) >>> 0);
@@ -213,8 +205,6 @@ function rot4(a, b, c, d, n) {
   return [na, nb, nc, nd];
 }
 
-// Mirrors the Camellia_Feistel(_s0,_s1,_s2,_s3,_key) macro: reads x0,x1 (already-live state)
-// and the two round-key words, and returns the new [y0,y1] to replace the other half of state.
 function feistelStep(x0, x1, y0, y1, k0, k1) {
   const t0 = (x0 ^ k0) >>> 0;
   const t1 = (x1 ^ k1) >>> 0;

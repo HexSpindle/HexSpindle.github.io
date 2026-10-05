@@ -4,7 +4,7 @@ import { loadImage, canvasToPng } from './_img.js';
 
 module('Image Filter',
   'Applies a greyscale or sepia filter to an image, using the same pixel formulas as ' +
-  "CyberChef's Jimp-based implementation: greyscale uses ITU-R BT.709 luma weights (0.2126/0.7152/" +
+  "Jimp-based implementation: greyscale uses ITU-R BT.709 luma weights (0.2126/0.7152/" +
   '0.0722), and sepia reproduces Jimp\'s formula exactly, including the fact that it reuses the ' +
   'already-recomputed red channel (rather than the original) when computing the new green and blue ' +
   'channels - a known quirk of that formula, not a textbook sepia matrix.',

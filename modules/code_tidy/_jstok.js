@@ -1,7 +1,3 @@
-// Small JavaScript tokenizer + beautifier / minifier (good for typical code, not a full parser).
-// Shared by javascript_beautify.js, javascript_minify.js and generic_code_beautify.js.
-// Ported from core/jstok.py.
-
 const KEYWORDS_BEFORE_REGEX = new Set(['return', 'typeof', 'instanceof', 'in', 'of', 'new', 'delete', 'void', 'throw', 'case', 'do', 'else', 'yield', 'await']);
 
 const PUNCT = ['{', '}', '(', ')', '[', ']', ';', ',', '<', '>', '<=', '>=', '==', '!=', '===', '!==', '+', '-', '*', '/', '%', '**', '++', '--', '<<', '>>', '>>>', '&', '|', '^', '!', '~',

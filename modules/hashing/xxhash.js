@@ -1,11 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// xxHash: XXH32/XXH64 hand-ported directly from the reference algorithm (xxhash.c/.h), and XXH3-64
-// /XXH3-128 hand-ported from the scalar code path of the same reference (short-key mixing for
-// len<=240, and the accumulate/scramble stripe loop + default 192-byte secret for longer inputs).
-// Verified byte-for-byte against the `xxhash` Python package across 0..2000+ byte inputs, seeded
-// and unseeded, spanning every size-banded code path in both XXH3 variants.
 const M32 = 0xffffffffn;
 const P32_1 = 0x9E3779B1n, P32_2 = 0x85EBCA77n, P32_3 = 0xC2B2AE3Dn, P32_4 = 0x27D4EB2Fn, P32_5 = 0x165667B1n;
 const M64 = (1n << 64n) - 1n;

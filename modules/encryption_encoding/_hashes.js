@@ -1,8 +1,3 @@
-// Private helper: minimal MD5 and SHA-224 digests, plus a generic HMAC/PBKDF2 built on a digest
-// function. These exist only because Web Crypto's PBKDF2/HKDF/HMAC refuse "MD5" and "SHA-224" as
-// a hash choice (SubtleCrypto only recognizes SHA-1/256/384/512) - every other hash choice in this
-// category's ops (SHA-1/256/384/512) goes through the real Web Crypto API instead, not this file.
-
 function rotl(x, c) { return (x << c) | (x >>> (32 - c)); }
 
 // ---- MD5 (RFC 1321) ----

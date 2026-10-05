@@ -34,13 +34,16 @@ module('To Table', 'Renders delimited text as an ASCII, Markdown or HTML table.'
     }
     const widths = Array.from({ length: w }, (_, i) => Math.max(...padded.map(r => r[i].length)));
     const line = r => '| ' + r.map((c, i) => c.padEnd(widths[i])).join(' | ') + ' |';
-    const sep = fmt === 'Markdown' ? '|' + widths.map(x => '-'.repeat(x + 2)).join('|') + '|' : '+' + widths.map(x => '-'.repeat(x + 2)).join('+') + '+';
-    const out = [];
-    if (fmt === 'ASCII') out.push(sep);
+    if (fmt === 'Markdown') {
+      const div = '| ' + widths.map(x => '-'.repeat(x)).join(' | ') + ' |';
+      return [line(padded[0]), div, ...padded.slice(1).map(line)].join('\n') + '\n';
+    }
+    const sep = '+' + widths.map(x => '-'.repeat(x + 2)).join('+') + '+';
+    const out = [sep];
     padded.forEach((r, i) => {
       out.push(line(r));
-      if (i === 0 && header) out.push(fmt === 'Markdown' ? sep : sep.replace(/-/g, '='));
+      if (i === 0 && header) out.push(sep);
     });
-    if (fmt === 'ASCII') out.push(sep);
-    return out.join('\n');
+    out.push(sep);
+    return out.join('\n') + '\n';
   }, { text: true });

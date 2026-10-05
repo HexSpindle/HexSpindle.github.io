@@ -1,7 +1,3 @@
-// A JSON parser that keeps Python's json.loads distinction between ints and floats (JS has a
-// single number type, so "42" and "42.0" would otherwise be indistinguishable) and between small
-// and arbitrary-precision integers (BigInt beyond Number.MAX_SAFE_INTEGER). Used by ops that encode
-// JSON into a binary format whose wire types depend on that distinction (CBOR, MessagePack, Protobuf).
 export class Flt { constructor(v) { this.v = v; } }
 
 export function parseJsonTyped(s) {

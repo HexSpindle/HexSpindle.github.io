@@ -33,11 +33,7 @@ module('Extract Audio Metadata',
   "MP3 (ID3v1/ID3v2 - delegates to the same parser as this project's 'Extract ID3'), WAV/BWF (RIFF " +
   'INFO list, bext broadcast-wave extension, iXML/axml text chunks), FLAC (Vorbis comments, picture ' +
   'block count) and OGG/Opus (Vorbis comments, found via a best-effort byte scan rather than full Ogg ' +
-  "page demuxing - see the OGG parsing note in the JSON output). This is a from-scratch, narrower port " +
-  "of CyberChef's 'Extract Audio Metadata', which additionally handles AAC/ADTS, AC3 (Dolby Digital), " +
-  'WMA/ASF, best-effort MP4/M4A and AIFF scanning, and C2PA provenance detection - none of those are ' +
-  'implemented here; unsupported/unrecognised containers produce a report with an error entry instead ' +
-  'of throwing, matching CyberChef\'s behaviour of always returning a (possibly mostly empty) report.',
+  "page demuxing - see the OGG parsing note in the JSON output).",
   [A.string('Filename (optional)', ''), A.number('Max embedded text bytes (iXML/axml)', 1024 * 512, 1024)],
   (data, filename, maxTextBytes) => {
     if (!data.length) throw new Error('No input data. Load an audio file.');
@@ -88,7 +84,7 @@ module('Extract Audio Metadata',
         report.errors.push({
           stage: 'sniff',
           message: 'Unsupported or unrecognised container. Supported: MP3, WAV/BWF, FLAC, OGG/Opus. ' +
-            "AAC, AC3, WMA, MP4/M4A and AIFF (which CyberChef's Extract Audio Metadata handles) are not implemented in this port.",
+            "AAC, AC3, WMA, MP4/M4A and AIFF",
         });
       }
     } catch (e) {

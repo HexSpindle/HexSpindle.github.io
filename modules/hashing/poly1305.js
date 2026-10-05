@@ -2,12 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { bytesToHex } from '../../core/util.js';
 
-// Poly1305 one-time authenticator (RFC 8439), using BigInt for the 130-bit modular arithmetic.
-// The Python source always derives the one-time (r, s) key pair from a 32-byte cipher key via either
-// ChaCha20 or AES (matching pycryptodome's Hash.Poly1305, not a bare RFC 8439 r/s pair): for ChaCha20,
-// (r, s) is the first 32 bytes of ChaCha20(key, nonce).keystream(); for AES, r = key[16:32] untouched
-// and s = AES-ECB(key[0:16], nonce). ChaCha20 is hand-rolled (no Web Crypto support); the single-block
-// AES-ECB encryption reuses the browser's native AES-CBC with a zero IV (identical to ECB for one block).
 const P = (1n << 130n) - 5n;
 const MASK128 = (1n << 128n) - 1n;
 

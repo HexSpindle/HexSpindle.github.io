@@ -2,23 +2,21 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
 module('To Hex Content', 'Converts special characters to Snort/Suricata-style |hex| content.',
-  [A.select('Convert', ['Only special chars', 'Only special chars including spaces', 'All chars'])],
-  (data, mode) => {
-    const special = (b) => {
-      if (mode === 'All chars') return true;
-      if (b === 32) return mode.endsWith('spaces');
-      return !(b > 32 && b < 127) || '|\\'.includes(String.fromCharCode(b));
-    };
-    const out = [];
-    let run = [];
+  [A.select('Convert', ['Only special chars', 'Only special chars including spaces', 'All chars']), A.boolean('Print spaces between bytes', false)],
+  (data, mode, spaces) => {
+    const hx = b => b.toString(16).padStart(2, '0');
+    if (mode === 'All chars') return '|' + [...data].map(hx).join(spaces ? ' ' : '') + '|';
+    const convSpaces = mode === 'Only special chars including spaces';
+    let out = '', inHex = false;
     for (const b of data) {
-      if (special(b)) {
-        run.push(b.toString(16).padStart(2, '0'));
+      if ((b === 32 && convSpaces) || (b < 48 && b !== 32) || (b > 57 && b < 65) || (b > 90 && b < 97) || b > 122) {
+        if (!inHex) { out += '|'; inHex = true; } else if (spaces) out += ' ';
+        out += hx(b);
       } else {
-        if (run.length) { out.push('|' + run.join(' ') + '|'); run = []; }
-        out.push(String.fromCharCode(b));
+        if (inHex) { out += '|'; inHex = false; }
+        out += String.fromCharCode(b);
       }
     }
-    if (run.length) out.push('|' + run.join(' ') + '|');
-    return out.join('');
+    if (inHex) out += '|';
+    return out;
   });

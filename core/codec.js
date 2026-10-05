@@ -1,5 +1,3 @@
-// Shared encoding helpers used by modules that need custom-alphabet base encodings.
-
 export function expandAlphabet(s) {
   const out = [];
   let i = 0;

@@ -1,7 +1,3 @@
-// Hand-rolled Blowfish (no Web Crypto support for this cipher). Bruce Schneier's original
-// 16-round Feistel design: a key-dependent P-array (18 32-bit subkeys) and four 256-entry S-boxes,
-// both initialized from the digits of pi (_blowfish_constants.js) and then churned through the
-// cipher itself, keyed, to produce the final subkeys - the standard Blowfish key schedule.
 import { P_INIT, S_INIT } from './_blowfish_constants.js';
 
 function u32(x) { return x >>> 0; }

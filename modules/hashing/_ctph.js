@@ -1,10 +1,3 @@
-// Context Triggered Piecewise Hashing (CTPH), ported line-for-line from the `ctph.js` npm package
-// (the library CyberChef's "CTPH"/"Compare CTPH hashes" operations delegate to). A distinct
-// implementation from `ssdeep.js` (see _ssdeep.js) - different FNV offset basis (0x28021967 vs
-// 671226215), a different rolling-hash accumulator, no max-signature-length cap, always flushing a
-// final segment at the last byte, and a different block-size search (log2-based, with the chosen
-// block-size *index* - not the block size itself - encoded as a single base64 output character).
-// Verified byte-for-byte against ctph.js 0.0.5 itself across a range of input lengths.
 const HASH_PRIME = 0x01000193;
 const HASH_INIT = 0x28021967;
 const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';

@@ -1,8 +1,3 @@
-// GOST signing (CMAC-style "imitovstavka" per GOST R 34.13-2015 S4.3) and GOST key wrapping
-// (RFC 4357 SS6.1/6.3), built on the Magma/Kuznyechik block ciphers in ./_gost.js. Ported from
-// the @wavesenterprise/crypto-gost-js engine (the library CyberChef's GOST Sign/Verify/KeyWrap/
-// KeyUnwrap operations delegate to) - specifically its processMAC15/wrapKeyGOST/wrapKeyCP/
-// diversifyKEK functions - and cross-checked against that library's own output byte-for-byte.
 import { makeMagma, makeKuznechik, ecbEncrypt, ecbDecrypt, cfbEncrypt } from './_gost.js';
 
 function makeCipher(algo, key) {

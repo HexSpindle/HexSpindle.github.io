@@ -8,8 +8,6 @@ function stripSteps(rstr) {
   return idx === -1 ? rstr : rstr.slice(0, idx);
 }
 
-/** Shared by Bombe and Multiple Bombe: builds the (fast-to-slow) rotor wiring list CyberChef's
- * BombeMachine expects, from the UI's left-to-right rotor args. */
 export function buildRotorList(model, rotor4, rotorL, rotorM, rotorR) {
   const rotors = [];
   for (let i = 0; i < 4; i++) {
@@ -21,8 +19,6 @@ export function buildRotorList(model, rotor4, rotorL, rotorM, rotorR) {
   return rotors;
 }
 
-/** Shared by Bombe and Multiple Bombe: formats a BombeMachine run's results as text, matching
- * CyberChef's HTML table but as plain text. */
 export function formatBombeResults(nLoops, result, rotorLabel) {
   let out = `Bombe run on menu with ${nLoops} loop${nLoops === 1 ? '' : 's'} (2+ desirable). `
     + 'Rotor positions are listed left to right and start at the beginning of the crib, and '

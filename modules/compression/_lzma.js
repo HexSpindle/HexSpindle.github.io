@@ -1,9 +1,3 @@
-// LZMA (not LZMA2) codec: range coder + the classic literal/match state machine, for the legacy
-// ".lzma" ("alone") container that `lzma.compress(..., format=FORMAT_ALONE)` produces. The modern
-// .xz container wraps LZMA2 framing (dictionary-reset chunks, block index, CRCs) around this same
-// core and isn't implemented here - see lzma_compress.js / lzma_decompress.js for what that means
-// in practice.
-
 const kNumBitModelTotalBits = 11;
 const kBitModelTotal = 1 << kNumBitModelTotalBits;
 const kNumMoveBits = 5;

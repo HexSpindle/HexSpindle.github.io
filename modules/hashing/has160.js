@@ -7,9 +7,7 @@ import { bytesToHex } from '../../core/util.js';
 // style padding/length) and a message-expansion schedule that XORs 4 words together instead of
 // SHA-1's rotate-and-mix. Hand-ported from RHash's librhash/has160.c (an independent, long-standing C
 // implementation; same step macros STEP_F1..F4, round-constant table and message-index/rotation
-// schedule reproduced here), and cross-checked step-by-step against crypto-api's has160.mjs (the
-// library CyberChef's own "HAS-160" operation calls through crypto-api's runHash) for the rotation
-// amounts and XOR-expansion indices.
+// schedule reproduced here).
 //
 // Verified against RHash's `rhash --has160` CLI (its own separate, independent implementation) for
 // '', 'a', 'abc', 'message digest', the lowercase alphabet, and 'a' at 55/56/63/64/65 bytes (to

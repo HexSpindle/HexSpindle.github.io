@@ -7,8 +7,6 @@ import { CRC64 } from './crc64_checksum.js';
 import { fletcher, fletcher8 } from './fletcher8_checksum.js';
 import { adler32 } from './adler32_checksum.js';
 
-// Mirrors core/checksums.py's CRC[32] catalogue (the single-variant crc32_checksum.js op only covers
-// the standard zlib/PNG "CRC-32" entry, so the full width-32 catalogue is reproduced here).
 const CRC32 = {
   'CRC-32': [32, 0x04C11DB7n, 0xFFFFFFFFn, true, true, 0xFFFFFFFFn],
   'CRC-32/BZIP2': [32, 0x04C11DB7n, 0xFFFFFFFFn, false, false, 0xFFFFFFFFn],

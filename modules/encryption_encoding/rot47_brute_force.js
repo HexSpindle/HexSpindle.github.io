@@ -12,7 +12,7 @@ module('ROT47 Brute Force', 'Shows the input ROT47-rotated by every amount 1-93.
         return (o >= 33 && o <= 126) ? String.fromCharCode(33 + (o - 33 + n) % 94) : c;
       }).join('');
       if (crib && !r.includes(crib)) continue;
-      out.push((show ? `Amount = ${n}: ` : '') + r);
+      out.push((show ? `Amount = ${String(n).padStart(2, ' ')}: ` : '') + r);
     }
     return out.join('\n');
   }, { text: true });

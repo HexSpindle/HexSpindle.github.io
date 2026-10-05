@@ -1,17 +1,3 @@
-// Apache Avro binary decoder for "Object Container Files" (avro.apache.org spec, Object Container
-// Files section), matching the behaviour of the `avsc` npm library that CyberChef's "Avro to JSON"
-// operation wraps (avsc@5.7.9, as pinned in CyberChef's package-lock.json):
-//  - "bytes"/"fixed" fields decode to the same shape Node's `Buffer.prototype.toJSON()` produces
-//    (`{"type":"Buffer","data":[...]}`), since avsc hands back real Buffers and CyberChef's op
-//    feeds the result straight into JSON.stringify.
-//  - Union branches are left unwrapped unless two or more non-null branches would otherwise decode
-//    to indistinguishable JS shapes (verified against avsc: a nullable int/string/record is never
-//    wrapped, but a union of two record types - or otherwise same-shape branches - is wrapped as
-//    `{"<BranchName>": value}` to disambiguate, matching avsc's `wrapUnions: 'auto'`).
-//  - Only the "null" and "deflate" block codecs are supported, matching avsc's BlockDecoder, which
-//    ships exactly those two by default (no built-in "snappy"/"bzip2"/"xz" support, since those need
-//    an explicit `codecs` option that CyberChef's operation never passes).
-
 import { decodeUtf8 } from '../../core/util.js';
 import { streamTransform } from '../compression/_streams.js';
 

@@ -1,21 +1,3 @@
-// Hand-rolled YAML / TOML / INI support for json_to_yaml, yaml_to_json and yaml_toml_ini_convert,
-// since there is no browser-native parser/serialiser for any of them and the Python source relies
-// on full-featured libraries (pyyaml, tomllib, configparser).
-//
-// NOT supported (documented, rather than silently mishandled):
-//  - YAML anchors/aliases (&foo / *foo), tags (!!foo), multi-document streams (only the first
-//    document is read), folded block scalars (">" is read the same as "|", i.e. without folding).
-//  - The dumper's "nameprep"-style scalar resolver approximates PyYAML's regex set (bools,
-//    nulls, ints, floats, ISO-ish dates) rather than reproducing it exactly, and multi-line strings
-//    are written with "|" literal block style rather than PyYAML's single-quoted folded style
-//    (both round-trip correctly, the bytes just differ from PyYAML's).
-//  - TOML: inline tables ({...}), arrays of tables ([[section]]), multi-line/literal strings,
-//    dotted keys outside table headers, and native datetime values (read back as plain strings).
-//  - INI: configparser's %-interpolation is not implemented (values are taken literally).
-//  - Across conversions, JS's single number type can't always preserve the JSON int/float
-//    distinction (e.g. "3.0" may round-trip as "3"), matching the same limitation noted for the
-//    CBOR/MessagePack/Protobuf ports.
-
 export class Flt { constructor(v) { this.v = v; } }
 
 // ---------- YAML ----------

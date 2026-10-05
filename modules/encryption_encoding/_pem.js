@@ -1,9 +1,3 @@
-// Private helper: minimal PEM -> DER decoding for importing RSA/EC keys into Web Crypto.
-// Supports PKCS#8 private keys ("-----BEGIN PRIVATE KEY-----") and SPKI public keys
-// ("-----BEGIN PUBLIC KEY-----"), which is what `cryptography.hazmat.primitives.serialization`
-// produces by default and what most modern tooling (openssl genpkey, etc.) emits. Older PKCS#1
-// ("-----BEGIN RSA PRIVATE KEY-----") or SEC1 EC private key PEMs aren't supported since Web
-// Crypto's importKey has no format for them.
 export function pemToDer(pem) {
   const match = pem.match(/-----BEGIN ([^-]+)-----([\s\S]*?)-----END \1-----/);
   if (!match) throw new Error('Not a valid PEM block');

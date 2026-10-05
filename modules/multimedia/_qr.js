@@ -1,10 +1,3 @@
-// Standard QR Code (ISO/IEC 18004) matrix generator, byte-mode only. Produces a real, scannable
-// matrix: finder/timing/alignment patterns, Reed-Solomon error correction, data masking with
-// penalty scoring and format/version information - no micro-QR, no alphanumeric/numeric mode
-// optimisation (so output may use a larger version than a mode-optimising encoder for the same
-// text, but is fully spec-compliant).
-
-// Number of (block count, total codewords, data codewords) per version (1-40) and EC level.
 export const ECC_TABLE = [
   {L:[[1, 26, 19]],M:[[1, 26, 16]],Q:[[1, 26, 13]],H:[[1, 26, 9]]},
   {L:[[1, 44, 34]],M:[[1, 44, 28]],Q:[[1, 44, 22]],H:[[1, 44, 16]]},

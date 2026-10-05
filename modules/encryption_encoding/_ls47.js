@@ -1,7 +1,3 @@
-// LS47 pen-and-paper cipher (https://github.com/exaexa/ls47), a 7x7-tile successor to Alan
-// Kaminsky's ElsieFour (LC4). Ported from CyberChef's lib/LS47.mjs, which is itself the reference
-// implementation (by the cipher's author) - there is no independent published spec to check it
-// against, so CyberChef's source *is* the spec here.
 export const LETTERS = "_abcdefghijklmnopqrstuvwxyz.0123456789,-+*/:?!'()";
 
 function rotateDown(key, col, n) {
@@ -28,8 +24,6 @@ function findIx(letter) {
   return [Math.floor(i / 7), i % 7];
 }
 
-/** Derives a 49-character key permutation from a password, by rotating the alphabet grid once per
- * password character (same key-expansion algorithm as the LS47 spec / CyberChef). */
 export function deriveKey(password) {
   let i = 0, k = LETTERS;
   for (const c of password) {

@@ -1,4 +1,3 @@
-// Shared BCD resources matching CyberChef's src/core/lib/BCD.mjs exactly.
 export const ENCODING_SCHEME = ['8 4 2 1', '7 4 2 1', '4 2 2 1', '2 4 2 1', '8 4 -2 -1', 'Excess-3', 'IBM 8 4 2 1'];
 
 export const ENCODING_LOOKUP = {

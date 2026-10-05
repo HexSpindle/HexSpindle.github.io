@@ -1,18 +1,21 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
-
-const NAMED = { 38: 'amp', 60: 'lt', 62: 'gt', 34: 'quot', 39: 'apos', 160: 'nbsp', 169: 'copy', 174: 'reg', 8364: 'euro', 8482: 'trade' };
+import { ENTITY_NAMES } from './_html_entities.js';
 
 module('To HTML Entity', 'Converts characters to HTML entities.', [A.boolean('Convert all characters', false), A.select('Convert to', ['Named entities', 'Numeric entities', 'Hex entities'])],
-  (t, everything, kind) => {
+  (t, all, kind) => {
+    const numeric = kind === 'Numeric entities', hexa = kind === 'Hex entities';
     let out = '';
-    for (const c of t) {
-      const o = c.codePointAt(0);
-      const special = '&<>"\''.includes(c) || o > 127;
-      if (!everything && !special) out += c;
-      else if (kind === 'Named entities' && o in NAMED) out += `&${NAMED[o]};`;
-      else if (kind === 'Hex entities') out += `&#x${o.toString(16)};`;
-      else out += `&#${o};`;
+    for (const ch of t) {
+      const c = ch.codePointAt(0);
+      const named = c in ENTITY_NAMES ? `&${ENTITY_NAMES[c]};` : null;
+      const hex = `&#x${c.toString(16).padStart(2, '0')};`;
+      if (all && numeric) out += `&#${c};`;
+      else if (all && hexa) out += hex;
+      else if (all) out += named || `&#${c};`;
+      else if (numeric) out += (c > 255 || named) ? `&#${c};` : ch;
+      else if (hexa) out += (c > 255 || named) ? hex : ch;
+      else out += named || (c > 255 ? `&#${c};` : ch);
     }
     return out;
   }, { text: true });
