@@ -926,6 +926,22 @@ function encodeMapped(text, name, strict) {
   return encodeWithStringMap(text, reverse, strict, reverse.get('?') || [0x3f]);
 }
 
+// Strict repertoire masks for legacy standards whose browser/EUC superset decoders accept
+// additional byte positions. Each mask covers the 94x94 row/cell grid (0x21..0x7E).
+function decode94Mask(b64) {
+  const raw = atob(b64), out = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+  return out;
+}
+function pairAllowed(mask, pair) {
+  const r = (pair >> 8) & 0xff, c = pair & 0xff;
+  if (r < 0x21 || r > 0x7e || c < 0x21 || c > 0x7e) return false;
+  const i = (r - 0x21) * 94 + (c - 0x21);
+  return !!(mask[i >> 3] & (1 << (i & 7)));
+}
+const GB2312_VALID_MASK = decode94Mask('//////////////8/AMD////////8z//z////////////////////////////HwD/////////////P8D//z/A//8/AAAAAPD///8fAPD///8fAPz//w/A/////wcAAPj//////////38AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////H/z///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==');
+const JIS0213_ISO_P2_VALID_MASK = decode94Mask('//////////////8/AAAAAAAAAAAAAADw/////////////////////////////////////////////z8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPz//////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/P////////////////////////////////////////////////////////////8DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8PAA==');
+
 function makePlane() { return { decode: new Map(), reverse: new Map() }; }
 function addPlaneEntry(p, pair, s) {
   p.decode.set(pair, s);
@@ -955,16 +971,22 @@ function native94Plane(label, kind = 'standard') {
   planeCache.set(key, p);
   return p;
 }
-function staticJisPlane(tableName, planeNo) {
-  const key = `staticjis:${tableName}:${planeNo}`;
+function staticJisPlane(tableName, planeNo, validMask = null) {
+  const key = `staticjis:${tableName}:${planeNo}:${validMask ? 'strict' : 'all'}`;
   if (planeCache.has(key)) return planeCache.get(key);
   const p = makePlane();
   for (const [packed, s] of MULTIBYTE_TABLES[tableName]) {
     const b = unpackPacked(packed);
+    let pair = null;
     if (planeNo === 1 && b.length === 2 && b[0] >= 0xa1 && b[0] <= 0xfe && b[1] >= 0xa1 && b[1] <= 0xfe)
-      addPlaneEntry(p, ((b[0] - 0x80) << 8) | (b[1] - 0x80), s);
+      pair = ((b[0] - 0x80) << 8) | (b[1] - 0x80);
     else if (planeNo === 2 && b.length === 3 && b[0] === 0x8f && b[1] >= 0xa1 && b[1] <= 0xfe && b[2] >= 0xa1 && b[2] <= 0xfe)
-      addPlaneEntry(p, ((b[1] - 0x80) << 8) | (b[2] - 0x80), s);
+      pair = ((b[1] - 0x80) << 8) | (b[2] - 0x80);
+    if (pair !== null && (!validMask || pairAllowed(validMask, pair))) {
+      // JIS X 0213:2000 plane 2 differs from the EUC-JISX0213 mapping at 0x7D3B.
+      const str = tableName === 'EUC-JISX0213' && planeNo === 2 && pair === 0x7d3b ? '\u9b1c' : s;
+      addPlaneEntry(p, pair, str);
+    }
   }
   planeCache.set(key, p);
   return p;
@@ -987,10 +1009,27 @@ function strictJisPlane(kind) {
 }
 function jis0208() { return strictJisPlane('0208'); }
 function jis0212() { return strictJisPlane('0212'); }
-function gb2312Plane() { return native94Plane('gbk', 'gb2312'); }
+function gb2312Plane() {
+  const key = 'strict:gb2312';
+  if (planeCache.has(key)) return planeCache.get(key);
+  const raw = native94Plane('gbk', 'gb2312'), p = makePlane();
+  for (let r = 0x21; r <= 0x77; r++) for (let c = 0x21; c <= 0x7e; c++) {
+    const pair = (r << 8) | c;
+    if (!pairAllowed(GB2312_VALID_MASK, pair)) continue;
+    // WHATWG GBK intentionally differs from strict GB2312 at these two positions.
+    const str = pair === 0x2124 ? '\u30fb' : pair === 0x212a ? '\u2015' : raw.decode.get(pair);
+    if (str !== undefined) addPlaneEntry(p, pair, str);
+  }
+  planeCache.set(key, p);
+  return p;
+}
 function ksc5601Plane() { return native94Plane('euc-kr'); }
-function jis0213_2000(n) { return staticJisPlane('EUC-JISX0213', n); }
-function jis0213_2004(n) { return staticJisPlane('EUC-JIS-2004', n); }
+function jis0213_2000(n) {
+  return staticJisPlane('EUC-JISX0213', n, n === 2 ? JIS0213_ISO_P2_VALID_MASK : null);
+}
+function jis0213_2004(n) {
+  return staticJisPlane('EUC-JIS-2004', n, n === 2 ? JIS0213_ISO_P2_VALID_MASK : null);
+}
 
 function decodePlanePair(p, r, c) {
   if (r < 0x21 || r > 0x7e || c < 0x21 || c > 0x7e) return '\ufffd';
