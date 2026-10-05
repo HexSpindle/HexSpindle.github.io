@@ -1,4 +1,3 @@
-// Shared number-list parsing for arithmetic_logic ops (mirrors core/numbers.py's parse_numbers).
 import { delim } from '../../core/util.js';
 
 export function parseNumbers(text, d = 'Line feed') {

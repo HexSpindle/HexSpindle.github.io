@@ -1,4 +1,3 @@
-// X.509 certificate / PKCS#10 CSR / CRL structure parsing and building, built on _asn1.js.
 import {
   parseOneDer, derUint, decodeOid, decodeAsn1Time, derSequence, derSet, derOid, derUtf8String,
   derPrintableString, derBoolean, derOctetString, derContextPrimitive, derInteger, bytesToHex,
@@ -16,8 +15,6 @@ function rfc4514Escape(v) {
   return s;
 }
 
-/** Renders a parsed Name (RDNSequence node) as an RFC 4514 string, most-specific RDN first
- * (matching `cryptography`'s Name.rfc4514_string()). */
 export function nameToRfc4514(nameNode) {
   const rdns = nameNode.children.map(rdnSet => rdnSet.children.map(atv => {
     const oid = decodeOid(atv.children[0].value);
@@ -90,7 +87,6 @@ function formatGeneralName(gn) {
   return `[${gn.tag}]:${bytesToHex(gn.value)}`;
 }
 
-// ---- Certificate ---------------------------------------------------------------------------
 
 export function parseTbsCertificate(tbs) {
   const c = tbs.children;
@@ -119,7 +115,6 @@ export function parseX509(der) {
   return { tbs, tbsRaw: tbsNode.raw, sigAlgo, signature: sigNode.value.subarray(1), raw: der };
 }
 
-// ---- CSR (PKCS#10) --------------------------------------------------------------------------
 
 export function parseCsr(der) {
   const top = parseOneDer(der);
@@ -142,7 +137,6 @@ export function parseCsr(der) {
   };
 }
 
-// ---- CRL --------------------------------------------------------------------------------------
 
 export function parseCrl(der) {
   const top = parseOneDer(der);
@@ -162,10 +156,6 @@ export function parseCrl(der) {
   return { version, sigAlgo, issuer, thisUpdate, nextUpdate, revoked };
 }
 
-// ---- Building (Name / Extensions, for CSR and self-signed cert generation) --------------------
-
-/** attrs: [{oid, value, printable}] in the order they should appear (most-significant first, as
- * given to cryptography's x509.Name()). Country code uses PrintableString, everything else UTF8String. */
 export function buildName(attrs) {
   const rdns = attrs.map(a => derSet([derSequence([derOid(a.oid), a.printable ? derPrintableString(a.value) : derUtf8String(a.value)])]));
   return derSequence(rdns);

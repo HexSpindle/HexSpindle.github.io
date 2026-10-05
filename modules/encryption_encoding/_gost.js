@@ -6,7 +6,6 @@ function xorBytes(a, b) {
   return out;
 }
 
-// ---- Kuznechik (128-bit block) ----
 
 function gfMul(a, b) {
   let r = 0;
@@ -119,7 +118,6 @@ export function makeKuznechik(key) {
   };
 }
 
-// ---- Magma (64-bit block) ----
 
 function magmaT(data) {
   const result = new Uint8Array(4);
@@ -202,8 +200,6 @@ export function makeMagma(key) {
     decryptBlock: (b) => magmaDecryptBlock(iterKey, b),
   };
 }
-
-// ---- GOST R 34.13-2015 modes of operation (padding mode 1 = zero padding) ----
 
 function numBlocks(data, blockSize) { return Math.floor(data.length / blockSize); }
 

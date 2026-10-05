@@ -1,7 +1,3 @@
-// Magic: speculative decoding. Tries a fixed list of candidate decoders breadth-first and ranks
-// results by printable-ratio/entropy/magic-byte heuristics. Any candidate operation not yet
-// registered is simply skipped (MODULES won't have it) - Magic naturally gets stronger as more
-// operations are added, no changes needed here.
 import { MODULES } from './registry.js';
 import { callModule, resolveArgs } from './engine.js';
 import { detect } from './filetypes.js';
@@ -45,7 +41,6 @@ function score(u8) {
 }
 
 async function md5hex(u8) {
-  // Not cryptographic here, just a dedup key - but reuse the project's own MD5 so no extra code.
   const { md5 } = await import('../modules/hashing/md5.js');
   return [...md5(u8)].map(b => b.toString(16).padStart(2, '0')).join('');
 }

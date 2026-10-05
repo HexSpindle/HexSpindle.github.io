@@ -1,8 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// A short, pronounceable, public-domain-style word list (kept dependency-free). Enough entropy to
-// demonstrate and use for real passphrases at 5+ words.
 const WORDS = ("abandon ability able about above absent absorb abstract absurd abuse access accident account accuse achieve acid "
   + "acoustic acquire across act action actor actress actual adapt add addict address adjust admit adult advance advice "
   + "aerobic affair afford afraid again age agent agree ahead aim air airport aisle alarm album alcohol alert alien all "

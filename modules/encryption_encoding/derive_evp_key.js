@@ -11,9 +11,6 @@ async function hashOnce(h, data) {
   return new Uint8Array(await crypto.subtle.digest(WEBCRYPTO_HASH[h], data));
 }
 
-// OpenSSL's legacy EVP_BytesToKey (iterated hashing, MD5 by default) - no Web Crypto equivalent,
-// hand-rolled directly from the algorithm (there's nothing to "prefer native" for here since this
-// isn't a standard KDF Web Crypto exposes at all).
 module('Derive EVP key', 'OpenSSL EVP_BytesToKey key derivation; outputs the key as hex.',
   [A.toggle('Passphrase', '', ['UTF8', 'Hex', 'Latin1', 'Base64'], 'UTF8'), A.number('Key size (bits)', 128, 8),
     A.number('Iterations', 1, 1), A.select('Hashing function', HASHES), A.toggle('Salt', '', ['Hex', 'UTF8', 'Latin1', 'Base64'], 'Hex')],

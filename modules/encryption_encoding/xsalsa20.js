@@ -1,10 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// XSalsa20 (D.J. Bernstein, "Extending the Salsa20 nonce"): extends Salsa20's 8-byte nonce to 24
-// bytes via an HSalsa20 subkey-derivation step, the same relationship XChaCha20 has to ChaCha20
-// (see chacha20.js's keystream()/hchacha20() for that construction). Requires a 32-byte key, as in
-// libsodium's crypto_stream_xsalsa20.
 function rotl(x, n) { return ((x << n) | (x >>> (32 - n))) >>> 0; }
 
 function doubleround(x) {
@@ -41,9 +37,6 @@ function permute20(input) {
   return x;
 }
 
-/** HSalsa20: the Salsa20 core run on a 16-byte nonce (filling both the nonce and counter slots),
- * with the result taken straight from the permutation (no feedforward addition) at the constant
- * and nonce positions (0,5,10,15,6,7,8,9) - the standard subkey-derivation step for XSalsa20. */
 function hsalsa20(key, nonce16) {
   const input = salsaState(key, le32(nonce16, 0), le32(nonce16, 4), le32(nonce16, 8), le32(nonce16, 12));
   const x = permute20(input);

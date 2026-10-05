@@ -45,7 +45,6 @@ function keyExpansion(key) {
   while (bytesGenerated < w.length) {
     for (let i = 0; i < 4; i++) temp[i] = w[bytesGenerated - 4 + i];
     if (bytesGenerated % (4 * nk) === 0) {
-      // RotWord + SubWord + Rcon
       const t0 = temp[0];
       temp[0] = SBOX[temp[1]] ^ RCON[bytesGenerated / (4 * nk) - 1];
       temp[1] = SBOX[temp[2]];

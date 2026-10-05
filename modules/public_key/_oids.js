@@ -1,5 +1,3 @@
-// Shared OID -> friendly-name table (same set used across the parsing/encoding ops) plus a few
-// small lookup tables for curves and RFC 4514 attribute abbreviations.
 export const OID_NAMES = {
   '1.2.840.113549.1.1.1': 'rsaEncryption', '1.2.840.113549.1.1.5': 'sha1WithRSAEncryption',
   '1.2.840.113549.1.1.11': 'sha256WithRSAEncryption', '1.2.840.113549.1.1.12': 'sha384WithRSAEncryption',

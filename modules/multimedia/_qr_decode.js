@@ -27,7 +27,6 @@ function otsuThreshold(gray) {
   return threshold;
 }
 
-/** Returns a Uint8Array of 0/1 (1 = dark module/ink) the same size as the image. */
 function binarize(rgba, width, height) {
   const gray = toGrayscale(rgba, width, height);
   const t = otsuThreshold(gray);
@@ -36,7 +35,6 @@ function binarize(rgba, width, height) {
   return bits;
 }
 
-// ---------------------------------------------------------------- finder pattern detection
 function runLengthEncode(isDark, width, height, axis, fixed) {
   const len = axis === 'row' ? width : height;
   const at = p => axis === 'row' ? isDark[fixed * width + p] : isDark[p * width + fixed];
@@ -49,7 +47,6 @@ function runLengthEncode(isDark, width, height, axis, fixed) {
   return runs;
 }
 
-/** Checks runs[k..k+4] for the finder pattern's 1:1:3:1:1 dark:light:dark:light:dark ratio. */
 function checkRatio(runs, k) {
   if (runs[k].color !== 1) return null;
   const c = [runs[k].length, runs[k + 1].length, runs[k + 2].length, runs[k + 3].length, runs[k + 4].length];
@@ -88,7 +85,6 @@ function clusterCandidates(points) {
   return clusters.map(c => ({ x: c.x / c.n, y: c.y / c.n, moduleSize: c.m / c.n, count: c.n })).sort((a, b) => b.count - a.count);
 }
 
-/** Finds the three finder-pattern centres, returning { topLeft, topRight, bottomLeft, moduleSize }. */
 function findFinderPatterns(isDark, width, height) {
   const hits = [];
   for (let y = 0; y < height; y++) {
@@ -115,7 +111,6 @@ function findFinderPatterns(isDark, width, height) {
   return { topLeft, topRight, bottomLeft, moduleSize };
 }
 
-// ---------------------------------------------------------------- grid sampling (affine)
 function nearestValidVersion(moduleCountEstimate) {
   let v = Math.round((moduleCountEstimate - 17) / 4);
   if (v < 1) v = 1;
@@ -123,8 +118,6 @@ function nearestValidVersion(moduleCountEstimate) {
   return v;
 }
 
-/** Samples the module grid into a 0/1 matrix using an affine transform fitted to the 3 finder
- * centres (handles translation/rotation/scale/shear, not perspective). */
 function sampleGrid(isDark, width, height, finder) {
   const { topLeft, topRight, bottomLeft, moduleSize } = finder;
   const pixelDist = Math.hypot(topRight.x - topLeft.x, topRight.y - topLeft.y);
@@ -149,7 +142,6 @@ function sampleGrid(isDark, width, height, finder) {
   return { matrix, size, version };
 }
 
-// ---------------------------------------------------------------- format/version info
 function popcount15(n) { let c = 0; while (n) { c += n & 1; n >>= 1; } return c; }
 
 function readFormatBits(matrix, size) {
@@ -176,8 +168,6 @@ function decodeFormatInfo(bits15) {
 
 function popcount18(n) { let c = 0; while (n) { c += n & 1; n >>= 1; } return c; }
 
-/** For versions >= 7, reads the dedicated version-info area as a sanity check/correction of the
- * version derived from finder-pattern spacing. Returns null if it can't be read reliably. */
 function decodeVersionInfo(matrix, size) {
   let vinfo = 0;
   for (let i = 0; i < 6; i++) for (let b = 0; b < 3; b++) vinfo |= matrix[size - 11 + b][i] << (i * 3 + b);
@@ -190,7 +180,6 @@ function decodeVersionInfo(matrix, size) {
   return best + 7;
 }
 
-// ---------------------------------------------------------------- Reed-Solomon decoding (GF 256)
 function gfInverse(a) { return GF_EXP[255 - GF_LOG[a]]; }
 function gfDiv(a, b) { return a === 0 ? 0 : gfMul(a, gfInverse(b)); }
 function gfPow(a, n) { if (n === 0) return 1; if (a === 0) return 0; return GF_EXP[(GF_LOG[a] * n) % 255]; }
@@ -206,7 +195,6 @@ function calcSyndromes(codewords, nsym) {
   return synd;
 }
 
-/** Berlekamp-Massey: finds the shortest LFSR (error locator polynomial) generating `synd`. */
 function berlekampMassey(synd) {
   let C = [1], B = [1], L = 0, m = 1, b = 1;
   for (let n = 0; n < synd.length; n++) {
@@ -225,8 +213,6 @@ function berlekampMassey(synd) {
   return { sigma: C, errorCount: L };
 }
 
-/** Chien search: finds the roots of sigma(x), i.e. the error positions (as array indices, index 0
- * = highest-degree / first codeword byte). */
 function chienSearch(sigma, n) {
   const positions = [];
   for (let i = 0; i < n; i++) {
@@ -238,9 +224,7 @@ function chienSearch(sigma, n) {
   return positions;
 }
 
-/** Forney algorithm: computes the error magnitude at each located position. */
 function forneyMagnitudes(synd, sigma, errPositions, n) {
-  // Error evaluator polynomial Omega(x) = S(x)*sigma(x) mod x^nsym
   const nsym = synd.length;
   const omega = new Array(nsym).fill(0);
   for (let i = 0; i < nsym; i++) {
@@ -248,9 +232,6 @@ function forneyMagnitudes(synd, sigma, errPositions, n) {
     for (let j = 0; j <= i; j++) s ^= gfMul(synd[i - j], sigma[j] || 0);
     omega[i] = s;
   }
-  // sigma'(x) in characteristic 2 keeps only the odd-degree terms of sigma, each losing one
-  // degree: d/dx sum(sigma_i x^i) = sum over odd i of sigma_i * x^(i-1) (even-i terms vanish since
-  // their integer coefficient i is even, i.e. an even number of GF(2) XORs).
   const evalSigmaDeriv = x => {
     let r = 0;
     for (let i = 1; i < sigma.length; i += 2) r ^= gfMul(sigma[i], gfPow(x, i - 1));
@@ -264,8 +245,6 @@ function forneyMagnitudes(synd, sigma, errPositions, n) {
     for (let j = 1; j < omega.length; j++) omegaVal ^= gfMul(omega[j] || 0, gfPow(xInv, j));
     const sigmaDerivVal = evalSigmaDeriv(xInv);
     if (sigmaDerivVal === 0) throw new Error('Reed-Solomon decoding failed (could not compute error magnitude).');
-    // X_k^{-(b-1)} with b=1 (our syndromes start at alpha^0) simplifies to 1, and the Forney
-    // formula for byte (non-binary) RS additionally needs a factor of X_k.
     const xk = GF_EXP[i % 255];
     const magnitude = gfMul(xk, gfDiv(omegaVal, sigmaDerivVal));
     magnitudes.set(pos, magnitude);
@@ -273,11 +252,9 @@ function forneyMagnitudes(synd, sigma, errPositions, n) {
   return magnitudes;
 }
 
-/** Corrects up to floor(nsym/2) byte errors in `codewords` (data+EC, data first/highest-degree).
- * Returns the corrected array, or throws if correction isn't possible. Exported for unit testing. */
 export function rsDecodeBlock(codewords, nsym) {
   const synd = calcSyndromes(codewords, nsym);
-  if (synd.every(s => s === 0)) return codewords; // no errors
+  if (synd.every(s => s === 0)) return codewords;
   const { sigma, errorCount } = berlekampMassey(synd);
   if (errorCount === 0 || errorCount > nsym / 2) throw new Error('Too many errors to correct in this QR code block.');
   const errPositions = chienSearch(sigma, codewords.length);
@@ -290,7 +267,6 @@ export function rsDecodeBlock(codewords, nsym) {
   return corrected;
 }
 
-// ---------------------------------------------------------------- block de-interleaving
 function deinterleave(codewords, blocks) {
   const infos = [];
   for (const [numBlocks, total, dataLen] of blocks) {
@@ -304,7 +280,6 @@ function deinterleave(codewords, blocks) {
   return infos;
 }
 
-// ---------------------------------------------------------------- data bitstream decoding
 const ALNUM = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
 const numericCountBits = v => v <= 9 ? 10 : v <= 26 ? 12 : 14;
 const alnumCountBits = v => v <= 9 ? 9 : v <= 26 ? 11 : 13;
@@ -316,7 +291,6 @@ function bytesToBits(bytes) {
   return bits;
 }
 
-// Exported for unit testing.
 export function decodeDataCodewords(dataBytes, version) {
   const bits = bytesToBits(dataBytes);
   let pos = 0;
@@ -348,8 +322,6 @@ export function decodeDataCodewords(dataBytes, version) {
   return out;
 }
 
-// ---------------------------------------------------------------- top level
-/** Decodes a QR code from raw RGBA image pixel data (as from a Canvas ImageData). */
 export function decodeQrFromPixels(rgba, width, height) {
   const isDark = binarize(rgba, width, height);
   const finder = findFinderPatterns(isDark, width, height);
@@ -361,8 +333,6 @@ export function decodeQrFromPixels(rgba, width, height) {
   if (version >= 7) {
     const confirmed = decodeVersionInfo(matrix, size);
     if (confirmed !== null && confirmed !== version) {
-      // Our spacing-based estimate disagreed with the dedicated version-info area; re-sample at
-      // the confirmed size since the grid geometry (and thus every subsequent read) depends on it.
       const correctedSize = confirmed * 4 + 17;
       const span = correctedSize - 7;
       const { topLeft, topRight, bottomLeft } = finder;
@@ -380,8 +350,6 @@ export function decodeQrFromPixels(rgba, width, height) {
   return finishDecode(matrix, size, version, ecLevel, mask);
 }
 
-// Exported for unit testing (lets tests feed in an encoder-built matrix directly, bypassing image
-// finder-pattern detection, to isolate bugs in the mask/codeword/RS/bitstream-decoding stages).
 export function finishDecode(matrix, size, version, ecLevel, mask) {
   const { isFunction } = buildFunctionPatterns(size, version);
   const maskFn = MASK_FUNCS[mask];

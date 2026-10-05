@@ -1,10 +1,3 @@
-// SM2 public-key encryption, the Chinese national-standard elliptic-curve cryptosystem
-// (GB/T 32918.1-2016 / GB/T 32918.4-2016), over the recommended curve sm2p256v1 from GB/T 32918.5.
-// Plain affine-coordinate double-and-add point arithmetic over Fp with BigInt (this tool has no
-// Web Crypto support for a Chinese national SM2 curve, so it is hand-rolled, same as the project's
-// other non-browser-native ciphers). KDF and the C3 hash both use SM3 (reused from
-// modules/hashing/sm3.js). Checked against the `gmssl` Python package's CryptSM2 for matching
-// algorithm structure and the GB/T 32918.5 example curve parameters.
 import { sm3 } from '../hashing/sm3.js';
 import { concatBytes } from '../../core/util.js';
 
@@ -84,8 +77,6 @@ function bytesToBigInt(bytes) {
   return v;
 }
 
-/** SM2 KDF (GB/T 32918.4, section 5.4.3): SM3(Z || counter) blocks concatenated, counter starting
- * at 1, truncated to klen bytes. */
 function kdf(z, klen) {
   const blocks = Math.ceil(klen / 32);
   const out = new Uint8Array(blocks * 32);
@@ -100,7 +91,6 @@ function kdf(z, klen) {
 function pointToXYBytes(pt) { return [bigIntToBytes(pt.x, 32), bigIntToBytes(pt.y, 32)]; }
 
 function randomScalar() {
-  // Uniform random k in [1, n-1].
   while (true) {
     const bytes = new Uint8Array(32);
     crypto.getRandomValues(bytes);
@@ -116,9 +106,6 @@ export function sm2PublicKeyFromXY(xHex, yHex) {
   return pt;
 }
 
-/** Encrypts `plaintext` (Uint8Array) with public key `pub`, returning the raw cipher bytes
- * (C1 || C3 || C2, or C1 || C2 || C3 depending on `format`). `kOverride` is for test vectors only
- * (GB/T 32918.5's worked example fixes k) - normal callers omit it and get a fresh random k. */
 export function sm2Encrypt(pub, plaintext, format = 'C1C3C2', kOverride = null) {
   if (!plaintext.length) throw new Error('Plaintext must not be empty');
   const k = kOverride !== null ? kOverride : randomScalar();
@@ -136,7 +123,6 @@ export function sm2Encrypt(pub, plaintext, format = 'C1C3C2', kOverride = null) 
   return format === 'C1C2C3' ? concatBytes([c1x, c1y, c2, c3]) : concatBytes([c1x, c1y, c3, c2]);
 }
 
-/** Decrypts `cipher` (Uint8Array) with private key `priv` (BigInt), verifying C3. */
 export function sm2Decrypt(priv, cipher, format = 'C1C3C2') {
   if (cipher.length < 64 + 32) throw new Error('Ciphertext too short');
   const c1x = cipher.subarray(0, 32), c1y = cipher.subarray(32, 64);

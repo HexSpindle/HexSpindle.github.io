@@ -1,4 +1,3 @@
-// Minimal XXH32, needed only for the LZ4 frame format's mandatory header checksum.
 const PRIME1 = 0x9E3779B1, PRIME2 = 0x85EBCA77, PRIME3 = 0xC2B2AE3D, PRIME4 = 0x27D4EB2F, PRIME5 = 0x165667B1;
 
 function rotl(x, r) { return ((x << r) | (x >>> (32 - r))) >>> 0; }

@@ -2,8 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { loadImage, canvasToPng } from './_img.js';
 
-// Canvas has no direct per-filter resampling control, so each named filter maps to the closest
-// smoothing setting (off for Nearest Neighbour, otherwise a smoothing quality tier).
 const QUALITY = { Bicubic: 'medium', 'Nearest Neighbour': null, Bilinear: 'low', Lanczos: 'high' };
 
 module('Resize Image', 'Resizes an image.',

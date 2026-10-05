@@ -12,16 +12,13 @@ module('Image Brightness / Contrast', 'Adjusts brightness, contrast and colour s
     const img = ctx.getImageData(0, 0, width, height);
     const n = img.data.length;
 
-    // Brightness: blend with black.
     for (let i = 0; i < n; i += 4) for (let k = 0; k < 3; k++) img.data[i + k] = clamp(Math.round(img.data[i + k] * b));
 
-    // Contrast: blend with a flat fill at the image's mean luma.
     let sum = 0, pixels = n / 4;
     for (let i = 0; i < n; i += 4) sum += luma(img.data[i], img.data[i + 1], img.data[i + 2]);
     const mean = Math.round(sum / pixels);
     for (let i = 0; i < n; i += 4) for (let k = 0; k < 3; k++) img.data[i + k] = clamp(Math.round(mean * (1 - c) + img.data[i + k] * c));
 
-    // Saturation ("Color"): blend with the per-pixel grayscale version.
     for (let i = 0; i < n; i += 4) {
       const gray = luma(img.data[i], img.data[i + 1], img.data[i + 2]);
       for (let k = 0; k < 3; k++) img.data[i + k] = clamp(Math.round(gray * (1 - s) + img.data[i + k] * s));

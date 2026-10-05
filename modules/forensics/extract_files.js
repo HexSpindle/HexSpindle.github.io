@@ -2,11 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { encodeUtf8 } from '../../core/util.js';
 
-// --- Minimal DEFLATE/gzip-member length scanner -----------------------------------------------
-// We only need to know *where a gzip member ends* (to carve it out), not its decompressed bytes,
-// so this walks the Huffman-coded block structure (RFC 1951) far enough to find the final block's
-// end-of-block marker without materialising any output - mirrors what Python's
-// zlib.decompressobj(31) + unused_data effectively finds for the carver.
 const LBASE = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258];
 const LEXTRA = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0];
 const DEXTRA = [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13];
@@ -42,7 +37,6 @@ function fixedTables() {
   return [FIXED_LIT, FIXED_DIST];
 }
 
-// Returns the byte offset just past the final DEFLATE block, or throws on truncated/invalid data.
 function deflateEnd(data, startByte) {
   let bitPos = startByte * 8;
   const limit = data.length * 8;
@@ -110,7 +104,6 @@ function gzipMemberEnd(data, s) {
   } catch { return -1; }
 }
 
-// --- Byte carving -----------------------------------------------------------------------------
 function matchesLit(data, i, pat) {
   if (i + pat.length > data.length) return false;
   for (let j = 0; j < pat.length; j++) if (data[i + j] !== pat[j]) return false;
@@ -123,7 +116,6 @@ function indexOfBytes(data, pat, from) {
   }
   return -1;
 }
-// Non-overlapping scan, like Python's re.finditer: testAt(i) returns the match length at i, or 0.
 function findAllNonOverlap(data, testAt) {
   const out = [];
   let i = 0;

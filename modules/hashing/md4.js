@@ -1,8 +1,5 @@
 import { module } from './_cat.js';
 
-// Hand-rolled MD4 (RFC 1320) - no browser API provides this. Verified against pycryptodome's
-// Crypto.Hash.MD4 (md4("") = 31d6cfe0d16ae931b73c59d7e0c089c0, md4("abc") = a448017aaf21d8525fc10ae87aa6729d,
-// and a 1000-byte run of "a" = 5f1bf26a8067c9159b91f1440f7c9e8a).
 function rotl(x, n) { return ((x << n) | (x >>> (32 - n))) >>> 0; }
 function F(x, y, z) { return (x & y) | (~x & z); }
 function G(x, y, z) { return (x & y) | (x & z) | (y & z); }

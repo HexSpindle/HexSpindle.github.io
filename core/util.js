@@ -1,5 +1,3 @@
-// Shared byte/encoding helpers used throughout the module registry and engine.
-
 export function reFlags(ignoreCase = false, multiline = true, dotall = false) {
   let f = 'u';
   if (ignoreCase) f += 'i';
@@ -55,7 +53,6 @@ export function base64Encode(u8) {
   return btoa(s);
 }
 
-/** toggle-type argument -> bytes, matching core/util.py's to_bytes(). */
 export function toBytes(value, enc) {
   if (enc === 'Hex') return parseHex(value);
   if (enc === 'Base64') return base64Decode(value);

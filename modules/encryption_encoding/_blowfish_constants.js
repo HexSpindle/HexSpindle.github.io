@@ -1,7 +1,3 @@
-// Blowfish P-array and S-box initial values: the hexadecimal digits of pi, as published by
-// Bruce Schneier (<https://www.schneier.com/code/constants.txt>). Private helper data for
-// _blowfish.js - excluded from the module registry by the leading underscore.
-
 export const P_INIT = [
   0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344, 0xa4093822, 0x299f31d0, 0x082efa98, 0xec4e6c89,
   0x452821e6, 0x38d01377, 0xbe5466cf, 0x34e90c6c, 0xc0ac29b7, 0xc97c50dd, 0x3f84d5b5, 0xb5470917,

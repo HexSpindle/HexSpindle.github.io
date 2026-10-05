@@ -28,7 +28,6 @@ module('XOR Brute Force', 'Tries every 1 or 2 byte XOR key on a sample of the in
     const total = Math.pow(256, kl);
     const cribBytes = crib ? encodeUtf8(crib) : null;
     const out = [];
-    // Key 0 is skipped (it's the input unchanged), as in CyberChef.
     for (let k = 1; k < total; k++) {
       const key = new Uint8Array(kl);
       let v = k;

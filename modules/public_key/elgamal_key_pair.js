@@ -2,8 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { modExp, randomBigInt, randomBelow, isProbablePrime } from './_bignum.js';
 
-// Textbook ElGamal domain parameters: a safe prime p = 2q+1 (q prime) and a generator g of the
-// full group of order p-1 (g^2 != 1 and g^q != 1 mod p).
 function generateSafePrime(bits) {
   while (true) {
     let q = randomBigInt(bits - 1) | 1n;

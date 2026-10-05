@@ -1,6 +1,5 @@
 import { module } from './_cat.js';
 
-// 16-bit ones-complement Internet checksum (RFC 1071), as used by IP/TCP/UDP headers.
 export function tcpIpChecksum(u8) {
   const padded = u8.length % 2 ? Uint8Array.of(...u8, 0) : u8;
   let s = 0;

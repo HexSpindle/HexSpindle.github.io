@@ -1,8 +1,5 @@
 import { module } from './_cat.js';
 
-// IPv4-only (the common case) - the Python version also handles IPv6 and network splitting via
-// stdlib's ipaddress module; this ports the core CIDR math by hand since there's no browser
-// equivalent of ipaddress.
 function ipToInt(ip) {
   const parts = ip.split('.').map(Number);
   if (parts.length !== 4 || parts.some(p => Number.isNaN(p) || p < 0 || p > 255)) throw new Error(`Not a valid IPv4 address: ${ip}`);

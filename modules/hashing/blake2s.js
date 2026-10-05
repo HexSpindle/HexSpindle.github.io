@@ -2,9 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { bytesToHex, concatBytes } from '../../core/util.js';
 
-// Hand-rolled BLAKE2s (RFC 7693) - 32-bit words, 64-byte blocks, 10 rounds. A distinct algorithm
-// from BLAKE2b, not just a truncated/rescaled version of it: different IV, rotation constants and
-// round count. Not exposed by Web Crypto.
 const IV = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
 const SIGMA = [
   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],

@@ -1,10 +1,3 @@
-// Private helper: AES-XTS (IEEE 1619-2007 / NIST SP 800-38E), including ciphertext stealing for
-// a final partial block, built on the small embedded AES core (./_aes.js) since Web Crypto has no
-// XTS mode. Matches the Python side's `cryptography.hazmat.primitives.ciphers.modes.XTS`: the
-// tweak is the little-endian 16-byte sector number, AES-encrypted once under key2 to seed the
-// per-block tweak, then advanced by multiplying by alpha (x) in GF(2^128) for each subsequent
-// block. Algorithm and byte layout verified against `cryptography`'s own XTS output for many
-// lengths (aligned and with a trailing partial block) and sector numbers.
 import { makeAes } from './_aes.js';
 
 function gfMulX(t) {

@@ -42,7 +42,6 @@ export async function dhash(data, size = 8) {
   return bitsToHex(bits);
 }
 
-// 1D orthonormal DCT-II, matching scipy.fftpack.dct(..., norm="ortho").
 function dct1d(x) {
   const n = x.length;
   const out = new Float64Array(n);
@@ -75,7 +74,6 @@ export async function phash(data, size = 32, keep = 8) {
   return bitsToHex(bits);
 }
 
-// One level of a 2D orthonormal Haar wavelet transform, returning the LL (approximation) quadrant.
 function haarLL(a) {
   const h = a.length, w = a[0].length;
   const rows = a.map(row => {

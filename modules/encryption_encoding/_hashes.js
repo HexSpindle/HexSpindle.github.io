@@ -1,6 +1,5 @@
 function rotl(x, c) { return (x << c) | (x >>> (32 - c)); }
 
-// ---- MD5 (RFC 1321) ----
 const MD5_S = [7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
   5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
   4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
@@ -41,7 +40,6 @@ export function md5(u8) {
   return out;
 }
 
-// ---- SHA-224 (FIPS 180-4; same compression function as SHA-256 with a different IV/output) ----
 const SHA2_K = [
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
   0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -105,8 +103,6 @@ function concatAll(...parts) {
   return out;
 }
 
-/** HMAC using one of the hand-rolled digests above (md5/sha224) - for the other hashes this
- * category's ops use native Web Crypto HMAC instead. */
 export function hmacGeneric(name, key, msg) {
   const { fn, blockSize } = DIGESTS[name];
   let k = key.length > blockSize ? fn(key) : key;
@@ -116,7 +112,6 @@ export function hmacGeneric(name, key, msg) {
   return fn(concatAll(opad, fn(concatAll(ipad, msg))));
 }
 
-/** PBKDF2-HMAC using one of the hand-rolled digests above. */
 export function pbkdf2Generic(name, password, salt, iterations, dkLen) {
   const { size } = DIGESTS[name];
   const numBlocks = Math.ceil(dkLen / size);

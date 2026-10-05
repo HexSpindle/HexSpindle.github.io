@@ -7,8 +7,6 @@ module('Text Encoding Brute Force', 'Decodes the input under many encodings so y
   (data, mode) => ENCODINGS.map(e => {
     let r;
     try {
-      // "Encode" re-renders the resulting bytes as Latin1 text so every encoding's output stays
-      // visible/comparable as a single line, same as the Python original.
       r = mode === 'Decode' ? decodeBytes(data, e) : decodeLatin1(encodeText(decodeUtf8(data), e, true));
     } catch (ex) {
       r = `<${ex.message}>`;

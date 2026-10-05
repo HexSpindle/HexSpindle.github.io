@@ -13,11 +13,6 @@ import { sm3 } from './sm3.js';
 import { adler32 } from './adler32_checksum.js';
 import { crc32 } from './crc32_checksum.js';
 
-// Runs the input through every supported hash algorithm in this category and reports one line per
-// algorithm. Note: unlike Python's hashlib (backed by OpenSSL, which supports the full SHA-2 family),
-// the browser's Web Crypto only implements SHA-1/256/384/512 - no SHA-224, SHA-512/224 or SHA-512/256 -
-// so those three are left out here; Whirlpool is also left out since no OpenSSL build in a browser
-// exposes it and this category has no hand-rolled Whirlpool.
 async function webDigest(data, algo) { return bytesToHex(new Uint8Array(await crypto.subtle.digest(algo, data))); }
 
 export async function generateAllHashes(data) {

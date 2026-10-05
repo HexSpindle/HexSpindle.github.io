@@ -1,6 +1,5 @@
 import { module } from './_cat.js';
 
-// Standard CRC-32 (ISO-HDLC / zlib / PNG variant - polynomial 0xEDB88320, matches Python's binascii.crc32).
 let TABLE = null;
 function table() {
   if (TABLE) return TABLE;

@@ -2,10 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { bytesToHex } from '../../core/util.js';
 
-// Hand-rolled BLAKE3, ported from the reference algorithm: a Merkle tree of 1024-byte chunks, each
-// chunk a chain of 64-byte-block compressions sharing BLAKE2s' G function (7 rounds here, not 10),
-// with parent nodes combining sibling chaining values and the root node supporting XOF-style
-// extendable output by re-running the final compression with an incrementing output-block counter.
 const IV = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
 const MSG_PERMUTATION = [2, 6, 3, 10, 7, 0, 4, 13, 1, 11, 12, 5, 9, 14, 15, 8];
 const CHUNK_START = 1, CHUNK_END = 2, PARENT = 4, ROOT = 8, KEYED_HASH = 16;

@@ -3,15 +3,6 @@ import { A } from '../../core/registry.js';
 import { base64Encode } from '../../core/util.js';
 import { blake2b } from './blake2b.js';
 
-// Argon2 (RFC 9106), hand-ported from the Argon2 reference implementation (P-H-C/phc-winner-argon2:
-// src/core.c + src/ref.c + src/blake2/blamka-round-ref.h), reusing this category's BLAKE2b for the
-// H/H' hashing. Implements the variable-length H' hash, the EksBlowfish-unrelated BlaMka/G
-// compression function applied column-then-row over each 1024-byte block, the data-independent
-// (Argon2i) vs data-dependent (Argon2d) addressing - and Argon2id's split (first half of pass 0
-// data-independent, the rest data-dependent) - and the index_alpha reference-block selection.
-// Verified byte-for-byte against Python's `argon2-cffi` (argon2.low_level.hash_secret_raw) for
-// Argon2id/Argon2i/Argon2d across parallelism 1 and 4, minimum memory (m=8), and hash lengths both
-// under and over 64 bytes (which take different code paths in H').
 export { argon2, TYPE_D, TYPE_I, TYPE_ID };
 
 const MASK64 = (1n << 64n) - 1n;

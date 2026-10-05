@@ -46,8 +46,6 @@ function highlightJs(src, { jsonMode = false } = {}) {
   return out;
 }
 
-// Small regex-alternation tokenizers for a few more common formats. Each rule list is tried in
-// order at every position (first match wins); unmatched single characters pass through escaped.
 function highlightByRules(src, rules) {
   const re = new RegExp(rules.map(([, pat]) => `(${pat})`).join('|'), 'gy');
   let out = '', i = 0;

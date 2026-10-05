@@ -2,8 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { loadImage, canvasToPng } from './_img.js';
 
-// Per-channel histogram stretch (same algorithm as PIL's ImageOps.autocontrast): trim `cut`% of
-// pixels off each end of the histogram, then linearly rescale the remaining range to 0-255.
 function buildLut(hist, cutPct) {
   const h = hist.slice();
   const n = h.reduce((a, b) => a + b, 0);

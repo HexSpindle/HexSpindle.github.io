@@ -1,7 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// MurmurHash3 x86 32-bit, matching core/checksums.py's murmur3_32().
 function murmur3_32(data, seed) {
   const c1 = 0xcc9e2d51n, c2 = 0x1b873593n, M32 = 0xffffffffn;
   let h = BigInt(seed) & M32;

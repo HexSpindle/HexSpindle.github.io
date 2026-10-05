@@ -103,7 +103,6 @@ class OutWindow {
   copyMatch(dist, len) { this.ensure(len); for (let i = 0; i < len; i++) { this.buf[this.pos] = this.buf[this.pos - dist]; this.pos++; } }
 }
 
-/** outSize === -1 means unknown: decode until the end-of-stream marker (distance 0xFFFFFFFF). */
 export function lzmaDecodeRaw(data, startPos, lc, lp, pb, outSize) {
   const rc = new RangeDecoder(data, startPos);
   const win = new OutWindow(outSize >= 0 ? outSize : 1 << 16);
@@ -362,7 +361,6 @@ export function lzmaEncodeRaw(data, lc, lp, pb) {
     }
   }
 
-  // End-of-stream marker: a "simple match" with distance 0xFFFFFFFF.
   const posState = pos & pbMask;
   rc.encodeBit(isMatch, (state << kNumPosBitsMax) + posState, 1);
   rc.encodeBit(isRep, state, 0);
@@ -385,8 +383,6 @@ export function lzmaAloneCompress(data) {
 
 function concatBytes(a, b) { const out = new Uint8Array(a.length + b.length); out.set(a, 0); out.set(b, a.length); return out; }
 
-/** Decodes the legacy ".lzma" (alone) container: 1-byte props, 4-byte LE dict size,
- * 8-byte LE uncompressed size (all-ones = unknown, terminated by the end marker). */
 export function lzmaAloneDecompress(data) {
   if (data.length < 13) throw new Error('Not valid LZMA (alone) data: header too short');
   const props = data[0];

@@ -1,6 +1,5 @@
 import { module } from './_cat.js';
 
-// Adler-32 (RFC 1950), as used by zlib.
 export function adler32(u8) {
   const MOD = 65521;
   let a = 1, b = 0;

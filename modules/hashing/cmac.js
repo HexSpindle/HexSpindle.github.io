@@ -3,14 +3,6 @@ import { A } from '../../core/registry.js';
 import { bytesToHex } from '../../core/util.js';
 import { desBlock } from './lm_hash.js';
 
-// AES-CMAC / Triple-DES-CMAC (RFC 4493 / NIST SP 800-38B). AES itself runs through the browser's
-// native Web Crypto AES-CBC with a zero IV: a single AES-CBC block with IV=0 is exactly AES-ECB
-// (CBC XORs the IV into the first block before encrypting; with IV=0 that's a no-op), and since CBC
-// chains each block's output only off *earlier* ciphertext, encrypting our whole (already
-// subkey-XORed and padded) message in one AES-CBC(IV=0) call and reading off the first n blocks of
-// ciphertext reproduces the CBC-MAC chain - the trailing PKCS#7 padding block Web Crypto appends is
-// simply discarded. Triple DES has no Web Crypto equivalent, so it reuses the hand-rolled DES from
-// lm_hash.js, run as an explicit CBC chain.
 function xorBytes(a, b) { const o = new Uint8Array(a.length); for (let i = 0; i < a.length; i++) o[i] = a[i] ^ b[i]; return o; }
 
 async function aesEcbBlock(key, block) {

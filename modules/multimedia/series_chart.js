@@ -84,7 +84,6 @@ module('Series chart',
         }
       }
 
-      // Mini y-axis + series name label.
       ctx.strokeStyle = '#333';
       ctx.lineWidth = 1;
       ctx.beginPath();

@@ -1,6 +1,3 @@
-// Small byte-array helpers shared by the utils ops that slice/filter raw bytes (drop/take
-// (every nth) bytes), scoped to this category only.
-
 export function splitLines(data) {
   const out = [];
   let start = 0;
@@ -19,8 +16,6 @@ export function joinLines(lines) {
   return out;
 }
 
-/** Python-style slice of a Uint8Array: start/end may be negative (counted from the end) and are
- * clamped to the array bounds, matching b[start:end] semantics. */
 export function pySlice(arr, start, end) {
   const n = arr.length;
   const norm = (i, def) => {

@@ -200,12 +200,10 @@ function getMappedCodePoint(style, offset, upper) {
 
   const source = upper ? map.upper : map.lower;
 
-  // Explicit table for Unicode ranges containing gaps.
   if (Array.isArray(source)) {
     return source[offset];
   }
 
-  // Normal contiguous Unicode range.
   return source + offset;
 }
 

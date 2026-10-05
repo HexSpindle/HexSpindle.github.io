@@ -2,30 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { bytesToHex } from '../../core/util.js';
 
-// MD6: Ron Rivest's SHA-3 competition submission (Rivest, Agre, Bailey, Cheng, Crutchfield, Flajolet,
-// Gunnels, Kaliski, Lin, Prabhakaran, Prevelakis, Vadhan, Yerukhimovich, "The MD6 Hash Function" -
-// NIST SHA-3 submission, 2008). A Merkle-tree-structured hash: the input is split into 512-byte
-// (64-word) blocks, each compressed with a fixed-point compression function f() (an 89-word feedback
-// shift register run for r rounds, built from a fixed constant array Q, a round-updated constant S
-// derived from the irreducible-polynomial mask Sm, and fixed shift-amount tables), with parent
-// nodes combining 16-word (c=128-byte) chaining values from up to 64 children per level ("par"
-// mode), falling back to sequential chaining ("seq" mode, c=128 bytes of previous state fed back
-// alongside each block) once the level count L is exceeded or only one node remains. Each node's
-// compression input is prefixed with a control word pair U/V encoding the level, index, round
-// count r, level limit L, final-node flag, padding-bit count, key length and digest length, per
-// the MD6 spec's node-ID/control-word layout. 64-bit words are represented as [hi,lo] uint32 pairs
-// throughout since JS bitwise ops are only 32-bit safe.
-//
-// Hand-ported from the `md6-hash` npm package (Richienb/md6-hash), itself a from-scratch MD6
-// implementation - restructured into this project's conventions, with the key/digest-length
-// validation rewritten and the UTF-8-decode step dropped (this op already receives raw bytes).
-// Verified against two independent, official-reference-derived vectors from the `md6` Rust crate
-// (nabijaczleweli/md6-rs), which hashes via FFI to Rivest's own reference C implementation:
-// MD6-256("") = bca38b24a804aa37d821d31af00f5598230122c5bbfc4c4ad5ed40e4258f04ca,
-// MD6-512("") = 6b7f33821a2c060ecdd81aefddea2fd3c4720270e18654f4cb08ece49ccb469f8beeee7c831206bd577f9f2630d91779203a9489e47e04df4e6deaa0f8e0c0,
-// MD6-256("The lazy fox jumps over the lazy dog") = e45551aae266e1482ac98e24229b3e90dc06177f8fb1a526e9da2cc957197aa -
-// all three match this port byte-for-byte.
-
 function xor(x, y) { return [x[0] ^ y[0], x[1] ^ y[1]]; }
 function and(x, y) { return [x[0] & y[0], x[1] & y[1]]; }
 
@@ -81,8 +57,6 @@ const S0 = [0x01234567, 0x89ABCDEF];
 const SM = [0x7311C281, 0x2425CFA0];
 const N_CONST = 89;
 
-/** The MD6 compression function f(), run for `r` rounds over the n=89+16r word array `N`. Returns
- * the final 16-word (128-byte) chaining value. */
 function f(nWords, r) {
   let S = S0.slice();
   const A = nWords.slice();

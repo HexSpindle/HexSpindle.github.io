@@ -1,12 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// Hand-rolled ChaCha20 / XChaCha20 (no Web Crypto support for this cipher). Follows RFC 8439 for the
-// 96-bit-nonce/32-bit-counter IETF variant, D.J. Bernstein's original construction for the 64-bit
-// nonce (a 64-bit block counter split across two words), and the XChaCha20 draft (HChaCha20 subkey
-// derivation + a 12-byte nonce of 4 zero bytes followed by the last 8 nonce bytes) for 24-byte
-// nonces - matching pycryptodome's Crypto.Cipher.ChaCha20 dispatch on nonce length.
-
 function rotl(x, n) { return ((x << n) | (x >>> (32 - n))) >>> 0; }
 
 function quarterRound(s, a, b, c, d) {
@@ -52,7 +46,6 @@ function hchacha20(key, nonce16) {
   return wordsToBytesLE(out);
 }
 
-/** Generates `len` bytes of ChaCha20 keystream starting at the given 64-byte-block counter. */
 function keystream(key, nonce, counter, len) {
   let effKey = key, effNonce = nonce;
   if (nonce.length === 24) {

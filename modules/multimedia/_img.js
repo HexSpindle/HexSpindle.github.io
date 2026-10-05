@@ -1,4 +1,3 @@
-// Shared Canvas-based image helpers for the multimedia modules.
 export async function loadImage(data) {
   const blob = new Blob([data]);
   const bitmap = await createImageBitmap(blob);
@@ -15,7 +14,6 @@ export async function canvasToFormat(canvas, type, quality) {
   return new Uint8Array(await blob.arrayBuffer());
 }
 
-// Separable convolution over RGB (alpha is passed through unchanged), with edge-clamped borders.
 function convolveSeparable(img, width, height, kernel) {
   const radius = (kernel.length - 1) / 2;
   const src = img.data;

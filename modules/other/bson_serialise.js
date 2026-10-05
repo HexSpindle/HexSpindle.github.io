@@ -2,9 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { encodeUtf8 } from '../../core/util.js';
 
-// Minimal JSON parser that (like Python's json.loads) distinguishes integers from floats by their
-// literal form, so BSON can pick Int32/Int64/Double faithfully instead of collapsing everything to
-// a JS double. Integers are kept as BigInt for arbitrary precision.
 function parseJson(text) {
   let i = 0;
   const s = text;

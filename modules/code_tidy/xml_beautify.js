@@ -1,10 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// Re-indents an already-parsed element's subtree in place, the way lxml's etree.indent() does:
-// whitespace-only text nodes are dropped and replaced with a fresh newline + indent before each
-// child and before the closing tag. Elements with no element children (text/mixed leaves) are
-// left untouched so their text content survives exactly as written.
 function indentNode(node, indent, level) {
   const kids = Array.from(node.childNodes);
   const hasElementChild = kids.some((k) => k.nodeType === 1);

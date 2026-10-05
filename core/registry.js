@@ -1,8 +1,3 @@
-// Module registry and argument-spec helpers.
-// Each operation file calls module(name, desc, args, fn, opts) to register itself; category comes
-// from the _cat.js helper in whichever modules/<category>/ folder the file lives in (there's no
-// filesystem-based auto-discovery at runtime, so new files must also be added to modules/index.js).
-
 export const MODULES = {};
 
 export const CATEGORY_LABELS = {
@@ -79,10 +74,6 @@ export const A = {
   toggle: (name, value = '', options = null, option = null) => { options = options || TOGGLE_ENCODINGS; return { name, type: 'toggle', value, options, option: option || options[0] }; },
 };
 
-/** Builds a per-category `module(...)` registration function, used as:
- *    import { makeModule } from '../../core/registry.js';
- *    export const module = makeModule('data_format');
- * so every operation file in that folder just calls module(name, desc, args, fn, opts). */
 export function makeModule(category) {
   return (name, desc, args, fn, opts = {}) => register(name, desc, args, fn, { ...opts, category });
 }

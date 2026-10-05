@@ -1,6 +1,3 @@
-// Hand-rolled big-integer helpers (BigInt-based) for the handful of public-key algorithms that
-// browsers' Web Crypto API has no support for at all: classic Diffie-Hellman, ElGamal and DSA.
-
 export function bytesToBigInt(bytes) {
   let v = 0n;
   for (const b of bytes) v = (v << 8n) | BigInt(b);

@@ -3,10 +3,6 @@ import { A } from '../../core/registry.js';
 import { bytesToHex, concatBytes, encodeUtf8 } from '../../core/util.js';
 import { keccakSponge } from './keccak.js';
 
-// NIST SP 800-185 extendable-output and keyed hash functions (cSHAKE, KMAC, TupleHash) plus the
-// reduced-round (12 instead of 24) Keccak variants TurboSHAKE and the KangarooTwelve tree hash,
-// all built on the shared Keccak-f[1600]/Keccak-p[1600,12] sponge in keccak.js.
-
 function minimalBytes(x) {
   if (x === 0) return new Uint8Array([0]);
   const out = [];
@@ -50,8 +46,6 @@ function turboShake(data, domain, outBytes, capBits) {
   return keccakSponge(data, 200 - capBits / 8, domain, outBytes, 12);
 }
 
-// K12's own length-encoding (distinct from the left/right_encode above): big-endian minimal bytes
-// followed by their count, with 0 encoded as a single zero byte.
 function k12LengthEncode(x) {
   if (x === 0) return new Uint8Array([0]);
   const b = minimalBytes(x);

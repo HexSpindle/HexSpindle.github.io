@@ -1,16 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// bcrypt (Blowfish-based, OpenBSD algorithm by Niels Provos / David Mazieres). Hand-ported from
-// OpenBSD's lib/libc/crypt/{blowfish,bcrypt}.c: the pi-digit S-box/P-array init state, the
-// EksBlowfishSetup key schedule (Blowfish_expandstate once with salt+key, then `2^cost` rounds of
-// Blowfish_expand0state alternating key/salt), encrypting "OrpheanBeholderScryDoubt" 64 times in
-// ECB mode, and bcrypt's own (non-standard) base64 alphabet. Verified byte-for-byte against
-// Python's `bcrypt` package (bcrypt.hashpw with a fixed salt via bcrypt.gensalt) across costs 4-10
-// and a range of password lengths/bytes, e.g. bcrypt.hashpw(b"password", b"$2b$04$<22-char salt>")
-// reproduces the exact same 60-char $2b$ hash.
-
-// ---- Blowfish ----
 const BF_INIT_HEX = (
   'd1310ba698dfb5ac2ffd72dbd01adfb7b8e1afed6a267e96ba7c9045f12c7f9924a19947b3916cf70801f2e2858efc16636920d8' +
   '71574e69a458fea3f4933d7e0d95748f728eb658718bcd5882154aee7b54a41dc25a59b59c30d5392af26013c5d1b023286085f0' +
@@ -121,7 +111,6 @@ function encipher(state, xlxr) {
   xlxr[1] = Xl >>> 0;
 }
 
-// Cyclic big-endian 4-byte reader over `data` (length `databytes`), matching Blowfish_stream2word.
 function makeStream2word(data, databytes) {
   let j = 0;
   return () => {
@@ -171,7 +160,6 @@ function expandstate(state, salt, saltbytes, key, keybytes) {
   }
 }
 
-// ---- bcrypt's own base64 alphabet (NOT standard base64) ----
 const B64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 const B64_INDEX = (() => { const m = new Int16Array(128).fill(-1); for (let i = 0; i < 64; i++) m[B64.charCodeAt(i)] = i; return m; })();
 
@@ -218,8 +206,6 @@ function bcryptDecode(str, len) {
 
 const ORPHEAN = new Uint8Array([...'OrpheanBeholderScryDoubt'].map(c => c.charCodeAt(0)));
 
-// Core EksBlowfishSetup + 64-round ECB encryption. keyBytes must already include the trailing
-// NUL-terminator byte bcrypt's C implementation implicitly appends (see bcryptHash below).
 function bcryptCrypt(keyBytes, saltBytes16, cost) {
   const rounds = 1 << cost;
   const state = newState();
@@ -248,7 +234,6 @@ function bcryptCrypt(keyBytes, saltBytes16, cost) {
   return ciphertext;
 }
 
-// Full `$2b$<cost>$<salt><hash>` assembly, given a raw (undecoded) password and a 16-byte salt.
 function bcryptHash(passwordBytes, saltBytes16, cost) {
   if (passwordBytes.length > 72) throw new Error('password cannot be longer than 72 bytes, truncate manually if necessary');
   const keyBytes = new Uint8Array(passwordBytes.length + 1); // C-string NUL terminator

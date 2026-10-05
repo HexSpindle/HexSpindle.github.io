@@ -2,15 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { encodeUtf8, base64Encode } from '../../core/util.js';
 
-// Ported from an op that opens a raw socket (http.client) with full control over TLS verification,
-// a CONNECT-tunnelling proxy, redirect chaining and wire-level byte/timing counts. A browser's
-// fetch() exposes none of that: it always verifies TLS itself (no "Verify TLS certificate" toggle),
-// has no proxy support, transparently and uncontrollably decompresses gzip/deflate before handing
-// back a body, hides the redirect chain behind `redirect: "manual"` (which turns every redirect into
-// an opaque, unreadable response - same-origin or not), and gives no wire-byte/connect/TLS-cert
-// introspection. This keeps the same argument surface and does its best with what fetch() allows:
-// real method/headers/auth/cookies/body/timeout/retries, and either full redirect-following (one
-// opaque hop) or none. Points that can't be ported are called out in the output/report itself.
 const OUTPUTS = ['Body', 'Headers', 'Headers + body', 'Summary (status, timing, redirects, TLS)', 'JSON report'];
 const BODY_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
 

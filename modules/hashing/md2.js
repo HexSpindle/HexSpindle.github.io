@@ -1,8 +1,5 @@
 import { module } from './_cat.js';
 
-// Hand-rolled MD2 (RFC 1319) - the browser's Web Crypto API doesn't support it. Verified against
-// pycryptodome's Crypto.Hash.MD2 (md2("") = 8350e5a3e24c153df2275c9f80692773,
-// md2("abc") = da853b0d3f88d99b30283a69e6ded6bb).
 const S = [
   41, 46, 67, 201, 162, 216, 124, 1, 61, 54, 84, 161, 236, 240, 6,
   19, 98, 167, 5, 243, 192, 199, 115, 140, 152, 147, 43, 217, 188,

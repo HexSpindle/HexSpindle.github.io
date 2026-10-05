@@ -12,7 +12,6 @@ module('RSA Encrypt', 'Encrypts the input with an RSA public key (PEM). Output i
     const info = await loadKeyInfo(pem);
     if (info.kind !== 'RSA') throw new Error(`Expected an RSA key, got ${info.kind}`);
     if (scheme.startsWith('RSAES')) {
-      // Web Crypto has no RSAES-PKCS1-v1_5 encryption support (by design); done by hand.
       const { n, e } = rsaPublicNumbersFromSpkiDer(info.der);
       return bytesToHex(rsaesPkcs1Encrypt(n, e, data));
     }

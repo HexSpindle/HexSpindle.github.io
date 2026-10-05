@@ -1,19 +1,5 @@
 import { module } from './_cat.js';
 
-// Decodes Microsoft's ".encode" scrambling scheme used for legacy .vbe (VBScript) and .jse
-// (JScript) "Encoded Script" files. This is NOT encryption - it is a fixed, publicly documented
-// byte substitution + permutation applied by script.encode/screnc.exe, originally reverse engineered
-// by Didier Stevens (https://DidierStevens.com). Encoded files look like:
-//   #@~^RQAAAA==-mD~sX|:/TP{~J:+dYbxL~@!F@*@!+@*@!&@*eEI@#@&@#@&.jm.raY 214Wv:zms/obI0xEAAA==^#~@
-// and are bounded by the literal markers "#@~^" ... "==^#~@".
-//
-// Algorithm: four two-character escapes are unescaped first (@&, @#, @*, @!, @$ -> LF, CR, >, <, @),
-// then each remaining printable, non-"<>@" byte is looked up in a 3-column substitution table
-// (D_DECODE) using a column picked by a fixed 64-entry repeating pattern (D_COMBINATION) keyed on
-// the position of the byte among the printable bytes seen so far (index, not raw offset).
-// Bytes 0-31 (other than tab) and the literal '<' '>' '@' pass through unchanged and do not advance
-// the index. This table/permutation pair is specific to this one scheme; it isn't configurable and
-// there is nothing else for this operation to "support" beyond it.
 const D_DECODE = [
   '', '', '', '', '', '', '', '', '',
   '\x57\x6E\x7B', '\x4A\x4C\x41', '\x0B\x0B\x0B', '\x0C\x0C\x0C', '\x4A\x4C\x41', '\x0E\x0E\x0E', '\x0F\x0F\x0F',

@@ -1,6 +1,5 @@
 import { module } from './_cat.js';
 
-// Common ID3v2 text/URL frame IDs (v2.3/v2.4; v2.2's 3-char IDs are mapped where they differ).
 const FRAME_NAMES = {
   TIT2: 'Title', TT2: 'Title', TPE1: 'Artist', TP1: 'Artist', TALB: 'Album', TAL: 'Album',
   TYER: 'Year', TYE: 'Year', TDRC: 'Date', TRCK: 'Track', TRK: 'Track', TPOS: 'Disc',
@@ -110,5 +109,4 @@ module('Extract ID3', 'Reads ID3v1/ID3v2 tags (title, artist, album, ...) from a
     return out.join('\n');
   });
 
-// Re-exported for Extract Audio Metadata, which delegates MP3 tag parsing to this same code.
 export { readId3v2, readId3v1 };

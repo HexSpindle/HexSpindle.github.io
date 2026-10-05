@@ -3,8 +3,6 @@ import { A } from '../../core/registry.js';
 import { bytesToHex } from '../../core/util.js';
 import { asconMac } from './_ascon.js';
 
-// Ascon-Mac, standardised as part of NIST SP 800-232 (2025). See _ascon.js for the permutation/IV
-// provenance and verification notes (1025/1025 official NIST KAT vectors pass).
 module('Ascon MAC', 'Ascon-Mac: a 128-bit message authentication code from the Ascon family, standardised in NIST SP 800-232. Requires a 16-byte (128-bit) key.',
   [A.toggle('Key', '', ['Hex', 'UTF8', 'Latin1', 'Base64'])],
   (data, key) => {

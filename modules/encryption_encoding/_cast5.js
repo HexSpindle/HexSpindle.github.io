@@ -1,4 +1,3 @@
-// Auto-extracted from OpenSSL crypto/cast/cast_s.h (CAST_S_table0..7)
 export const S0 = new Uint32Array([
   0x30fb40d4, 0x9fa0ff0b, 0x6beccd2f, 0x3f258c7a, 0x1e213f2f, 0x9c004dd3,
   0x6003e540, 0xcf9fc949, 0xbfd4af27, 0x88bbbdb5, 0xe2034090, 0x98d09675,
@@ -368,9 +367,6 @@ export const S7 = new Uint32Array([
 ]);
 
 
-// CAST5 / CAST-128 (RFC 2144), ported directly from OpenSSL's crypto/cast/{c_skey.c,c_enc.c,
-// cast_local.h}. S-box tables (S0..S7) are extracted verbatim from cast_s.h above:
-// S0..S3 are the round-function S-boxes, S4..S7 are the key-schedule S-boxes.
 
 function u32be(b, o) { return (((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0); }
 function putU32be(v, out, o) { out[o] = (v >>> 24) & 0xff; out[o + 1] = (v >>> 16) & 0xff; out[o + 2] = (v >>> 8) & 0xff; out[o + 3] = v & 0xff; }

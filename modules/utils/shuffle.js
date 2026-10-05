@@ -2,8 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { delim } from '../../core/util.js';
 
-// Seeded PRNG (mulberry32) used only to make a given seed reproducible within this port - it does
-// not reproduce the Python version's Mersenne Twister bit-for-bit for the same seed value.
 function mulberry32(seed) {
   let a = seed >>> 0;
   return function () {

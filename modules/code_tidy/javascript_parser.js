@@ -80,7 +80,6 @@ class Parser {
     return n;
   }
 
-  // ---- Program -----------------------------------------------------------
   parseProgram() {
     const start = this.tok().start;
     const body = [];
@@ -90,7 +89,6 @@ class Parser {
     return prog;
   }
 
-  // ---- Statements ---------------------------------------------------------
   parseStatement() {
     const start = this.tok().start;
     if (this.is(';')) { this.advance(); return this.node('EmptyStatement', start, {}); }
@@ -110,7 +108,6 @@ class Parser {
       if (kw === 'try') return this.parseTry();
       if (kw === 'switch') return this.parseSwitch();
       if (kw === 'class') return this.parseClass(true);
-      // labeled statement: Identifier ':' (only if not a keyword-led statement and not a plain expr)
       if (!KEYWORD_STATEMENTS.has(kw) && this.is(':', 1)) {
         this.advance(); this.advance();
         const body = this.parseStatement();
@@ -360,9 +357,6 @@ class Parser {
     return this.node('ExpressionStatement', start, { expression });
   }
 
-  // ---- Expressions ----------------------------------------------------------
-  // `noIn` suppresses treating a bare top-level `in` as the binary operator, so `for (x in y)` can
-  // tell init expressions from the `in` that introduces the right-hand side.
   parseExpression(noIn = false) {
     const start = this.tok().start;
     let expr = this.parseAssignExpr(noIn);
@@ -376,7 +370,6 @@ class Parser {
 
   parseAssignExpr(noIn = false) {
     const start = this.tok().start;
-    // Arrow function lookahead
     const arrow = this.tryParseArrow();
     if (arrow) return arrow;
     const left = this.parseConditional(noIn);
@@ -393,7 +386,6 @@ class Parser {
     const startI = this.i;
     let isAsync = false;
     if (this.isKind('id') && this.is('async') && (this.is('(', 1) || this.isKind('id', 1))) {
-      // peek further to avoid consuming `async` as a plain identifier when it isn't an arrow
       const save = this.i;
       this.advance();
       const got = this._tryArrowAfterAsync();
@@ -473,7 +465,6 @@ class Parser {
 
   parseEquality(noIn) { return this._equality(noIn); }
 
-  // ---- Unary / postfix / call chain ----
   parseUnary(noIn) {
     const start = this.tok().start;
     if (this.isKind('p') && ['+', '-', '!', '~'].includes(this.text())) {
@@ -559,7 +550,6 @@ class Parser {
       } else if (this.is('(')) {
         expr = this.node('CallExpression', start, { callee: expr, arguments: this.parseArgs(), optional: false });
       } else if (this.isKind('str') && /^`/.test(this.text())) {
-        // tagged template literal
         const quasi = { type: 'TemplateLiteral', raw: this.advance().text };
         expr = this.node('TaggedTemplateExpression', start, { tag: expr, quasi });
       } else break;
@@ -659,14 +649,10 @@ class Parser {
     return this.node('ObjectExpression', start, { properties });
   }
 
-  // ---- Left-hand side helper used by `extends` ----
   parseLeftHandSide() { return this.parseCallNewMember(false); }
 }
 
 function buildPrecedenceChain(ParserProto) {
-  // Builds the binary-operator precedence chain (lowest to highest) on the prototype, each level
-  // delegating to the next. Done this way (rather than one function per level written out longhand)
-  // to keep ~10 near-identical precedence levels from ballooning the file.
   const levels = [
     ['parseLogicalOr', 'parseLogicalAnd', ['||']],
     ['parseLogicalAnd', 'parseBitOr', ['&&']],

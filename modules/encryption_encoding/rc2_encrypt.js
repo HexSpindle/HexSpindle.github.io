@@ -4,9 +4,6 @@ import { parseHex, decodeLatin1, bytesToHex } from '../../core/util.js';
 import { blockCipherCrypt } from './_block_modes.js';
 import { RC2 } from './_rc2.js';
 
-// Mirrors core/cipher.py's cipher_args()[:5]: the Mode dropdown keeps pycryptodome's full mode
-// list (GCM included), but RC2 has no AEAD support here, so a GCM selection silently falls back
-// to CBC - matching rc2_encrypt.py's `mode if mode != "GCM" else "CBC"`.
 const MODES = ['CBC', 'CFB', 'OFB', 'CTR', 'ECB', 'GCM'];
 
 module('RC2 Encrypt', 'RC2 (5-128 byte key).',

@@ -1,7 +1,3 @@
-// Twofish (Schneier, Kelsey, Whiting, Wagner, Hall, Ferguson - AES finalist). 128-bit blocks,
-// 128/192/256-bit keys, 16-round Feistel-like structure with key-dependent S-boxes built from two
-// fixed permutations (Q0/Q1), an MDS matrix over GF(2^8) and a Reed-Solomon-code-based key schedule.
-// Reference: "Twofish: A 128-Bit Block Cipher" (Schneier et al., 1998), https://www.schneier.com/academic/twofish/
 const Q0 = [
   0xa9, 0x67, 0xb3, 0xe8, 0x04, 0xfd, 0xa3, 0x76, 0x9a, 0x92, 0x80, 0x78, 0xe4, 0xdd, 0xd1, 0x38,
   0x0d, 0xc6, 0x35, 0x98, 0x18, 0xf7, 0xec, 0x6c, 0x43, 0x75, 0x37, 0x26, 0xfa, 0x13, 0x94, 0x48,

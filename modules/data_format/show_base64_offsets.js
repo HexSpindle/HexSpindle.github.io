@@ -26,7 +26,6 @@ module('Show Base64 offsets', 'When a string is within a block of data and the w
     const len0 = offset0.indexOf('='), len1 = offset1.indexOf('='), len2 = offset2.indexOf('=');
     let staticSection;
 
-    // Offset 0
     if (len0 % 4 === 2) {
       staticSection = offset0.slice(0, -3);
       offset0 = tip(b64DecStr(staticSection, alphabet).slice(0, -2), escapeHtml(staticSection)) +
@@ -43,7 +42,6 @@ module('Show Base64 offsets', 'When a string is within a block of data and the w
     }
     if (!showVariable) offset0 = escapeHtml(staticSection);
 
-    // Offset 1
     let padding = `<span class="hl3">${escapeHtml(offset1.slice(0, 1))}</span><span class="hl5">${escapeHtml(offset1.slice(1, 2))}</span>`;
     offset1 = offset1.slice(2);
     if (len1 % 4 === 2) {
@@ -62,7 +60,6 @@ module('Show Base64 offsets', 'When a string is within a block of data and the w
     }
     if (!showVariable) offset1 = escapeHtml(staticSection);
 
-    // Offset 2
     padding = `<span class="hl3">${escapeHtml(offset2.slice(0, 2))}</span><span class="hl5">${escapeHtml(offset2.slice(2, 3))}</span>`;
     offset2 = offset2.slice(3);
     if (len2 % 4 === 2) {

@@ -3,7 +3,6 @@ export const FIELD_DELIMITERS = { 'Space': ' ', 'Comma': ',', 'Semi-colon': ';',
 
 function splitRows(input, recordDelim) {
   const rows = input.split(recordDelim);
-  // Drop a single trailing empty row caused by a final record delimiter at the end of the input.
   if (rows.length && rows[rows.length - 1] === '') rows.pop();
   return rows;
 }
@@ -89,8 +88,6 @@ export function formatTick(n) {
   return String(r);
 }
 
-// Draws a simple linear X/Y axis frame with a handful of ticks into a canvas 2D context. A plain
-// approximation of d3-axis, not a port of it.
 export function drawAxes(ctx, { x0, y0, width, height, xDomain, yDomain, xLabel, yLabel, ticks = 5 }) {
   ctx.save();
   ctx.strokeStyle = '#333';
@@ -140,7 +137,6 @@ function cubeRound(x, y, z) {
   return [rx, rz];
 }
 
-/** Pointy-top axial hex coordinates for a point, given hex "radius" (centre to corner). */
 export function pixelToHex(x, y, radius) {
   const q = (Math.sqrt(3) / 3 * x - 1 / 3 * y) / radius;
   const r = (2 / 3 * y) / radius;
@@ -148,14 +144,12 @@ export function pixelToHex(x, y, radius) {
   return [rq, rr];
 }
 
-/** Centre pixel of a pointy-top axial hex cell. */
 export function hexToPixel(q, r, radius) {
   const x = radius * (Math.sqrt(3) * q + Math.sqrt(3) / 2 * r);
   const y = radius * (1.5 * r);
   return [x, y];
 }
 
-/** Bins [x,y] points into pointy-top hexagons of the given pack radius (in the same space as the points). */
 export function hexbin(points, radius) {
   const bins = new Map();
   for (const p of points) {
@@ -172,7 +166,6 @@ export function hexbin(points, radius) {
   return [...bins.values()];
 }
 
-/** Draws a pointy-top hexagon path of the given radius centred at (cx, cy). */
 export function hexagonPath(ctx, cx, cy, radius) {
   ctx.beginPath();
   for (let i = 0; i < 6; i++) {

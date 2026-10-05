@@ -1,10 +1,3 @@
-// Ascon-AEAD128, NIST's selected lightweight AEAD algorithm, standardised in NIST SP 800-232
-// (August 2025). 128-bit key, 128-bit nonce, 128-bit rate, 128-bit tag; pa=12 permutation rounds
-// for initialization/finalization, pb=8 for the associated-data/plaintext processing loop.
-// Reference: NIST SP 800-232, https://doi.org/10.6028/NIST.SP.800-232 - ported from the algorithm
-// structure of js-ascon (github.com/brainfoolong/js-ascon), itself based on the Ascon team's own
-// reference implementation (github.com/meichlseder/pyascon), and checked against pyascon's
-// ascon_encrypt()/ascon_decrypt().
 const MASK64 = 0xffffffffffffffffn;
 const RATE = 16;
 const PA = 12;
@@ -16,18 +9,14 @@ function rotr64(x, n) {
   return ((x >> nb) | ((x & ((1n << nb) - 1n)) << (64n - nb))) & MASK64;
 }
 
-/** The Ascon permutation, applied to the 5x64-bit state for the given number of rounds (always the
- * *last* `rounds` of the 12 defined round constants, matching the spec's p^a / p^b conventions). */
 function permutation(state, rounds) {
   for (let round = 12 - rounds; round < 12; round++) {
     state[2] ^= BigInt(0xf0 - round * 0x10 + round);
-    // substitution layer
     state[0] ^= state[4]; state[4] ^= state[3]; state[2] ^= state[1];
     const t = new Array(5);
     for (let i = 0; i <= 4; i++) t[i] = (state[i] ^ MASK64) & state[(i + 1) % 5];
     for (let i = 0; i <= 4; i++) state[i] ^= t[(i + 1) % 5];
     state[1] ^= state[0]; state[0] ^= state[4]; state[3] ^= state[2]; state[2] ^= MASK64;
-    // linear diffusion layer
     state[0] ^= rotr64(state[0], 19) ^ rotr64(state[0], 28);
     state[1] ^= rotr64(state[1], 61) ^ rotr64(state[1], 39);
     state[2] ^= rotr64(state[2], 1) ^ rotr64(state[2], 6);
@@ -37,8 +26,6 @@ function permutation(state, rounds) {
   }
 }
 
-/** 64-bit little-endian word at `bytes[offset..offset+8)`; bytes past the end of the array (used
- * when reading a short final/partial block) are treated as 0. */
 function wordAt(bytes, offset) {
   let v = 0n;
   for (let i = 7; i >= 0; i--) {
@@ -64,8 +51,6 @@ function initialize(key, nonce) {
   const iv = wordAt(new Uint8Array([VERSION, 0, (PB << 4) + PA, 0x80, 0x00, RATE, 0, 0]), 0);
   const state = [iv, wordAt(key, 0), wordAt(key, 8), wordAt(nonce, 0), wordAt(nonce, 8)];
   permutation(state, PA);
-  // XOR in a (conceptual) 40-byte buffer of 24 zero bytes followed by the key - i.e. only the last
-  // two state words (positions 3 and 4) are affected.
   state[3] ^= wordAt(key, 0);
   state[4] ^= wordAt(key, 8);
   return state;
@@ -109,8 +94,6 @@ function processPlaintext(state, plaintext) {
 
 function processCiphertext(state, ciphertext) {
   const lastLen = ciphertext.length % RATE;
-  // Zero-pad up to the next multiple of RATE - when already aligned (lastLen===0), this still adds
-  // one full extra zero block, matching the spec's unconditional "pad to rate+lastLen bytes".
   const message = concatBytes(ciphertext, new Uint8Array(RATE - lastLen));
   const out = new Uint8Array(ciphertext.length);
   let outOff = 0;

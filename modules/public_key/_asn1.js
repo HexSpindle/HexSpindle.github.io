@@ -1,5 +1,3 @@
-// Minimal DER ASN.1 parser + encoder, shared by every public_key op that needs to walk or build
-// certificates, CSRs, CRLs, SPKI/PKCS8 keys, JWK<->PEM conversions, or raw OID/hex utilities.
 import { parseHex, bytesToHex, concatBytes, encodeUtf8, decodeUtf8, decodeLatin1 } from '../../core/util.js';
 
 export const CLASS_NAMES = ['UNIVERSAL', 'APPLICATION', 'CONTEXT', 'PRIVATE'];
@@ -9,7 +7,6 @@ export const UNIVERSAL_TYPE_NAMES = {
   22: 'IA5String', 23: 'UTCTime', 24: 'GeneralizedTime', 30: 'BMPString',
 };
 
-// ---- Parsing ----------------------------------------------------------------------------------
 
 function parseOne(bytes, i) {
   const start = i;
@@ -73,7 +70,6 @@ export function derUint(node) {
   for (const b of node.value) v = (v << 8n) | BigInt(b);
   return v;
 }
-
 export function derInt(node) {
   const b = node.value;
   let v = derUint(node);
@@ -108,7 +104,6 @@ export function decodeAsn1Time(node) {
   return new Date(Date.UTC(y, mo - 1, d, h, mi, sec));
 }
 
-// ---- Encoding -----------------------------------------------------------------------------
 
 function encodeLength(len) {
   if (len < 0x80) return new Uint8Array([len]);
@@ -137,7 +132,6 @@ function minimalUnsignedBytes(n) {
 export function derInteger(n) {
   const bn = typeof n === 'bigint' ? n : BigInt(n);
   if (bn >= 0n) return derTLV(0x02, minimalUnsignedBytes(bn));
-  // Two's-complement encoding for negative integers (rarely needed here).
   let bits = bn.toString(2).length;
   let bytesLen = Math.ceil((bits + 1) / 8);
   let mod = 1n << BigInt(bytesLen * 8);

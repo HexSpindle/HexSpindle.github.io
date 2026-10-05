@@ -9,11 +9,6 @@ const EC_CURVE = { ES256: 'P-256', ES384: 'P-384', ES512: 'P-521' };
 
 function b64u(u8) { return base64Encode(u8).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 
-// Signs HS256/384/512 (HMAC, native Web Crypto) and RS256/384/512 + ES256/384/512 (RSASSA-PKCS1-v1_5
-// / ECDSA over a PKCS#8 PEM private key, native Web Crypto) - matching the Python side's full
-// algorithm scope. Web Crypto's ECDSA signatures are already the raw r||s (JOSE/IEEE P1363) format
-// JWT expects, so unlike the Python side (which signs DER and re-encodes) no manual ASN.1 handling
-// is needed here.
 module('JWT Sign', 'Signs the JSON claims in the input as a JWT. HS* use the key as a secret; RS*/ES* need a PEM private key.',
   [A.area('Private/Secret key', ''), A.select('Signing algorithm', ALGS)],
   async (t, key, alg) => {

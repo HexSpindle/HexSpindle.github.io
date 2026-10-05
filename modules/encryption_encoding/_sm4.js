@@ -1,4 +1,3 @@
-// Auto-extracted from OpenSSL crypto/sm4/sm4.c (SM4_S, FK, CK)
 export const SBOX = new Uint8Array([
   0xd6, 0x90, 0xe9, 0xfe, 0xcc, 0xe1, 0x3d, 0xb7, 0x16, 0xb6, 0x14, 0xc2,
   0x28, 0xfb, 0x2c, 0x05, 0x2b, 0x67, 0x9a, 0x76, 0x2a, 0xbe, 0x04, 0xc3,
@@ -46,9 +45,7 @@ function rotl(x, n) { return (((x << n) | (x >>> (32 - n))) >>> 0); }
 function tau(x) {
   return (((SBOX[(x >>> 24) & 0xff] << 24) | (SBOX[(x >>> 16) & 0xff] << 16) | (SBOX[(x >>> 8) & 0xff] << 8) | SBOX[x & 0xff]) >>> 0);
 }
-// Linear transform L used in the encryption/decryption round function.
 function L(x) { const t = tau(x); return (t ^ rotl(t, 2) ^ rotl(t, 10) ^ rotl(t, 18) ^ rotl(t, 24)) >>> 0; }
-// Linear transform L' used in the key schedule.
 function Lp(x) { const t = tau(x); return (t ^ rotl(t, 13) ^ rotl(t, 23)) >>> 0; }
 
 export function sm4KeySchedule(key) {

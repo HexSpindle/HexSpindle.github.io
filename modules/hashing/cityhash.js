@@ -1,10 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// Google CityHash (32/64/128-bit), hand-ported from the reference city.cc (k0/k1/k2 primes, the
-// HashLen0to16/17to32/33to64 size-banded paths, WeakHashLen32WithSeeds, CityMurmur for 128-bit
-// strings under 128 bytes). Verified byte-for-byte against the `cityhash` Python package
-// (python-cityhash) across 0..240+ byte inputs, including the >64-byte and >128-byte loop paths.
 const MASK64 = (1n << 64n) - 1n;
 const k0 = 0xc3a5c85c97cb3127n, k1 = 0xb492b66fbe98f273n, k2 = 0x9ae16a3b2f90404fn;
 const kMul = 0x9ddfea08eb382d69n;

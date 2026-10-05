@@ -1,6 +1,5 @@
 const Q = 65537; // 2^16 + 1 (prime)
 
-// IDEA "multiplication": 0 represents 2^16 (=65536) by convention.
 function mul(a, b) {
   a = a === 0 ? 0x10000 : a;
   b = b === 0 ? 0x10000 : b;
@@ -11,7 +10,6 @@ function mul(a, b) {
 function addMod16(a, b) { return (a + b) & 0xffff; }
 function negAdd(a) { return (0x10000 - a) & 0xffff; } // additive inverse mod 2^16
 
-// Multiplicative inverse mod Q=65537 (extended Euclidean algorithm); 0 represents 65536.
 function mulInv(a) {
   const av = a === 0 ? 0x10000 : a;
   let oldR = Q, r = av;
@@ -80,13 +78,11 @@ export function ideaDecryptBlock(EK, block) {
   let q3 = (block[4] << 8) | block[5];
   let q4 = (block[6] << 8) | block[7];
 
-  // Invert the final transform.
   let x1 = mul(q1, mulInv(EK[48]));
   let x3 = addMod16(q2, negAdd(EK[49]));
   let x2 = addMod16(q3, negAdd(EK[50]));
   let x4 = mul(q4, mulInv(EK[51]));
 
-  // Invert rounds 8..1, each using its OWN (not reordered) round keys.
   for (let round = 7; round >= 0; round--) {
     const base = round * 6;
     const Z1 = EK[base], Z2 = EK[base + 1], Z3 = EK[base + 2], Z4 = EK[base + 3], Z5 = EK[base + 4], Z6 = EK[base + 5];

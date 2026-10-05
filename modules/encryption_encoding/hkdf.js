@@ -5,10 +5,6 @@ import { hmacGeneric, DIGESTS } from './_hashes.js';
 
 const WEBCRYPTO_HASH = { SHA256: 'SHA-256', SHA1: 'SHA-1', SHA384: 'SHA-384', SHA512: 'SHA-512' };
 
-// Uses the browser's native Web Crypto HKDF for SHA-256/1/384/512; SubtleCrypto doesn't recognize
-// "MD5" as an HKDF hash at all, so that one falls back to a hand-rolled HMAC-based extract/expand
-// (RFC 5869, using the small hand-rolled HMAC-MD5 in ./_hashes.js) to match Python's hmac+hashlib
-// implementation exactly.
 module('HKDF', 'HMAC-based key derivation (RFC 5869); outputs the key as hex. Input is the input keying material.',
   [A.toggle('Salt', '', ['Hex', 'UTF8', 'Latin1', 'Base64'], 'Hex'), A.toggle('Info', '', ['UTF8', 'Hex', 'Latin1', 'Base64'], 'UTF8'),
     A.number('Output length (bytes)', 32, 1), A.select('Hashing function', ['SHA256', 'SHA1', 'SHA384', 'SHA512', 'MD5'])],

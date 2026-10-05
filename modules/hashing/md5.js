@@ -1,7 +1,5 @@
 import { module } from './_cat.js';
 
-// Hand-rolled MD5 (RFC 1321) - no browser API provides this. Verified against the RFC 1321 test
-// vectors (md5("") = d41d8cd98f00b204e9800998ecf8427e, md5("abc") = 900150983cd24fb0d6963f7d28e17f72).
 const S = [7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22, 5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,
   4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23, 6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21];
 const K = Array.from({ length: 64 }, (_, i) => (Math.abs(Math.sin(i + 1)) * 4294967296) >>> 0);

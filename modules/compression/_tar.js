@@ -1,4 +1,3 @@
-// Shared USTAR header helpers for tar.js / untar.js.
 import { encodeUtf8, decodeLatin1 } from '../../core/util.js';
 import { concat } from './_bytes.js';
 
@@ -58,8 +57,6 @@ function parsePax(text) {
   return kv;
 }
 
-/** Parses a tar archive (USTAR / GNU, with GNU long-name 'L' and PAX 'x' extensions). Returns
- * [{name, size, typeflag, content: Uint8Array}] for regular files only. */
 export function parseTar(data) {
   const entries = [];
   let i = 0;

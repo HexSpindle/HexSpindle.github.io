@@ -1,4 +1,3 @@
-// Shared "A<sample delimiter>B" set-splitting for arithmetic_logic ops (mirrors core/util.py's split_sets).
 function unescape(s) {
   return s.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '\r');
 }

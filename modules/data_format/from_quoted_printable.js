@@ -3,7 +3,6 @@ import { module } from './_cat.js';
 function isHex(b) { return (b >= 48 && b <= 57) || (b >= 65 && b <= 70) || (b >= 97 && b <= 102); }
 function hexVal(b) { return b <= 57 ? b - 48 : (b <= 70 ? b - 55 : b - 87); }
 
-// Mirrors CPython's binascii.a2b_qp (header=False), which is what quopri.decodestring() delegates to.
 module('From Quoted Printable', 'Decodes MIME Quoted-Printable data.', [],
   (data) => {
     const out = [];

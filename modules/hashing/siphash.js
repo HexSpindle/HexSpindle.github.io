@@ -1,7 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// SipHash-c-d keyed PRF, ported directly from the Python reference (64-bit lanes via BigInt).
 const MASK = (1n << 64n) - 1n;
 const rotl = (x, b) => ((x << BigInt(b)) | (x >> BigInt(64 - b))) & MASK;
 

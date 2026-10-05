@@ -1,6 +1,3 @@
-// Auto-extracted from RHash librhash/snefru.c (the SNEFRU S-box, generated per Merkle's 1990
-// paper from the published "A Million Random Digits" table; reproduced here from RHash's
-// precomputed form rather than re-deriving it, to avoid transcription/derivation errors).
 export const SNEFRU_SBOX = new Uint32Array([
   0x64f9001b, 0xfeddcdf6, 0x7c8ff1e2, 0x11d71514, 0x8b8c18d3, 0xdddf881e, 0x6eab5056, 0x88ced8e1,
   0x49148959, 0x69c56fd5, 0xb7994f03, 0x0fbcee3e, 0x3c264940, 0x21557e58, 0xe14b3fc2, 0x2e5cf591,

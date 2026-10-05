@@ -83,8 +83,6 @@ export function parseJsonTyped(s) {
   return val();
 }
 
-// json.dumps-equivalent: BigInt is rendered as a bare integer literal (JSON.stringify can't emit
-// BigInt at all) and Flt as its plain float value.
 export function stringifyTyped(obj, indent = 2) {
   return JSON.stringify(obj, (_, v) => {
     if (typeof v === 'bigint') return `@@BIGINT:${v}@@`;

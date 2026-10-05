@@ -8,9 +8,6 @@ const CITIES = 'Springfield Fairview Madison Georgetown Franklin Clinton Greenvi
 const STREETS = 'Main Oak Maple Cedar Elm Washington Lake Hill Park Church'.split(' ');
 const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-// A faithful port of CPython's `random.Random`: the Mersenne Twister (MT19937) core plus the
-// seeding (init_by_array) and _randbelow algorithms it uses for choice()/randint(), so that a given
-// seed reproduces the exact same sequence as the Python version.
 class MT19937 {
   constructor(seed) {
     this.mt = new Uint32Array(624);

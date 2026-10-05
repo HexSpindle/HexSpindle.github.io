@@ -25,7 +25,6 @@ function eq(a, b) {
   return d === 0;
 }
 
-// ---- PKCS#1 v1.5 -------------------------------------------------------------------------------
 
 function digestInfo(hashName, digestBytes) {
   return derSequence([derSequence([derOid(DIGEST_OID[hashName]), derNull()]), derOctetString(digestBytes)]);
@@ -52,7 +51,6 @@ export async function pkcs1v15Verify(n, e, hashName, message, signature) {
   return eq(em, expected);
 }
 
-// ---- PSS (RFC 8017 EMSA-PSS) --------------------------------------------------------------------
 
 async function mgf1(seed, maskLen, hashName) {
   const hLen = digestLen(hashName);
@@ -90,8 +88,6 @@ export async function pssSign(n, d, hashName, message, saltLen) {
   return bigIntToBytes(modExp(bytesToBigInt(em), d, n), k);
 }
 
-/** Verifies a PSS signature, auto-detecting the salt length from the decoded message (matching
- * cryptography's padding.PSS.AUTO), rather than requiring the verifier to know it in advance. */
 export async function pssVerify(n, e, hashName, message, signature) {
   const k = modulusByteLen(n);
   if (signature.length !== k) return false;

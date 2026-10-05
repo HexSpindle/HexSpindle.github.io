@@ -8,9 +8,6 @@ function b64urlEncode(u8) {
   return btoa(s).replace(/\+/g, '-').replace(/\//g, '_');
 }
 
-// Fernet (the Python `cryptography` library's spec): AES-128-CBC (PKCS#7 padded, native Web
-// Crypto) + HMAC-SHA256 (native Web Crypto) over version-byte || 8-byte-BE-timestamp || iv ||
-// ciphertext, base64url-encoded. Random IV and current timestamp, exactly like the Python side.
 module('Fernet Encrypt', 'Encrypts with Fernet (AES-128-CBC + HMAC-SHA256). Key is a 32-byte url-safe Base64 string.', [A.string('Key (base64)', '')],
   async (data, key) => {
     const keyBytes = base64Decode(key);

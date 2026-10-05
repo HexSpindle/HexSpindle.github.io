@@ -3,8 +3,6 @@ import { A } from '../../core/registry.js';
 import { parseHex, decodeLatin1, bytesToHex, bytesEqual } from '../../core/util.js';
 import { makeAes } from './_aes.js';
 
-// RFC 3394 AES Key Unwrap - see aes_key_wrap.js for why this uses the small embedded AES core
-// instead of Web Crypto's native (size-restricted) "AES-KW".
 module('AES Key Unwrap', 'Unwraps an AES Key Wrap (RFC 3394) hex string and checks its integrity.',
   [A.toggle('Key encryption key', '', ['Hex', 'UTF8', 'Latin1', 'Base64'], 'Hex'), A.toggle('IV', 'A6A6A6A6A6A6A6A6', ['Hex', 'UTF8', 'Latin1', 'Base64'], 'Hex'), A.select('Output', ['Hex', 'Raw'])],
   (data, kek, iv, out) => {

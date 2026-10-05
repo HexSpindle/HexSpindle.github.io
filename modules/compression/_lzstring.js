@@ -1,6 +1,3 @@
-// Port of the lz-string JS library's own algorithm (by pieroxy), used for the "lz-string" data
-// format commonly seen packed into URLs and localStorage.
-
 const KEY_STR_BASE64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 const KEY_STR_URI_SAFE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$';
 

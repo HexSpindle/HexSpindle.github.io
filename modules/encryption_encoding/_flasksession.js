@@ -15,8 +15,6 @@ function b64uDecode(s) {
 }
 
 function intToBytes(n) {
-  // Big-endian, minimal length (matches itsdangerous' int_to_bytes: pack as u64 BE, strip leading
-  // zero bytes).
   if (n === 0) return new Uint8Array([0]);
   const bytes = [];
   let v = BigInt(n);

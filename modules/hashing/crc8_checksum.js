@@ -1,9 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// Generic Rocksoft "catalogue model" CRC engine (width/poly/init/refin/refout/xorout), shared by all
-// CRC variants in this category. params = [width, poly, init, refin, refout, xorout] (poly/init/xorout
-// as BigInt, to support widths up to 64 bits).
 function reflect(v, bits) {
   let r = 0n;
   for (let i = 0; i < bits; i++) {

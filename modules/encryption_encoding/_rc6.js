@@ -1,7 +1,3 @@
-// RC6 (Rivest, Robshaw, Sidney, Yin - AES finalist), parameterised RC6-w/r/b: w-bit words (here
-// fixed at the standard w=32), r rounds (default 20), b-byte key of any length. Reference: "The RC6
-// Block Cipher" v1.1 (RSA Laboratories, 1998) - https://www.grc.com/r&d/rc6.pdf - whose worked
-// example and the IETF draft-krovetz-rc6-rc5-vectors-00 test vectors this is checked against.
 const W = 32;
 const MASK = 0xffffffff;
 const LGW = 5; // log2(32)
@@ -10,8 +6,6 @@ const Q32 = 0x9e3779b9;
 
 function rotl(x, n) { n &= 31; return n === 0 ? x >>> 0 : (((x << n) | (x >>> (32 - n))) >>> 0); }
 function rotr(x, n) { n &= 31; return n === 0 ? x >>> 0 : (((x >>> n) | (x << (32 - n))) >>> 0); }
-// x*(2x+1) can reach ~2^65, far past doubles' 2^53 exact-integer range, so this one multiplication
-// needs BigInt (everything else here fits in 32 bits and uses plain >>> 0 arithmetic).
 function fFunc(x) { return Number((BigInt(x) * BigInt((2 * x + 1) >>> 0)) & 0xffffffffn) >>> 0; }
 
 function bytesToWordsLE(bytes) {

@@ -1,6 +1,3 @@
-// Hand-rolled RSAES-PKCS1-v1_5 encryption/decryption. Web Crypto deliberately has no support for
-// this scheme (only RSA-OAEP for encryption, and RSASSA-PKCS1-v1_5 for *signing*), so the raw
-// modexp + padding has to be done by hand here.
 import { bigIntToBytes, bytesToBigInt, modExp } from './_bignum.js';
 
 function modulusByteLen(n) { return Math.ceil(n.toString(2).length / 8); }

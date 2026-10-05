@@ -3,9 +3,6 @@ import { A, Html } from '../../core/registry.js';
 
 const escapeHtml = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-// Longest-common-subsequence opcodes between two token arrays, in the style of Python's
-// difflib.SequenceMatcher.get_opcodes(). Common prefix/suffix is stripped first so the O(n*m)
-// DP table only has to cover the part that actually differs - real-world diffs are mostly shared text.
 function diffOpcodes(a, b, key) {
   const ka = a.map(key), kb = b.map(key);
   let start = 0;

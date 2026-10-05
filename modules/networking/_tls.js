@@ -1,5 +1,3 @@
-// Minimal TLS ClientHello/ServerHello parser, shared by JA3/JA3S/Parse TLS record - mirrors
-// core/tls.py's parse_hello/ja3_string/ja3s_string field for field.
 const GREASE = new Set();
 for (let h = 0; h < 16; h++) { const hex = h.toString(16); GREASE.add(parseInt(`${hex}a${hex}a`, 16)); }
 
@@ -13,8 +11,6 @@ function readU16List(b, i, countBytes = 2) {
   return [vals, i + n];
 }
 
-/** Parses a single TLS record containing a ClientHello or ServerHello handshake message. Accepts a
- * raw TLS record (with 5-byte record header) or a bare handshake message. */
 export function parseHello(data) {
   let b = data;
   if (b.length > 5 && b[0] === 0x16) {

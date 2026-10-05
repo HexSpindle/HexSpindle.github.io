@@ -1,8 +1,3 @@
-// Partial Zstandard support: only Raw (stored) and RLE block types are implemented - the
-// "Compressed" block type needs the FSE/tANS entropy stage and Huffman-coded literals, which
-// aren't implemented (see zstandard_compress.js / zstandard_decompress.js for what this means in
-// practice). Frame-level parsing (header flags, content size, dictionary ID, checksum) is general
-// enough to handle real-world frames; it's only the block payload itself that's limited.
 import { concat } from './_bytes.js';
 
 const MAGIC = 0xFD2FB528;

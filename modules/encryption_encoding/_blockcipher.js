@@ -1,6 +1,3 @@
-// Shared block-cipher plumbing for DES / Triple DES / Blowfish (the hand-rolled ciphers in this
-// category that Web Crypto has no native support for), mirroring core/cipher.py's cipher_args()
-// and run_cipher() - ECB/CBC/CFB/OFB/CTR only (GCM is mapped to CBC by each caller, same as Python).
 import { A } from '../../core/registry.js';
 import { parseHex, decodeLatin1, bytesToHex, concatBytes } from '../../core/util.js';
 
@@ -60,7 +57,7 @@ function cbcDecrypt(decBlock, bs, iv, data) {
   }
   return out;
 }
-/** Full-block-feedback CFB (segment_size == block_size), matching pycryptodome's default. */
+
 function cfb(encBlock, bs, iv, data, decrypt) {
   const out = new Uint8Array(data.length);
   let shift = iv;
@@ -90,9 +87,7 @@ function incCounterField(ctr, from) {
   for (let i = out.length - 1; i >= from; i--) { out[i] = (out[i] + 1) & 255; if (out[i] !== 0) break; }
   return out;
 }
-/** CTR: an IV exactly one block long is the starting counter value (the whole block increments,
- * wrapping around); a shorter IV is a fixed nonce prefix with the remaining bytes as a counter that
- * starts at 0 - matching pycryptodome's initial_value-vs-nonce split in core/cipher.py's run_cipher(). */
+
 function ctr(encBlock, bs, iv, data) {
   const out = new Uint8Array(data.length);
   let counter = iv.length === bs ? iv : concatBytes([iv, new Uint8Array(bs - iv.length)]);
@@ -106,11 +101,6 @@ function ctr(encBlock, bs, iv, data) {
   return out;
 }
 
-/**
- * Generic ECB/CBC/CFB/OFB/CTR runner for a block cipher given its single-block encrypt/decrypt
- * functions and block size. Mirrors core/cipher.py's run_cipher() (minus the AEAD modes, which none
- * of DES/3DES/Blowfish's module files expose).
- */
 export function runCipher(encBlock, decBlock, bs, data, key, iv, mode, inp, out, decrypt) {
   if (inp === 'Hex') data = parseHex(decodeLatin1(data));
   if (mode !== 'ECB' && mode !== 'CTR' && iv.length !== bs) throw new Error(`IV must be ${bs} bytes for ${mode} (got ${iv.length})`);

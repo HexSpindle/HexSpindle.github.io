@@ -1,4 +1,3 @@
-// File signature database used by Detect File Type and Magic.
 const b = s => Uint8Array.from(s, c => c.charCodeAt(0));
 
 export const SIGNATURES = [

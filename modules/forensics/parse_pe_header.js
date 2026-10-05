@@ -4,8 +4,6 @@ import { decodeLatin1 } from '../../core/util.js';
 
 const MACHINES = { 0x14c: 'x86', 0x8664: 'x64', 0x1c0: 'ARM', 0xaa64: 'ARM64', 0x1c4: 'ARMNT' };
 const SUBSYSTEMS = { 1: 'Native', 2: 'Windows GUI', 3: 'Windows CUI', 7: 'POSIX CUI', 9: 'Windows CE GUI', 10: 'EFI application' };
-// Array (not an object) because the Python dict's *insertion* order drives the output below,
-// and plain objects would instead sort these integer-like keys numerically.
 const DLL_CHARS = [
   [0x0040, 'DYNAMIC_BASE (ASLR)'], [0x0100, 'NX_COMPAT (DEP)'], [0x0400, 'NO_SEH'],
   [0x4000, 'GUARD_CF (CFG)'], [0x0020, 'HIGH_ENTROPY_VA'], [0x8000, 'TERMINAL_SERVER_AWARE'],
@@ -114,7 +112,7 @@ module('Parse PE Header', 'Decodes a Windows PE (EXE/DLL) file: machine type, ti
           }
         }
         if (dlls.length) { out.push('\nImported DLLs:'); out.push(...dlls.map(d => `  ${d}`)); }
-      } catch { /* mirrors the Python source's bare except: pass around import-table parsing */ }
+      } catch { /* pass around import-table parsing */ }
     }
     return out.join('\n');
   });

@@ -1,5 +1,3 @@
-// Shared BigInt helpers for the Windows FILETIME conversions (100ns-tick math needs BigInt to
-// avoid precision loss - Number can't exactly represent values this large).
 export function bigFloorDiv(a, b) {
   let q = a / b;
   const r = a % b;

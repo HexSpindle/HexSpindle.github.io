@@ -161,7 +161,6 @@ export function ipv4IsReserved(v4) { return v4InNet(v4, '240.0.0.0/4'); }
 export function ipv4IsUnspecified(v4) { return v4 === 0n; }
 export function ipv4IsGlobal(v4) { return !ipv4IsPrivate(v4); }
 
-/** classify() returns the subset of flag names (matching Python's getattr-based list) that are true. */
 export function classifyV6(val) {
   const mapped = ipv4Mapped(val);
   const flags = {};
@@ -186,8 +185,6 @@ export function classifyV6(val) {
   }
   return ['is_loopback', 'is_link_local', 'is_multicast', 'is_private', 'is_global', 'is_unspecified', 'is_reserved', 'is_site_local'].filter(k => flags[k]);
 }
-
-// -------------------------------------------------------------- generic address/network helpers
 
 export function parseAddressAuto(str) {
   if (str.includes(':')) return { version: 6, val: parseIPv6(str).val };

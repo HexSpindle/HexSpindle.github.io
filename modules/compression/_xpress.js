@@ -1,16 +1,5 @@
 const MAX_DECOMPRESSED = 32 * 1024 * 1024;
 
-/**
- * Decompress an XPRESS plain-LZ77 stream.
- *
- * The stream is self-terminating: a sequence of 32-bit flag groups tested from bit 31 down. A
- * clear bit is a literal byte. A set bit is a match described by an LE16 word, (offset-1) in the
- * top 13 bits and (length-3) in the low 3 bits. A match whose low 3 bits are 7 uses the
- * shared-nibble form: the low nibble of the next stream byte extends the length, and its high
- * nibble extends the next match that also uses this form. A nibble of 15 selects a raw length: a
- * byte, an LE16 if the byte is 255, or an LE32 if the LE16 is 0. The final flag group is padded
- * with set bits; a match flag with no input left is the end-of-data marker.
- */
 export function xpressDecompress(input) {
   const out = [];
   let pending = -1; // offset of the shared-nibble byte, -1 when none pending
@@ -32,7 +21,6 @@ export function xpressDecompress(input) {
       continue;
     }
 
-    // A set flag with no input left is the end-of-data marker.
     if (i >= input.length) return Uint8Array.from(out);
     if (input.length - i < 2) throw new Error('XPRESS: truncated match');
     const mb = input[i] | (input[i + 1] << 8);
@@ -81,17 +69,6 @@ export function xpressDecompress(input) {
   }
 }
 
-/**
- * Decompress an XPRESS LZ77+Huffman stream into exactly decompressedSize bytes.
- *
- * The first 256 bytes hold 512 4-bit code lengths, the even symbol in the low nibble and the odd
- * in the high. Canonical codes are assigned in (length, symbol) order, most-significant bit
- * first. The bit stream follows as LE16 words, MSB first, read through a 32-bit register refilled
- * while fewer than 15 bits remain. Symbols 0..255 are literals. Symbol 256 is end-of-data;
- * mid-stream it decodes as a match of length 3 at offset 1. Symbols 257..511 are matches:
- * ((s-256)>>4) selects the offset bit width, ((s-256)&15) the base length, with a nibble of 15
- * selecting a raw length byte (an LE16 if 255, an LE32 if the LE16 is 0).
- */
 export function xpressDecompressHuffman(input, decompressedSize) {
   if (decompressedSize <= 0 || decompressedSize > MAX_DECOMPRESSED) throw new Error('XPRESS: invalid decompressed size');
   if (input.length < 256) throw new Error('XPRESS: truncated Huffman table');
@@ -102,7 +79,6 @@ export function xpressDecompressHuffman(input, decompressedSize) {
     lens[l * 2 + 1] = input[l] >>> 4;
   }
 
-  // Decode table in canonical (length, symbol) order, MSB first.
   const TABLE_BITS = 15;
   const TABLE_SIZE = 1 << TABLE_BITS;
   const table = new Array(TABLE_SIZE);
@@ -117,7 +93,6 @@ export function xpressDecompressHuffman(input, decompressedSize) {
   }
   if (e !== TABLE_SIZE) throw new Error('XPRESS: invalid Huffman code lengths');
 
-  // Preload two LE16 words, most-significant bit first.
   let bits = 0;
   let nbits = 0;
   let i = 256;
@@ -148,7 +123,6 @@ export function xpressDecompressHuffman(input, decompressedSize) {
     }
 
     if (sym === 256) {
-      // End of data; mid-stream it decodes as a match(3, 1).
       if (out.length === decompressedSize) break;
       if (out.length === 0 || decompressedSize - out.length < 3) throw new Error('XPRESS: corrupt end-of-data marker');
       const start = out.length - 1;

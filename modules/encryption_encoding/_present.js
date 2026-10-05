@@ -1,13 +1,8 @@
-// PRESENT (Bogdanov, Knudsen, Leander, Paar, Poschmann, Robshaw, Seurin, Vikkelsoe), an
-// ultra-lightweight SPN block cipher: 64-bit blocks, 80 or 128-bit keys, 31 rounds of
-// key-xor / 4-bit S-box / bit permutation. Standardised as ISO/IEC 29192-2:2019.
-// Reference: "PRESENT: An Ultra-Lightweight Block Cipher" (CHES 2007), https://www.lightweightcrypto.org/present/present_ches2007.pdf
 const NROUNDS = 31;
 
 const SBOX = [0xc, 0x5, 0x6, 0xb, 0x9, 0x0, 0xa, 0xd, 0x3, 0xe, 0xf, 0x8, 0x4, 0x7, 0x1, 0x2];
 const SBOX_INV = [0x5, 0xe, 0xf, 0x8, 0xc, 0x1, 0x2, 0xd, 0xb, 0x4, 0x6, 0x3, 0x0, 0x7, 0x9, 0xa];
 
-// Bit i of the state moves to bit P[i].
 const PBOX = [];
 for (let i = 0; i < 64; i++) {
   if (i === 63) PBOX.push(63);

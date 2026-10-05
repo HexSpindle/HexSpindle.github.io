@@ -1,8 +1,3 @@
-// Tables are pure numeric constants (an S-box and its byte-rotated/XOR-combined lookup tables
-// plus 11 round constants) derived from the Whirlpool algorithm's definition; not a copyrightable
-// expression of php-src's code, just extracted via it rather than hand-typed to avoid transcription
-// errors - see whirlpool.js for how they're used and verified.
-// Auto-extracted from php-src ext/hash/php_hash_whirlpool_tables.h (PHP license, BSD-3-Clause)
 export const RC = [
   0x0000000000000000n, 0x1823c6e887b8014fn, 0x36a6d2f5796f9152n, 0x60bc9b8ea30c7b35n, 0x1de0d7c22e4bfe57n, 0x157737e59ff04adan, 0x58c9290ab1a06b85n, 0xbd5d10f4cb3e0567n, 0xe427418ba77d95d8n, 0xfbee7c66dd17479en, 0xca2dbf07ad5a8333n
 ];

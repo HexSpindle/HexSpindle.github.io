@@ -1,7 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// (name, regex) - common credential/token shapes. False positives are expected; this is a triage aid.
 const RULES = [
   ['AWS Access Key ID', '\\b(?:AKIA|ASIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASCA)[A-Z0-9]{16}\\b'],
   ["AWS Secret Access Key (near 'secret')", "(?i)aws(.{0,20})?(?:secret|private)[_-]?(?:access)?[_-]?key(.{0,5})?[\"'=:\\s]+([A-Za-z0-9/+=]{40})"],

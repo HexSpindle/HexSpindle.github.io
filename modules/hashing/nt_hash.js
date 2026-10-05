@@ -1,7 +1,6 @@
 import { module } from './_cat.js';
 import { md4 } from './md4.js';
 
-// Windows NT hash: MD4 of the UTF-16LE password. Reuses the MD4 implementation from md4.js.
 export function ntHash(text) {
   const u16 = new Uint8Array(text.length * 2);
   const dv = new DataView(u16.buffer);

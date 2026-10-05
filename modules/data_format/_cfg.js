@@ -1,7 +1,5 @@
 export class Flt { constructor(v) { this.v = v; } }
 
-// ---------- YAML ----------
-
 const TRUEWORDS = /^(true|True|TRUE|yes|Yes|YES|on|On|ON)$/;
 const FALSEWORDS = /^(false|False|FALSE|no|No|NO|off|Off|OFF)$/;
 const NULLWORDS = /^(null|Null|NULL|~)$/;
@@ -104,7 +102,6 @@ export function yamlDump(obj) {
   return yamlScalar(obj) + '\n...\n';
 }
 
-// --- YAML parsing ---
 
 function stripComment(line) {
   let inS = false, inD = false;
@@ -330,8 +327,6 @@ export function yamlLoad(text) {
   return parseScalarOrFlow(content);
 }
 
-// ---------- TOML ----------
-
 export function tomlDump(obj) {
   const lines = [];
   const esc = (v) => {
@@ -417,8 +412,6 @@ export function tomlLoad(text) {
   }
   return root;
 }
-
-// ---------- INI ----------
 
 export function iniDump(obj) {
   const lines = [];

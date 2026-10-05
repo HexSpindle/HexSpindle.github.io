@@ -25,7 +25,6 @@ function readInts(raw, cnt, width, little, signed) {
   return out;
 }
 
-// Mirrors Python's bytes.__repr__ for the rare "unknown tag type, short raw value" case.
 function pyBytesRepr(u8) {
   let hasSingle = false, hasDouble = false;
   for (const b of u8) { if (b === 0x27) hasSingle = true; else if (b === 0x22) hasDouble = true; }

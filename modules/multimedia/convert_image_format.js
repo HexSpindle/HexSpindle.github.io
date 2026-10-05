@@ -14,7 +14,6 @@ module('Convert Image Format', 'Converts an image between PNG, JPEG, GIF, BMP, W
     if (fmt === 'BMP') return encodeBmp(img, width, height);
     if (fmt === 'TIFF') return encodeTiff(img, width, height);
     if (fmt === 'GIF') return encodeGif(img, width, height);
-    // ICO: embed a PNG, per the modern (Vista+) icon format.
     const png = await canvasToFormat(canvas, 'image/png');
     return encodeIco(png, width, height);
   });

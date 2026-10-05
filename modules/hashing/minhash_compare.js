@@ -1,8 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// Matches Python's `sep.encode().decode("unicode_escape")` for a handful of common escapes
-// (the only ones a separator argument would realistically contain).
 function unicodeEscape(s) {
   return s.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '\r').replace(/\\\\/g, '\\');
 }

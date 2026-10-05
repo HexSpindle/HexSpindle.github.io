@@ -1,4 +1,3 @@
-// RC2 PI table (RFC 2268)
 export const PITABLE = new Uint8Array([
   0xd9, 0x78, 0xf9, 0xc4, 0x19, 0xdd, 0xb5, 0xed, 0x28, 0xe9, 0xfd, 0x79, 0x4a, 0xa0, 0xd8, 0x9d,
   0xc6, 0x7e, 0x37, 0x83, 0x2b, 0x76, 0x53, 0x8e, 0x62, 0x4c, 0x64, 0x88, 0x44, 0x8b, 0xfb, 0xa2,
@@ -29,8 +28,6 @@ export function rc2KeySchedule(key) {
     if (i < T) L[i] = key[i];
     else L[i] = PITABLE[(L[i - 1] + L[i - T]) & 0xff];
   }
-  // Effective key length in bits = T*8 (forced by core/cipher.py), so the EKB-masking step
-  // in the full RFC 2268 algorithm reduces to this no-op lookup (TM = 0xff in that case).
   L[128 - T] = PITABLE[L[128 - T]];
   for (let i = 127 - T; i >= 0; i--) {
     L[i] = PITABLE[L[i + 1] ^ L[i + T]];

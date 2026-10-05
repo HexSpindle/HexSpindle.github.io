@@ -5,8 +5,6 @@ const WORDS = ('lorem ipsum dolor sit amet consectetur adipiscing elit sed do ei
   + 'laboris nisi aliquip ex ea commodo consequat duis aute irure in reprehenderit voluptate velit esse cillum fugiat nulla pariatur excepteur sint occaecat cupidatat non proident '
   + 'sunt culpa qui officia deserunt mollit anim id est laborum').split(' ');
 
-// A faithful re-implementation of CPython's `random` module (Mersenne Twister, MT19937), seeded the
-// same way as the Python source (random.Random(42)), so output is byte-identical for a given word count.
 class PyRandom {
   constructor(seed) { this.mt = new Uint32Array(624); this.mti = 625; this.initByArray([seed >>> 0]); }
   initGenrand(s) {

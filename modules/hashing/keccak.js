@@ -1,10 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// Hand-rolled Keccak-f[1600] / Keccak-p[1600,n] permutation and sponge construction - no browser
-// API exposes the Keccak/SHA-3 family (checked: Node's crypto.subtle.digest rejects 'SHA3-256' and
-// 'SHAKE128' with "Unrecognized algorithm name" on this V8/Node build, same as real browsers today).
-// This file holds the shared permutation + sponge, reused by sha3.js, shake.js and cshake_kmac.js.
 
 const MASK64 = (1n << 64n) - 1n;
 const RC = [
@@ -15,7 +11,6 @@ const RC = [
   0x8000000000008002n, 0x8000000000000080n, 0x000000000000800an, 0x800000008000000an,
   0x8000000080008081n, 0x8000000000008080n, 0x0000000080000001n, 0x8000000080008008n,
 ];
-// Rotation offsets r[x,y], laid out flat by lane index x+5y.
 const RHO = [
   0, 1, 62, 28, 27,
   36, 44, 6, 55, 20,
@@ -61,8 +56,6 @@ function squeezeBlock(state, rateBytes) {
   return out;
 }
 
-/** Generic Keccak sponge. domainByte already encodes the domain-separation suffix bits plus the
- * leading '1' bit of the pad10*1 padding (e.g. 0x01 for plain Keccak, 0x06 for SHA-3, 0x1F for SHAKE). */
 export function keccakSponge(data, rateBytes, domainByte, outputBytes, rounds = 24) {
   const state = new BigUint64Array(25);
   let offset = 0;
@@ -91,7 +84,6 @@ export function keccakSponge(data, rateBytes, domainByte, outputBytes, rounds = 
   return out;
 }
 
-// Original (pre-FIPS) Keccak padding: domain byte 0x01, capacity = 2 * digest size.
 export function keccak(data, digestBits) {
   const digestBytes = digestBits / 8;
   const rate = 200 - 2 * digestBytes;

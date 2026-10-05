@@ -29,7 +29,6 @@ export function getAllHeaders(headers, name) {
   return headers.filter(([k]) => k.toLowerCase() === low).map(([, v]) => v);
 }
 
-/** Mirrors email.utils.parseaddr for the single-address case this tool needs. */
 export function parseAddr(s) {
   s = (s || '').trim();
   if (!s) return ['', ''];
@@ -47,7 +46,6 @@ const MONTHNAMES = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep
 const DAYNAMES = new Set(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
 const TIMEZONES = { UT: 0, UTC: 0, GMT: 0, Z: 0, AST: -400, ADT: -300, EST: -500, EDT: -400, CST: -600, CDT: -500, MST: -700, MDT: -600, PST: -800, PDT: -700 };
 
-/** Ports email._parseaddr._parsedate_tz: a very tolerant RFC 2822 (and RFC 850) date parser. */
 function parsedateTz(data) {
   if (!data) return null;
   let parts = data.split(/\s+/).filter(Boolean);
@@ -101,8 +99,6 @@ function parsedateTz(data) {
     if (/^[+-]?\d+$/.test(tz)) tzoffset = parseInt(tz, 10);
     if (tzoffset === 0 && tz.startsWith('-')) tzoffset = null;
   }
-  // The HHMM-style offset (e.g. -500 for EST, or a parsed "-0500") converts to seconds even when
-  // it's 0 - that's a no-op, so there's no need to mirror Python's `if tzoffset:` truthy-skip here.
   let tzSeconds = null;
   if (tzoffset !== null) {
     const sign = tzoffset < 0 ? -1 : 1;
@@ -112,9 +108,6 @@ function parsedateTz(data) {
   return { yy: yn, mm: mo, dd: dn, hh, mi, ss, tzSeconds };
 }
 
-/** Mirrors email.utils.parsedate_to_datetime: returns {ms, iso} (ms = epoch milliseconds of the
- * instant, treating a date with no zone as if its wall-clock value were UTC - which gives the same
- * relative deltas as Python's naive-datetime subtraction) or null if the string can't be parsed. */
 export function parseDateToDatetime(s) {
   const p = parsedateTz(s);
   if (!p) return null;

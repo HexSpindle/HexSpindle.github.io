@@ -62,8 +62,6 @@ function parse(b, depth = 0) {
   return out;
 }
 
-// json.dumps renders Python's arbitrary-precision ints as bare numbers; JSON.stringify can't emit
-// BigInt at all, so route them through a marker string and unquote it afterwards.
 function stringify(obj) {
   return JSON.stringify(obj, (_, v) => typeof v === 'bigint' ? `@@BIGINT:${v}@@` : v, 2)
     .replace(/"@@BIGINT:(-?\d+)@@"/g, '$1');

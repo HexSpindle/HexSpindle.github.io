@@ -2,8 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { bytesToHex, concatBytes } from '../../core/util.js';
 
-// Hand-rolled BLAKE2b (RFC 7693) - 64-bit words, 128-byte blocks, 12 rounds. Not exposed by
-// Web Crypto (checked: crypto.subtle.digest rejects 'BLAKE2b' / 'BLAKE2b-256').
 const MASK64 = (1n << 64n) - 1n;
 const IV = [
   0x6a09e667f3bcc908n, 0xbb67ae8584caa73bn, 0x3c6ef372fe94f82bn, 0xa54ff53a5f1d36f1n,

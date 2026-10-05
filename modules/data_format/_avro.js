@@ -58,8 +58,6 @@ function bufferJson(bytes) {
   return { type: 'Buffer', data: Array.from(bytes) };
 }
 
-// JS-shape bucket used to decide whether a union needs {"Branch": value} wrapping to stay
-// unambiguous (mirrors avsc's default "auto" union-wrapping heuristic).
 function shapeKind(schema) {
   switch (schema.type) {
     case 'null': return 'null';

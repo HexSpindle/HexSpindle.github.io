@@ -1,14 +1,8 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// MinHash signature for estimating Jaccard similarity over word-shingle sets. The random
-// (a, b) hash-function coefficients are drawn with a Mersenne Twister seeded exactly as CPython's
-// random.Random(seed) (MT19937 init_by_array + the getrandbits/randrange algorithm used by
-// randrange()), so a given seed reproduces the same coefficients - and thus the same signature -
-// as the Python op. Verified against the Python source's own run() for several seeds/texts.
 const PRIME = (1n << 61n) - 1n;
 
-// ---- CPython-compatible MT19937 (random.Random) ----
 const N = 624, M = 397, MATRIX_A = 0x9908b0df, UPPER_MASK = 0x80000000, LOWER_MASK = 0x7fffffff;
 class MT19937 {
   constructor() { this.mt = new Uint32Array(N); this.mti = N + 1; }

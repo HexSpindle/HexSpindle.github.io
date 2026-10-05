@@ -5,8 +5,6 @@ const NAMES_DOW = { 0: 'Sun', 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 
 
 function rangeIncl(a, b) { const r = []; for (let i = a; i <= b; i++) r.push(i); return r; }
 
-// Mirrors Python's int(s): the whole (trimmed) string must be a plain base-10 integer, or it throws -
-// this matters because the Python source relies on that exception for malformed/unsupported fields.
 function pyInt(s) {
   s = s.trim();
   if (!/^[+-]?\d+$/.test(s)) throw new Error(`invalid literal for int() with base 10: '${s}'`);

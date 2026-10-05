@@ -3,10 +3,6 @@ import { A } from '../../core/registry.js';
 import { parseHex, decodeLatin1, bytesToHex } from '../../core/util.js';
 import { makeAes } from './_aes.js';
 
-// RFC 3394 AES Key Wrap, matching the Python side's pycryptodome-based implementation exactly
-// (including its support for any key-encryption-key size and any multiple-of-8-byte payload of
-// at least 16 bytes - Web Crypto's native "AES-KW" only covers standard 16/24/32-byte payloads,
-// so a small embedded AES core (./_aes.js) is used instead for the raw ECB block encryption).
 module('AES Key Wrap', 'Wraps a key with AES Key Wrap (RFC 3394). Output is hex.',
   [A.toggle('Key encryption key', '', ['Hex', 'UTF8', 'Latin1', 'Base64'], 'Hex'), A.toggle('IV', 'A6A6A6A6A6A6A6A6', ['Hex', 'UTF8', 'Latin1', 'Base64'], 'Hex'), A.select('Input', ['Raw', 'Hex'])],
   (data, kek, iv, inp) => {

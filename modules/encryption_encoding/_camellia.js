@@ -1,4 +1,3 @@
-// Auto-extracted from OpenSSL crypto/camellia/camellia.c (Camellia_SBOX table)
 export const SBOX1_1110 = new Uint32Array([
   0x70707000, 0x82828200, 0x2c2c2c00, 0xececec00, 0xb3b3b300, 0x27272700,
   0xc0c0c000, 0xe5e5e500, 0xe4e4e400, 0x85858500, 0x57575700, 0x35353500,
@@ -303,7 +302,6 @@ function ekeygen(keyBitLength, rawKey) {
   k[12] = s0; k[13] = s1; k[14] = s2; k[15] = s3;
   [s0, s1, s2, s3] = rot4(s0, s1, s2, s3, 30); // KA <<< 45
   k[28] = s0; k[29] = s1; k[30] = s2; k[31] = s3;
-  // KA <<< 77 (free +32 via register relabelling, no extra rotate)
   k[48] = s1; k[49] = s2; k[50] = s3; k[51] = s0;
   [s1, s2, s3, s0] = rot4(s1, s2, s3, s0, 17); // KA <<< 94
   k[56] = s1; k[57] = s2; k[58] = s3; k[59] = s0;

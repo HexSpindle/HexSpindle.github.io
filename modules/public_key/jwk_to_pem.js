@@ -11,11 +11,6 @@ module('JWK to PEM', 'Converts a JSON Web Key (RSA / EC) to PEM.', [],
       throw new Error('Not a JWK: expected a JSON object with a \'kty\' field (e.g. "kty": "RSA")');
     }
     const isPriv = 'd' in j;
-    // Only the raw key material matters for a PEM/DER export - PEM has no concept of restricted key
-    // usage - but importKey() validates the requested algorithm/usages against the JWK's own
-    // use/key_ops/alg hints and rejects anything that doesn't match (e.g. an RSA-OAEP encryption key
-    // would be rejected for the sign/verify usage below). Strip those hints so any RSA/EC JWK
-    // (signing, encryption, or key-agreement) converts regardless of what it was issued for.
     j = { ...j };
     delete j.use; delete j.key_ops; delete j.alg;
     let algo, usages;

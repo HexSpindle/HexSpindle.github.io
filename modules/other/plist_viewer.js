@@ -1,9 +1,6 @@
 import { module } from './_cat.js';
 import { base64Decode, decodeUtf8 } from '../../core/util.js';
 
-// Mirrors how `json.dumps(obj, indent=2, default=str)` renders the Python objects plistlib.loads()
-// returns for types JSON has no representation for: `bytes` (<data>) prints as Python's bytes repr
-// (b'...'), and the naive UTC `datetime` (<date>) prints as "YYYY-MM-DD HH:MM:SS[.ffffff]".
 function pyBytesRepr(bytes) {
   let out = "b'";
   for (const b of bytes) {

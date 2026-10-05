@@ -1,6 +1,3 @@
-// Recipe engine. Runs entirely in the browser: no network calls, no server. Flow control
-// (Fork/Subsection/Merge/Jump/Conditional Jump/Register/Label/Return/Comment) includes a global
-// $R0.. register scheme shared across the whole recipe.
 import { MODULES, Html } from './registry.js';
 import { toBytes, encodeUtf8, decodeUtf8, concatBytes, delim, reFlags } from './util.js';
 
@@ -193,8 +190,6 @@ async function runBlock(kind, data, sub, args, ctx, offset) {
   return concatBytes(out);
 }
 
-/** Runs a recipe. Returns {output, html, steps, error, pausedAt, ms} - same shape as the Python
- * server's POST /api/bake response, so the UI layer needs no changes to consume it. */
 export async function bake(data, recipe, upto = null) {
   const ctx = new Ctx(upto);
   const t0 = performance.now();

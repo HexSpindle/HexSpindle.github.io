@@ -41,7 +41,6 @@ export const ECC_TABLE = [
   {L:[[19, 148, 118], [6, 149, 119]],M:[[18, 75, 47], [31, 76, 48]],Q:[[34, 54, 24], [34, 55, 25]],H:[[20, 45, 15], [61, 46, 16]]},
 ];
 
-// Alignment pattern centre coordinates, index = version-2 (versions 1 and <2 have none).
 export const ALIGNMENT_POS = [
   [6, 18], [6, 22], [6, 26], [6, 30], [6, 34], [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50],
   [6, 30, 54], [6, 32, 58], [6, 34, 62], [6, 26, 46, 66], [6, 26, 48, 70], [6, 26, 50, 74],
@@ -54,14 +53,12 @@ export const ALIGNMENT_POS = [
   [6, 26, 54, 82, 110, 138, 166], [6, 30, 58, 86, 114, 142, 170],
 ];
 
-// 18-bit BCH version info, index = version-7 (versions 7-40).
 export const VERSION_INFO = [
   31892, 34236, 39577, 42195, 48118, 51042, 55367, 58893, 63784, 68472, 70749, 76311, 79154,
   84390, 87683, 92361, 96236, 102084, 102881, 110507, 110734, 117786, 119615, 126325, 127568,
   133589, 136944, 141498, 145311, 150283, 152622, 158308, 161089, 167017,
 ];
 
-// 15-bit format info (BCH + mask 0x5412), index = (ecBits << 3 | maskPattern), ecBits: L=1 M=0 Q=3 H=2.
 export const FORMAT_INFO = [
   21522, 20773, 24188, 23371, 17913, 16590, 20375, 19104, 30660, 29427, 32170, 30877, 26159,
   25368, 27713, 26998, 5769, 5054, 7399, 6608, 1890, 597, 3340, 2107, 13663, 12392, 16177, 14854,
@@ -78,7 +75,6 @@ const ALIGNMENT_PATTERN = [
   [1, 1, 1, 1, 1], [1, 0, 0, 0, 1], [1, 0, 1, 0, 1], [1, 0, 0, 0, 1], [1, 1, 1, 1, 1],
 ];
 
-// GF(256) log/exp tables, primitive polynomial 0x11D, generator 2.
 export const GF_EXP = new Uint8Array(512);
 export const GF_LOG = new Uint8Array(256);
 (function initGF() {
@@ -135,7 +131,6 @@ function pickVersion(dataLen, ecLevel) {
   return null;
 }
 
-/** Builds the (unmasked) data+EC codeword bit sequence for the given version/level. */
 function buildCodewords(bytes, version, ecLevel) {
   const blocks = ECC_TABLE[version - 1][ecLevel];
   const capacityBits = blocks.reduce((s, [n, , d]) => s + n * d, 0) * 8;
@@ -156,7 +151,6 @@ function buildCodewords(bytes, version, ecLevel) {
   let p = 0;
   while (dataCodewords.length * 8 < capacityBits) dataCodewords.push(pad[p++ % 2]);
 
-  // Split into per-block data arrays, then compute EC codewords per block.
   const dataBlocks = [], ecBlocks = [];
   let idx = 0;
   for (const [numBlocks, total, data] of blocks) {
@@ -168,7 +162,6 @@ function buildCodewords(bytes, version, ecLevel) {
       ecBlocks.push(Array.from(rsEncode(block, ecLen)));
     }
   }
-  // Interleave: all blocks' data codewords column-wise, then all EC codewords column-wise.
   const out = [];
   const maxData = Math.max(...dataBlocks.map(b => b.length));
   for (let i = 0; i < maxData; i++) for (const b of dataBlocks) if (i < b.length) out.push(b[i]);
@@ -236,18 +229,12 @@ function maskPenalty(m, size) {
   return n1 + n2 + n3 + n4;
 }
 
-/** Lays out the finder/separator/timing/alignment patterns and reserves the format/version info
- * areas for a QR symbol of this version, returning `{ matrix, isFunction }` - shared by the
- * encoder and (via its own copy of this same layout logic) the decoder, which needs to know
- * exactly which modules are function patterns (never masked) vs. data (masked). */
 export function buildFunctionPatterns(size, version) {
-  // 2 = reserved/unfilled, used only during construction.
   const matrix = Array.from({ length: size }, () => new Array(size).fill(2));
   const isFunction = Array.from({ length: size }, () => new Array(size).fill(false));
 
   const setFn = (i, j, v) => { matrix[i][j] = v; isFunction[i][j] = true; };
 
-  // Finder patterns (+ separators) at the three corners.
   const corners = [[0, 0], [0, size - 8], [size - 8, 0]];
   for (const [bi, bj] of corners) {
     const offset = bi === 0 ? 1 : 0;
@@ -257,14 +244,12 @@ export function buildFunctionPatterns(size, version) {
     }
   }
 
-  // Timing patterns.
   for (let i = 8; i < size - 8; i++) {
     const bit = i % 2 === 0 ? 1 : 0;
     setFn(6, i, bit);
     setFn(i, 6, bit);
   }
 
-  // Alignment patterns.
   if (version >= 2) {
     const positions = ALIGNMENT_POS[version - 2];
     const minP = positions[0], maxP = positions[positions.length - 1];
@@ -277,8 +262,6 @@ export function buildFunctionPatterns(size, version) {
     }
   }
 
-  // Reserve format info areas (filled in later). The dark module (size-8, 8) reads as 0 here and
-  // is set to 1 only after masking - mask scoring must see it unset, matching the real algorithm.
   for (let i = 0; i < 9; i++) {
     if (!isFunction[i][8]) setFn(i, 8, 0);
     if (!isFunction[8][i]) setFn(8, i, 0);
@@ -287,7 +270,6 @@ export function buildFunctionPatterns(size, version) {
     if (!isFunction[size - 1 - i][8]) setFn(size - 1 - i, 8, 0);
     if (!isFunction[8][size - 1 - i]) setFn(8, size - 1 - i, 0);
   }
-  // Reserve version info areas (versions >= 7).
   if (version >= 7) {
     for (let i = 0; i < 6; i++) for (let j = 0; j < 3; j++) {
       setFn(size - 11 + j, i, 0);
@@ -298,9 +280,6 @@ export function buildFunctionPatterns(size, version) {
   return { matrix, isFunction };
 }
 
-/** Returns the (row, col) positions of all non-function modules in the standard zig-zag codeword
- * placement order (upwards/downwards column pairs, skipping the vertical timing column) - used by
- * the encoder (to place codeword bits) and the decoder (to read them back in the same order). */
 export function zigzagPositions(size, isFunction) {
   const positions = [];
   for (let rightBase = size - 1; rightBase > 0; rightBase -= 2) {
@@ -318,7 +297,6 @@ export function zigzagPositions(size, isFunction) {
   return positions;
 }
 
-/** Builds the complete QR matrix for `text` (UTF-8 byte mode) at the given EC level ('L'|'M'|'Q'|'H'). */
 export function buildQrMatrix(text, ecLevel = 'M') {
   const bytes = new TextEncoder().encode(text);
   const version = pickVersion(bytes.length, ecLevel);
@@ -326,15 +304,12 @@ export function buildQrMatrix(text, ecLevel = 'M') {
   const size = version * 4 + 17;
   const { matrix, isFunction } = buildFunctionPatterns(size, version);
 
-  // Place data+EC codewords in the standard zig-zag pattern (upwards/downwards column pairs,
-  // skipping the vertical timing column).
   const codewordBits = buildCodewords(bytes, version, ecLevel);
   let idx = 0;
   for (const [i, j] of zigzagPositions(size, isFunction)) {
     matrix[i][j] = idx < codewordBits.length ? codewordBits[idx++] : 0;
   }
 
-  // Try all 8 masks, keep the one with the lowest penalty score.
   let best = null, bestScore = Infinity, bestMask = 0;
   for (let m = 0; m < 8; m++) {
     const maskFn = MASK_FUNCS[m];
@@ -343,7 +318,6 @@ export function buildQrMatrix(text, ecLevel = 'M') {
     if (score < bestScore) { bestScore = score; best = candidate; bestMask = m; }
   }
 
-  // Format info (EC level + mask), duplicated around the top-left finder pattern.
   const fmtBits = FORMAT_INFO[(EC_BITS[ecLevel] << 3) | bestMask];
   let voffset = 0, hoffset = 0;
   for (let i = 0; i < 8; i++) {
@@ -357,7 +331,6 @@ export function buildQrMatrix(text, ecLevel = 'M') {
   }
   best[size - 8][8] = 1;
 
-  // Version info (versions >= 7), two 6x3 blocks near the bottom-left/top-right finder patterns.
   if (version >= 7) {
     const vinfo = VERSION_INFO[version - 7];
     for (let i = 0; i < 6; i++) for (let b = 0; b < 3; b++) {

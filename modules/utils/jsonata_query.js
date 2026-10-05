@@ -99,7 +99,6 @@ function parse(src) {
       const right = parseExpr(bp + 1);
       left = { type: 'binary', op: opName, left, right };
     }
-    // ternary has the lowest precedence of all and is right-associative
     if (minBp <= 1 && peek().t === 'op' && peek().v === '?') {
       next();
       const thenE = parseExpr(0);
@@ -231,7 +230,6 @@ function parse(src) {
   }
 
   function parseStatement() {
-    // "$x := expr" assignment, otherwise a plain expression
     if (peek().t === 'var' && toks[pos + 1] && toks[pos + 1].t === 'op' && toks[pos + 1].v === ':=') {
       const name = next().v;
       next(); // ':='
@@ -246,7 +244,6 @@ function parse(src) {
   return result;
 }
 
-// ---------- Evaluator ----------
 
 function isPlainObject(x) { return x !== null && typeof x === 'object' && !Array.isArray(x); }
 
@@ -485,7 +482,6 @@ function evalCall(node, focus, scope) {
   return fn(...args);
 }
 
-// ---------- Built-in functions ----------
 
 const toArr = v => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
 
@@ -566,7 +562,6 @@ const BUILTINS = {
   },
 };
 
-// ---------- Entry point ----------
 
 module('Jsonata Query', 'Queries and transforms JSON with a JSONata expression (jsonata.org) - a hand-written practical subset, not the full language. See the source comment at the top of this file for exactly what is and isn\'t supported, and why (the real jsonata library is a ~300KB bundle this project does not vendor).',
   [A.area('Query', '$')],

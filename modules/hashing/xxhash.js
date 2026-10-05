@@ -200,7 +200,6 @@ function XXH64_avalanche(h) {
   return h;
 }
 
-// ---- short keys (0..240), 64-bit ----
 function len_1to3_64b(input, off, len, secret, secOff, seed) {
   const c1 = BigInt(input[off]), c2 = BigInt(input[off + (len >> 1)]), c3 = BigInt(input[off + len - 1]);
   const combined = u32((c1 << 16n) | (c2 << 24n) | (c3 << 0n) | (BigInt(len) << 8n));
@@ -257,7 +256,6 @@ function len_129to240_64b(input, off, len, secret, seed) {
   return XXH3_avalanche(u64(acc + accEnd));
 }
 
-// ---- short keys (0..240), 128-bit ----
 function len_1to3_128b(input, off, len, secret, seed) {
   const c1 = BigInt(input[off]), c2 = BigInt(input[off + (len >> 1)]), c3 = BigInt(input[off + len - 1]);
   const combinedl = u32((c1 << 16n) | (c2 << 24n) | (c3 << 0n) | (BigInt(len) << 8n));
@@ -344,7 +342,6 @@ function len_129to240_128b(input, off, len, secret, seed) {
   return { lo, hi };
 }
 
-// ---- long keys (> 240) ----
 const INIT_ACC = [0xC2B2AE3Dn, P64_1, P64_2, P64_3, P64_4, 0x85EBCA77n, P64_5, 0x9E3779B1n];
 
 function scalarRound(acc, input, iOff, secret, sOff, lane) {

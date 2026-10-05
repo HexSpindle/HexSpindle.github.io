@@ -6,8 +6,6 @@ function makeCipher(algo, key) {
   throw new Error(`Unsupported algorithm: ${algo}`);
 }
 
-// CMAC-style subkey doubling in GF(2^n) (n = 64 for Magma, 128 for Kuznyechik), big-endian,
-// irreducible-polynomial feedback byte XORed into the last byte on overflow.
 function doubleSubkey(bytes) {
   const n = bytes.length;
   const out = new Uint8Array(n);
@@ -21,8 +19,6 @@ function doubleSubkey(bytes) {
   return out;
 }
 
-// GOST R 34.13-2015 padding procedure 2 as implemented by the reference engine: append a single
-// 0x01 byte, then zero-pad to the next block boundary (note: NOT the ISO/IEC 9797-1 0x80 marker).
 function bitPad(data, blockSize) {
   const n = data.length;
   const m = Math.ceil((n + 1) / blockSize) * blockSize;
@@ -34,8 +30,6 @@ function bitPad(data, blockSize) {
 
 function xorInto(dst, src) { for (let i = 0; i < dst.length; i++) dst[i] ^= src[i]; }
 
-/** GOST R 34.13-2015 S4.3 MAC ("imitovstavka"): OMAC/CMAC built from the block cipher, with an
- * optional non-zero initial register (used as the UKM when this is reused inside key wrapping). */
 export function gostMac(algo, key, data, macLenBytes, initial = null) {
   const cipher = makeCipher(algo, key);
   const bs = cipher.blockSize;
@@ -67,7 +61,6 @@ export function gostVerify(algo, key, mac, data, iv = null) {
   return diff === 0;
 }
 
-// ---- RFC 4357 S6.1/6.2: GOST 28147-89 key wrap ("NO" keyWrapping - no diversification) --------
 
 export function gostKeyWrapNo(algo, kek, cek, ukm) {
   const bs = makeCipher(algo, kek).blockSize;
@@ -92,9 +85,6 @@ export function gostKeyUnwrapNo(algo, kek, wrapped, ukm) {
   return cek;
 }
 
-// ---- RFC 4357 S6.5: CryptoPro KEK diversification algorithm (defined for the 64-bit GOST 28147-89
-// cipher only; the reference engine's generalisation to a 128-bit block does not work - verified
-// empirically against it - so "CP" wrapping here supports Magma only). ------------------------
 
 function readU32LE(b, off) { return (b[off] | (b[off + 1] << 8) | (b[off + 2] << 16) | (b[off + 3] << 24)) >>> 0; }
 function writeU32LE(b, off, v) { b[off] = v & 0xff; b[off + 1] = (v >>> 8) & 0xff; b[off + 2] = (v >>> 16) & 0xff; b[off + 3] = (v >>> 24) & 0xff; }

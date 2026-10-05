@@ -38,7 +38,6 @@ export function splitPkcs8(der) {
   return { oid, paramsNode, keyOctets: keyOctets.value };
 }
 
-/** True if `der` looks like an EncryptedPrivateKeyInfo (PBES2-wrapped) rather than a plain PrivateKeyInfo. */
 export function isEncryptedPkcs8(der) {
   const top = parseOneDer(der).children;
   return top.length >= 2 && !(top[0].class === 0 && top[0].tag === 2);
@@ -51,7 +50,6 @@ export function ecCurveFromParams(paramsNode) {
   return curve;
 }
 
-// ---- PKCS#8 "ENCRYPTED PRIVATE KEY" (PBES2 + PBKDF2 + AES-CBC) decryption ----------------------
 
 const PRF_HASH = {
   '1.2.840.113549.2.7': 'SHA-1', '1.2.840.113549.2.9': 'SHA-256',
@@ -91,9 +89,6 @@ export async function decryptPkcs8(der, password) {
   }
 }
 
-/** Loads a PEM block (PRIVATE/ENCRYPTED PRIVATE/PUBLIC KEY, or CERTIFICATE) and returns
- * {type: 'private'|'public', kind, der} where `der` is a plain PKCS8/SPKI DER buffer and `kind`
- * is one of 'RSA'|'EC'|'DSA'|'Ed25519'|'Ed448'|'X25519'|'X448'. */
 export async function loadKeyInfo(pem, password) {
   const block = findPem(pem);
   if (!block) throw new Error('No PEM key found');
@@ -127,9 +122,6 @@ export async function loadKeyInfo(pem, password) {
   throw new Error('No PEM key found');
 }
 
-// ---- RSA raw-number extraction (needed only for the MD5-digest PKCS#1v1.5 path, which Web
-// Crypto's RSASSA-PKCS1-v1_5 cannot do since it only supports SHA-* as the embedded hash). -------
-
 export function rsaPublicNumbersFromSpkiDer(der) {
   const { oid, keyBits } = splitSpki(der);
   if (oid !== OID.rsaEncryption) throw new Error('Not an RSA public key');
@@ -141,17 +133,13 @@ export function rsaPrivateNumbersFromPkcs8Der(der) {
   const { oid, keyOctets } = splitPkcs8(der);
   if (oid !== OID.rsaEncryption) throw new Error('Not an RSA private key');
   const fields = parseOneDer(keyOctets).children;
-  // RSAPrivateKey ::= SEQUENCE { version, n, e, d, p, q, dP, dQ, qInv }
   return { n: derUint(fields[1]), e: derUint(fields[2]), d: derUint(fields[3]) };
 }
-
-// ---- DSA raw-number extraction / construction ---------------------------------------------------
 
 export function dsaPublicNumbersFromSpkiDer(der) {
   const { oid, paramsNode, keyBits } = splitSpki(der);
   if (oid !== OID.dsa) throw new Error('Not a DSA public key');
   const [p, q, g] = paramsNode.children.map(derUint);
-  // y is DER-encoded as a bare INTEGER inside the BIT STRING content.
   const y = derUint(parseSeq(keyBits)[0]);
   return { p, q, g, y };
 }
@@ -176,7 +164,6 @@ export function buildDsaPkcs8Der(p, q, g, x) {
   return derSequence([derInteger(0), algo, derOctetString(xDer)]);
 }
 
-// ---- DER <-> raw r||s signature conversion (ECDSA and DSA both use SEQUENCE{INTEGER r, INTEGER s}) -
 
 export function derSignatureToRaw(der, fieldLen) {
   const [rNode, sNode] = parseOneDer(der).children;
@@ -188,8 +175,6 @@ export function rawSignatureToDer(raw) {
   const s = derUint({ value: raw.subarray(half) });
   return derSequence([derInteger(r), derInteger(s)]);
 }
-
-// ---- DSA raw verify (shared by the DSA Verify op and X.509/CSR signature checking) --------------
 
 export async function dsaVerifyRaw(p, q, g, y, hashName, data, r, s) {
   const { modExp, modInverse, bytesToBigInt } = await import('./_bignum.js');
@@ -204,8 +189,6 @@ export async function dsaVerifyRaw(p, q, g, y, hashName, data, r, s) {
   return v === r;
 }
 
-// ---- Generic X.509/CSR/CRL signature verification (signatureAlgorithm OID -> Web Crypto / DSA) --
-
 const SIG_ALGO_INFO = {
   '1.2.840.113549.1.1.5': { kind: 'RSA', hash: 'SHA-1' }, '1.2.840.113549.1.1.11': { kind: 'RSA', hash: 'SHA-256' },
   '1.2.840.113549.1.1.12': { kind: 'RSA', hash: 'SHA-384' }, '1.2.840.113549.1.1.13': { kind: 'RSA', hash: 'SHA-512' },
@@ -216,8 +199,6 @@ const SIG_ALGO_INFO = {
 };
 const EC_FIELD_BYTES = { 'P-256': 32, 'P-384': 48, 'P-521': 66 };
 
-/** Verifies a signature (as found in an X.509 cert/CSR/CRL) given the signer's SPKI DER, the
- * signatureAlgorithm OID, the signed bytes, and the raw (already BIT-STRING-unwrapped) signature. */
 export async function verifyX509Signature(spkiDer, sigAlgoOid, signedData, signature) {
   const info = SIG_ALGO_INFO[sigAlgoOid];
   if (!info) throw new Error(`Unsupported signature algorithm for verification: ${OID_NAMES[sigAlgoOid] || sigAlgoOid}`);

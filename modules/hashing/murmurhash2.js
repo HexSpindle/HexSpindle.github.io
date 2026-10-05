@@ -1,8 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 
-// MurmurHash2 (32-bit, and the 64-bit A variants for x64/x86). Verified against the `mmh3` Python
-// package's murmur2 output and the reference algorithm (M=0x5bd1e995, R=24).
 const M = 0x5bd1e995n, R = 24n;
 const M32 = 0xffffffffn, M64 = (1n << 64n) - 1n;
 

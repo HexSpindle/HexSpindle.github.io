@@ -1,4 +1,3 @@
-// Auto-extracted from OpenSSL crypto/seed/seed.c (SS table) and KC0..KC15
 export const SS0 = new Uint32Array([
   0x2989a1a8, 0x05858184, 0x16c6d2d4, 0x13c3d3d0, 0x14445054, 0x1d0d111c,
   0x2c8ca0ac, 0x25052124, 0x1d4d515c, 0x03434340, 0x18081018, 0x1e0e121c,
@@ -189,9 +188,6 @@ export const KC = new Uint32Array([
   0x779b99e3, 0xef3733c6, 0xde6e678d, 0xbcdccf1b
 ]);
 
-// SEED (Korean national standard, RFC 4269), ported directly from OpenSSL's
-// crypto/seed/{seed.c,seed_local.h}. SS0..SS3 (the G-function tables) and KC0..KC15
-// (key-schedule constants) are extracted verbatim from seed.c above.
 
 function u32be(b, o) { return (((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0); }
 function putU32be(v, out, o) { out[o] = (v >>> 24) & 0xff; out[o + 1] = (v >>> 16) & 0xff; out[o + 2] = (v >>> 8) & 0xff; out[o + 3] = v & 0xff; }

@@ -17,8 +17,6 @@ function pyRepr(s) {
   return out + quote;
 }
 
-// Ratcliff/Obershelp longest-matching-blocks ratio, matching Python's
-// difflib.SequenceMatcher(None, a, b).ratio() (no junk/autojunk heuristics applied).
 function findLongestMatch(a, b, aLo, aHi, bLo, bHi, b2j) {
   let bestI = aLo, bestJ = bLo, bestSize = 0;
   let j2len = new Map();

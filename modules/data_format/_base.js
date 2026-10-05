@@ -1,6 +1,3 @@
-// Arbitrary-base big-number conversion (BigInt-based, preserves leading zero bytes base58-style).
-// Mirrors core/codec.py's int_to_base/base_to_int/bytes_to_base/base_to_bytes.
-
 export function intToBaseBig(n, alphabet) {
   if (n === 0n) return alphabet[0];
   const base = BigInt(alphabet.length);

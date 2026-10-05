@@ -1,6 +1,3 @@
-// Snappy framing format (uncompressed-length varint + literal/copy tags), shared by
-// snappy_compress.js / snappy_decompress.js.
-
 function pushVarint(out, n) {
   while (n >= 0x80) { out.push((n & 0x7F) | 0x80); n >>>= 7; }
   out.push(n);

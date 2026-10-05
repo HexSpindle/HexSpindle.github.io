@@ -1,6 +1,3 @@
-// bzip2 decoder: BWT + MTF + RLE2 + Huffman, mirroring the classic bzip2 block format.
-// Decode-only (see bzip2_compress.js for why compression isn't implemented).
-
 class BitReader {
   constructor(data) { this.data = data; this.bytePos = 0; this.bitPos = 0; }
   readBit() {

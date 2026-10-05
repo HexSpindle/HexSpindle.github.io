@@ -1,5 +1,3 @@
-// LZ4 block-format encode/decode, shared by lz4_compress.js / lz4_decompress.js, plus a minimal
-// frame wrapper (single frame, independent blocks, header checksum only).
 import { xxh32 } from './_xxhash.js';
 import { concat } from './_bytes.js';
 
@@ -10,7 +8,7 @@ export function lz4BlockCompress(data) {
   const out = [];
   const hash = new Map();
   let anchor = 0, i = 0;
-  const matchEndLimit = n - 5; // the last 5 bytes of a block are always literals, never part of a match
+  const matchEndLimit = n - 5;
   const mfLimit = matchEndLimit - MINMATCH;
 
   while (i <= mfLimit) {

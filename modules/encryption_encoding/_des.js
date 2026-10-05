@@ -1,8 +1,3 @@
-// Hand-rolled DES / Triple DES (no Web Crypto support for either). A textbook bit-array
-// implementation of FIPS 46-3: standard IP/FP/E/P/PC1/PC2 permutation tables and the eight S-boxes,
-// 16 Feistel rounds with the classic key schedule. Triple DES is EDE: encrypt with K1, decrypt with
-// K2, encrypt with K3 (K3 = K1 again for a 16-byte key) - matching pycryptodome's Crypto.Cipher.DES3.
-
 const IP = [58,50,42,34,26,18,10,2,60,52,44,36,28,20,12,4,62,54,46,38,30,22,14,6,64,56,48,40,32,24,16,8,
   57,49,41,33,25,17,9,1,59,51,43,35,27,19,11,3,61,53,45,37,29,21,13,5,63,55,47,39,31,23,15,7];
 const FP = [40,8,48,16,56,24,64,32,39,7,47,15,55,23,63,31,38,6,46,14,54,22,62,30,37,5,45,13,53,21,61,29,
@@ -103,7 +98,6 @@ function keyDegenerates(k1, k2) {
   return true;
 }
 
-/** Splits a 16 or 24-byte Triple DES key into (k1, k2, k3), raising if it degenerates to single DES. */
 export function splitDes3Key(key) {
   if (key.length !== 16 && key.length !== 24) throw new Error(`Triple DES key must be 16 or 24 bytes (got ${key.length})`);
   const k1 = key.subarray(0, 8), k2 = key.subarray(8, 16), k3 = key.length === 24 ? key.subarray(16, 24) : k1;

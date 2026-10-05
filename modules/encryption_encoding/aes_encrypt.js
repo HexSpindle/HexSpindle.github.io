@@ -2,8 +2,6 @@ import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
 import { parseHex, decodeLatin1, bytesToHex } from '../../core/util.js';
 
-// Uses the browser's native Web Crypto API (SubtleCrypto) - no library needed, and it's the same
-// well-audited implementation every browser ships for real TLS/WebAuthn use, not a hand-rolled AES.
 module('AES Encrypt', 'AES-CBC encryption via the browser’s native Web Crypto API (PKCS#7 padding).',
   [A.toggle('Key', '', ['Hex', 'UTF8', 'Latin1', 'Base64']), A.toggle('IV', '', ['Hex', 'UTF8', 'Latin1', 'Base64']), A.select('Input', ['Raw', 'Hex']), A.select('Output', ['Hex', 'Raw'])],
   async (data, key, iv, inp, out) => {

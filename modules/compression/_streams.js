@@ -1,5 +1,3 @@
-// Shared helper: run bytes through the browser's native CompressionStream/DecompressionStream.
-// Supported formats: 'gzip', 'deflate' (zlib-wrapped), 'deflate-raw'.
 export async function streamTransform(u8, format, mode) {
   const Ctor = mode === 'compress' ? CompressionStream : DecompressionStream;
   if (typeof Ctor === 'undefined') throw new Error(`${Ctor === CompressionStream ? 'CompressionStream' : 'DecompressionStream'} isn't supported in this browser`);

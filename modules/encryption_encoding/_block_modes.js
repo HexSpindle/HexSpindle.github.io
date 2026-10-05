@@ -1,8 +1,3 @@
-// Shared chaining-mode plumbing for the block ciphers that have no native Web Crypto support
-// (Camellia, CAST5, IDEA, RC2, SEED, SM4). Mirrors core/cryptography_cipher.py (CBC/CFB/OFB/CTR/ECB,
-// full-block-feedback CFB, PKCS#7 padding on ECB/CBC) and, for RC2, core/cipher.py's pycryptodome-style
-// CTR (a short IV is a nonce prefix with a zero-started big-endian counter filling the rest of the block).
-
 export function pkcs7Pad(data, bs) {
   const padLen = bs - (data.length % bs);
   const out = new Uint8Array(data.length + padLen);
@@ -25,7 +20,6 @@ function xorBlock(out, a, b, len) {
   for (let i = 0; i < len; i++) out[i] = a[i] ^ b[i];
 }
 
-// Big-endian increment (with wraparound) of block[from..from+len).
 function incCounter(block, from, len) {
   for (let i = from + len - 1; i >= from; i--) {
     block[i] = (block[i] + 1) & 0xff;
@@ -33,14 +27,6 @@ function incCounter(block, from, len) {
   }
 }
 
-/**
- * cipher: { blockSize, keySchedule(keyBytes) -> ks,
- *           encryptBlock(ks, Uint8Array[blockSize]) -> Uint8Array[blockSize],
- *           decryptBlock(ks, Uint8Array[blockSize]) -> Uint8Array[blockSize] }
- * opts: { data, key, iv, mode, decrypt, strictCtr }
- *   strictCtr=true (default; matches the `cryptography`-backed ciphers): CTR requires iv.length===blockSize.
- *   strictCtr=false (RC2 / pycryptodome): a shorter iv is a nonce prefix, counter fills the rest from 0.
- */
 export function blockCipherCrypt(cipher, { data, key, iv, mode, decrypt, strictCtr = true }) {
   const bs = cipher.blockSize;
   const ks = cipher.keySchedule(key);

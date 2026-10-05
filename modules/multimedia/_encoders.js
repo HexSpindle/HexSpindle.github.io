@@ -1,6 +1,3 @@
-// Manual encoders for raster formats OffscreenCanvas can't produce natively (PNG/JPEG/WebP use
-// canvas.convertToBlob instead - see _img.js's canvasToFormat).
-
 export function encodeBmp(imgData, width, height) {
   const rowSize = Math.ceil((width * 3) / 4) * 4; // rows are padded to a 4-byte boundary
   const pixelDataSize = rowSize * height;
@@ -48,7 +45,6 @@ export function encodeIco(pngBytes, width, height) {
 }
 
 export function encodeTiff(imgData, width, height) {
-  // Minimal uncompressed baseline TIFF, one strip, RGBA8, little-endian.
   const pixelBytes = width * height * 4;
   const entries = [
     [256, 3, 1, width], [257, 3, 1, height], [258, 3, 4, 8], // bits per sample (per-component, offset below)
@@ -83,7 +79,6 @@ export function encodeTiff(imgData, width, height) {
   return new Uint8Array(buf);
 }
 
-// --- GIF89a (single frame, LZW-compressed, up to 256 colours via median-cut quantisation) ---
 
 function medianCutPalette(data, maxColors) {
   const pixels = [];

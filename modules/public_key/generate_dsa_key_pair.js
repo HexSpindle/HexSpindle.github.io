@@ -4,7 +4,6 @@ import { toPem } from './_pem.js';
 import { buildDsaSpkiDer, buildDsaPkcs8Der } from './_pki.js';
 import { modExp, randomBigInt, randomBelow, isProbablePrime } from './_bignum.js';
 
-// FIPS 186-4 (L, N) pairings: 1024->160, 2048->224, 3072->256.
 const N_FOR_L = { 1024: 160, 2048: 224, 3072: 256 };
 
 function generateParams(L) {
@@ -12,7 +11,6 @@ function generateParams(L) {
   while (true) {
     const q = randomBigInt(N) | 1n;
     if (!isProbablePrime(q)) continue;
-    // Search for p = q*k + 1 with the requested bit length.
     for (let tries = 0; tries < 4096; tries++) {
       const x = randomBigInt(L);
       let k = x / q;
