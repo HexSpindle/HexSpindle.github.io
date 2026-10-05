@@ -1,0 +1,201 @@
+// Shared CSV-ish parsing, colour and small drawing helpers for the chart operations (Hex Density
+// chart, Scatter chart, Series chart, Heatmap chart). CyberChef renders these with D3 as SVG; this
+// project has no bundler and doesn't vendor D3 or d3-hexbin, so they're drawn directly onto an
+// OffscreenCanvas instead. Axis/tick rendering here is a plain approximation of D3's axis
+// generators, not a port of them, and colour gradients are interpolated in linear RGB rather than
+// D3's Lab space, so exact pixel-for-pixel parity with CyberChef's output is not the goal.
+
+export const RECORD_DELIMITERS = { 'Line feed': '\n', 'CRLF': '\r\n' };
+export const FIELD_DELIMITERS = { 'Space': ' ', 'Comma': ',', 'Semi-colon': ';', 'Colon': ':', 'Tab': '\t' };
+
+function splitRows(input, recordDelim) {
+  const rows = input.split(recordDelim);
+  // Drop a single trailing empty row caused by a final record delimiter at the end of the input.
+  if (rows.length && rows[rows.length - 1] === '') rows.pop();
+  return rows;
+}
+
+function getValues(input, recordDelim, fieldDelim, headersIncluded, length) {
+  let headings;
+  const values = [];
+  splitRows(input, recordDelim).forEach((row, i) => {
+    const split = row.split(fieldDelim);
+    if (split.length !== length) {
+      throw new Error(`Each row must have ${length} field(s) separated by the field delimiter (row ${i + 1}: "${row}").`);
+    }
+    if (headersIncluded && i === 0) headings = split;
+    else values.push(split);
+  });
+  return { headings, values };
+}
+
+export function getScatterValues(input, recordDelim, fieldDelim, headersIncluded) {
+  let { headings, values } = getValues(input, recordDelim, fieldDelim, headersIncluded, 2);
+  if (headings) headings = { x: headings[0], y: headings[1] };
+  values = values.map(row => {
+    const x = parseFloat(row[0]), y = parseFloat(row[1]);
+    if (Number.isNaN(x) || Number.isNaN(y)) throw new Error('Values must be numbers in base 10.');
+    return [x, y];
+  });
+  if (!values.length) throw new Error('No data rows found.');
+  return { headings, values };
+}
+
+export function getScatterValuesWithColour(input, recordDelim, fieldDelim, headersIncluded) {
+  let { headings, values } = getValues(input, recordDelim, fieldDelim, headersIncluded, 3);
+  if (headings) headings = { x: headings[0], y: headings[1] };
+  values = values.map(row => {
+    const x = parseFloat(row[0]), y = parseFloat(row[1]);
+    if (Number.isNaN(x) || Number.isNaN(y)) throw new Error('Values must be numbers in base 10.');
+    return [x, y, row[2]];
+  });
+  if (!values.length) throw new Error('No data rows found.');
+  return { headings, values };
+}
+
+export function getSeriesValues(input, recordDelim, fieldDelim) {
+  const { values } = getValues(input, recordDelim, fieldDelim, false, 3);
+  const xValues = [];
+  const seriesMap = new Map();
+  for (const row of values) {
+    const [name, xVal, yStr] = row;
+    const y = parseFloat(yStr);
+    if (Number.isNaN(y)) throw new Error('Values must be numbers in base 10.');
+    if (!xValues.includes(xVal)) xValues.push(xVal);
+    if (!seriesMap.has(name)) seriesMap.set(name, Object.create(null));
+    seriesMap.get(name)[xVal] = y;
+  }
+  if (!seriesMap.size) throw new Error('No data rows found.');
+  const series = [...seriesMap.entries()].map(([name, data]) => ({ name, data }));
+  return { xValues, series };
+}
+
+// Resolves any CSS colour (name, hex, rgb()/rgba()) to {r,g,b} using the canvas's own colour
+// parser, so the same colour names/strings CyberChef/D3 accept (e.g. "mediumseagreen") work here.
+let probeCtx = null;
+export function cssColorToRgb(str) {
+  if (!probeCtx) probeCtx = new OffscreenCanvas(1, 1).getContext('2d');
+  probeCtx.clearRect(0, 0, 1, 1);
+  probeCtx.fillStyle = '#000';
+  probeCtx.fillStyle = str;
+  probeCtx.fillRect(0, 0, 1, 1);
+  const [r, g, b] = probeCtx.getImageData(0, 0, 1, 1).data;
+  return { r, g, b };
+}
+
+// Linear RGB interpolation between two CSS colours (CyberChef/D3 interpolates in Lab space for a
+// perceptually smoother gradient; this is a simpler approximation).
+export function lerpColor(a, b, t) {
+  t = Math.max(0, Math.min(1, t));
+  const ca = cssColorToRgb(a), cb = cssColorToRgb(b);
+  const r = Math.round(ca.r + (cb.r - ca.r) * t);
+  const g = Math.round(ca.g + (cb.g - ca.g) * t);
+  const bl = Math.round(ca.b + (cb.b - ca.b) * t);
+  return `rgb(${r}, ${g}, ${bl})`;
+}
+
+export function formatTick(n) {
+  if (Number.isInteger(n)) return String(n);
+  const r = Math.round(n * 100) / 100;
+  return String(r);
+}
+
+// Draws a simple linear X/Y axis frame with a handful of ticks into a canvas 2D context. A plain
+// approximation of d3-axis, not a port of it.
+export function drawAxes(ctx, { x0, y0, width, height, xDomain, yDomain, xLabel, yLabel, ticks = 5 }) {
+  ctx.save();
+  ctx.strokeStyle = '#333';
+  ctx.fillStyle = '#333';
+  ctx.lineWidth = 1;
+  ctx.font = '11px sans-serif';
+  ctx.beginPath();
+  ctx.moveTo(x0, y0); ctx.lineTo(x0, y0 + height); ctx.lineTo(x0 + width, y0 + height);
+  ctx.stroke();
+
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (let i = 0; i <= ticks; i++) {
+    const v = yDomain[0] + (yDomain[1] - yDomain[0]) * (i / ticks);
+    const y = y0 + height - (height * i / ticks);
+    ctx.beginPath(); ctx.moveTo(x0 - 3, y); ctx.lineTo(x0, y); ctx.stroke();
+    ctx.fillText(formatTick(v), x0 - 6, y);
+  }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (let i = 0; i <= ticks; i++) {
+    const v = xDomain[0] + (xDomain[1] - xDomain[0]) * (i / ticks);
+    const x = x0 + (width * i / ticks);
+    ctx.beginPath(); ctx.moveTo(x, y0 + height); ctx.lineTo(x, y0 + height + 3); ctx.stroke();
+    ctx.fillText(formatTick(v), x, y0 + height + 6);
+  }
+
+  if (yLabel) {
+    ctx.save();
+    ctx.translate(12, y0 + height / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText(yLabel, 0, 0);
+    ctx.restore();
+  }
+  if (xLabel) {
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText(xLabel, x0 + width / 2, y0 + height + 32);
+  }
+  ctx.restore();
+}
+
+// --- Hexagonal binning -----------------------------------------------------------------------
+// A standard axial/cube-rounding hex-grid assignment (the "pixel to hex" algorithm, as popularised
+// by Red Blob Games), used instead of porting d3-hexbin's own (offset-row) implementation. Both
+// produce genuine hexagonal tilings; the bin centres/ids won't match d3-hexbin's exactly, but the
+// visual result (points grouped into a honeycomb of hexagons) is the same idea.
+function cubeRound(x, y, z) {
+  let rx = Math.round(x), ry = Math.round(y), rz = Math.round(z);
+  const xDiff = Math.abs(rx - x), yDiff = Math.abs(ry - y), zDiff = Math.abs(rz - z);
+  if (xDiff > yDiff && xDiff > zDiff) rx = -ry - rz;
+  else if (yDiff > zDiff) ry = -rx - rz;
+  else rz = -rx - ry;
+  return [rx, rz];
+}
+
+/** Pointy-top axial hex coordinates for a point, given hex "radius" (centre to corner). */
+export function pixelToHex(x, y, radius) {
+  const q = (Math.sqrt(3) / 3 * x - 1 / 3 * y) / radius;
+  const r = (2 / 3 * y) / radius;
+  const [rq, rr] = cubeRound(q, -q - r, r);
+  return [rq, rr];
+}
+
+/** Centre pixel of a pointy-top axial hex cell. */
+export function hexToPixel(q, r, radius) {
+  const x = radius * (Math.sqrt(3) * q + Math.sqrt(3) / 2 * r);
+  const y = radius * (1.5 * r);
+  return [x, y];
+}
+
+/** Bins [x,y] points into pointy-top hexagons of the given pack radius (in the same space as the points). */
+export function hexbin(points, radius) {
+  const bins = new Map();
+  for (const p of points) {
+    const [q, r] = pixelToHex(p[0], p[1], radius);
+    const id = `${q},${r}`;
+    let bin = bins.get(id);
+    if (!bin) {
+      const [cx, cy] = hexToPixel(q, r, radius);
+      bin = { q, r, x: cx, y: cy, points: [] };
+      bins.set(id, bin);
+    }
+    bin.points.push(p);
+  }
+  return [...bins.values()];
+}
+
+/** Draws a pointy-top hexagon path of the given radius centred at (cx, cy). */
+export function hexagonPath(ctx, cx, cy, radius) {
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI / 180) * (60 * i - 30);
+    const px = cx + radius * Math.cos(angle);
+    const py = cy + radius * Math.sin(angle);
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+}

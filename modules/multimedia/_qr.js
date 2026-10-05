@@ -49,7 +49,7 @@ export const ECC_TABLE = [
 ];
 
 // Alignment pattern centre coordinates, index = version-2 (versions 1 and <2 have none).
-const ALIGNMENT_POS = [
+export const ALIGNMENT_POS = [
   [6, 18], [6, 22], [6, 26], [6, 30], [6, 34], [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50],
   [6, 30, 54], [6, 32, 58], [6, 34, 62], [6, 26, 46, 66], [6, 26, 48, 70], [6, 26, 50, 74],
   [6, 30, 54, 78], [6, 30, 56, 82], [6, 30, 58, 86], [6, 34, 62, 90], [6, 28, 50, 72, 94],
@@ -62,19 +62,19 @@ const ALIGNMENT_POS = [
 ];
 
 // 18-bit BCH version info, index = version-7 (versions 7-40).
-const VERSION_INFO = [
+export const VERSION_INFO = [
   31892, 34236, 39577, 42195, 48118, 51042, 55367, 58893, 63784, 68472, 70749, 76311, 79154,
   84390, 87683, 92361, 96236, 102084, 102881, 110507, 110734, 117786, 119615, 126325, 127568,
   133589, 136944, 141498, 145311, 150283, 152622, 158308, 161089, 167017,
 ];
 
 // 15-bit format info (BCH + mask 0x5412), index = (ecBits << 3 | maskPattern), ecBits: L=1 M=0 Q=3 H=2.
-const FORMAT_INFO = [
+export const FORMAT_INFO = [
   21522, 20773, 24188, 23371, 17913, 16590, 20375, 19104, 30660, 29427, 32170, 30877, 26159,
   25368, 27713, 26998, 5769, 5054, 7399, 6608, 1890, 597, 3340, 2107, 13663, 12392, 16177, 14854,
   9396, 8579, 11994, 11245,
 ];
-const EC_BITS = { L: 1, M: 0, Q: 3, H: 2 };
+export const EC_BITS = { L: 1, M: 0, Q: 3, H: 2 };
 
 const FINDER_PATTERN = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 1, 1, 1, 1, 1, 1, 0], [0, 1, 0, 0, 0, 0, 0, 1, 0],
@@ -86,8 +86,8 @@ const ALIGNMENT_PATTERN = [
 ];
 
 // GF(256) log/exp tables, primitive polynomial 0x11D, generator 2.
-const GF_EXP = new Uint8Array(512);
-const GF_LOG = new Uint8Array(256);
+export const GF_EXP = new Uint8Array(512);
+export const GF_LOG = new Uint8Array(256);
 (function initGF() {
   let x = 1;
   for (let i = 0; i < 255; i++) {
@@ -97,7 +97,7 @@ const GF_LOG = new Uint8Array(256);
   }
   for (let i = 255; i < 512; i++) GF_EXP[i] = GF_EXP[i - 255];
 })();
-const gfMul = (a, b) => (a === 0 || b === 0) ? 0 : GF_EXP[GF_LOG[a] + GF_LOG[b]];
+export const gfMul = (a, b) => (a === 0 || b === 0) ? 0 : GF_EXP[GF_LOG[a] + GF_LOG[b]];
 
 function rsGeneratorPoly(degree) {
   let poly = [1];
@@ -187,7 +187,7 @@ function buildCodewords(bytes, version, ecLevel) {
   return bits.bits;
 }
 
-const MASK_FUNCS = [
+export const MASK_FUNCS = [
   (i, j) => (i + j) % 2 === 0,
   (i, j) => i % 2 === 0,
   (i, j) => j % 3 === 0,
@@ -243,12 +243,11 @@ function maskPenalty(m, size) {
   return n1 + n2 + n3 + n4;
 }
 
-/** Builds the complete QR matrix for `text` (UTF-8 byte mode) at the given EC level ('L'|'M'|'Q'|'H'). */
-export function buildQrMatrix(text, ecLevel = 'M') {
-  const bytes = new TextEncoder().encode(text);
-  const version = pickVersion(bytes.length, ecLevel);
-  if (version === null) throw new Error('Input text is too long to fit in a QR code');
-  const size = version * 4 + 17;
+/** Lays out the finder/separator/timing/alignment patterns and reserves the format/version info
+ * areas for a QR symbol of this version, returning `{ matrix, isFunction }` - shared by the
+ * encoder and (via its own copy of this same layout logic) the decoder, which needs to know
+ * exactly which modules are function patterns (never masked) vs. data (masked). */
+export function buildFunctionPatterns(size, version) {
   // 2 = reserved/unfilled, used only during construction.
   const matrix = Array.from({ length: size }, () => new Array(size).fill(2));
   const isFunction = Array.from({ length: size }, () => new Array(size).fill(false));
@@ -303,10 +302,14 @@ export function buildQrMatrix(text, ecLevel = 'M') {
     }
   }
 
-  // Place data+EC codewords in the standard zig-zag pattern (upwards/downwards column pairs,
-  // skipping the vertical timing column).
-  const codewordBits = buildCodewords(bytes, version, ecLevel);
-  let idx = 0;
+  return { matrix, isFunction };
+}
+
+/** Returns the (row, col) positions of all non-function modules in the standard zig-zag codeword
+ * placement order (upwards/downwards column pairs, skipping the vertical timing column) - used by
+ * the encoder (to place codeword bits) and the decoder (to read them back in the same order). */
+export function zigzagPositions(size, isFunction) {
+  const positions = [];
   for (let rightBase = size - 1; rightBase > 0; rightBase -= 2) {
     const right = rightBase <= 6 ? rightBase - 1 : rightBase;
     for (let vertical = 0; vertical < size; vertical++) {
@@ -315,12 +318,28 @@ export function buildQrMatrix(text, ecLevel = 'M') {
         let upwards = (right & 2) === 0;
         if (j < 6) upwards = !upwards;
         const i = upwards ? size - 1 - vertical : vertical;
-        if (!isFunction[i][j] && idx < codewordBits.length) { matrix[i][j] = codewordBits[idx]; idx++; }
-        else if (!isFunction[i][j] && matrix[i][j] === 2) matrix[i][j] = 0;
+        if (!isFunction[i][j]) positions.push([i, j]);
       }
     }
   }
-  for (let i = 0; i < size; i++) for (let j = 0; j < size; j++) if (matrix[i][j] === 2) matrix[i][j] = 0;
+  return positions;
+}
+
+/** Builds the complete QR matrix for `text` (UTF-8 byte mode) at the given EC level ('L'|'M'|'Q'|'H'). */
+export function buildQrMatrix(text, ecLevel = 'M') {
+  const bytes = new TextEncoder().encode(text);
+  const version = pickVersion(bytes.length, ecLevel);
+  if (version === null) throw new Error('Input text is too long to fit in a QR code');
+  const size = version * 4 + 17;
+  const { matrix, isFunction } = buildFunctionPatterns(size, version);
+
+  // Place data+EC codewords in the standard zig-zag pattern (upwards/downwards column pairs,
+  // skipping the vertical timing column).
+  const codewordBits = buildCodewords(bytes, version, ecLevel);
+  let idx = 0;
+  for (const [i, j] of zigzagPositions(size, isFunction)) {
+    matrix[i][j] = idx < codewordBits.length ? codewordBits[idx++] : 0;
+  }
 
   // Try all 8 masks, keep the one with the lowest penalty score.
   let best = null, bestScore = Infinity, bestMask = 0;

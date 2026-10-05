@@ -16,8 +16,10 @@ function fmtDate(d) {
   return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())} ${pad2(d.getUTCHours())}:${pad2(d.getUTCMinutes())}:${pad2(d.getUTCSeconds())}+00:00`;
 }
 
-module('Parse X.509 certificate', 'Decodes a certificate (PEM, hex or DER) into readable fields.', [A.select('Input format', ['PEM', 'DER Hex', 'Base64', 'Raw'])],
-  async (data, fmt) => {
+/** Decodes a single certificate (PEM, hex, base64 or raw DER) into the same readable-fields text
+ * the 'Parse X.509 certificate' op returns. Shared with parse_x509_certificate_bundles.js so a
+ * bundle of concatenated PEM certs can be parsed one-by-one without duplicating this logic. */
+export async function parseX509ToText(data, fmt) {
     let { der } = loadDerOrPem(data);
     if (fmt === 'Base64') der = base64Decode(decodeLatin1(data));
     const cert = parseX509(der);
@@ -48,4 +50,7 @@ module('Parse X.509 certificate', 'Decodes a certificate (PEM, hex or DER) into 
     const [sha1, sha256] = await Promise.all([crypto.subtle.digest('SHA-1', der), crypto.subtle.digest('SHA-256', der)]);
     out.push(`SHA-1 fingerprint: ${bytesToHex(new Uint8Array(sha1), ':')}`, `SHA-256 fingerprint: ${bytesToHex(new Uint8Array(sha256), ':')}`);
     return out.join('\n');
-  }, { nondeterministic: true });
+}
+
+module('Parse X.509 certificate', 'Decodes a certificate (PEM, hex or DER) into readable fields.', [A.select('Input format', ['PEM', 'DER Hex', 'Base64', 'Raw'])],
+  (data, fmt) => parseX509ToText(data, fmt), { nondeterministic: true });
