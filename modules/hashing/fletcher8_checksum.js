@@ -28,4 +28,10 @@ export function fletcher(data, wbits) {
   return s2.toString(16).padStart(hexLen, '0') + s1.toString(16).padStart(hexLen, '0');
 }
 
-module('Fletcher-8 Checksum', 'Fletcher checksum over 4-bit words.', [], (data) => fletcher(data, 4));
+export function fletcher8(data) {
+  let a = 0, b = 0;
+  for (const x of data) { a = (a + x) % 15; b = (b + a) % 15; }
+  return ((b << 4) | a).toString(16).padStart(2, '0');
+}
+
+module('Fletcher-8 Checksum', 'Fletcher-8 checksum (bytes summed modulo 15, as in CyberChef).', [], (data) => fletcher8(data));

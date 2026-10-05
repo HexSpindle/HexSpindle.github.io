@@ -25,6 +25,10 @@ export const B64_PRESETS = [
   ['ROT13: N-ZA-Mn-za-m0-9+/=', expandAlphabet('N-ZA-Mn-za-m0-9+/=')],
 ];
 
+export function resolveAlphabet(s, size) {
+  return (s.length === size || s.length === size + 1) && new Set(s).size === s.length ? s : expandAlphabet(s);
+}
+
 function alpha(s, size) {
   const a = (s.length === size || s.length === size + 1) && new Set(s).size === s.length ? s : expandAlphabet(s);
   if (a.length < size) throw new Error(`Alphabet must be at least ${size} characters (got ${a.length})`);

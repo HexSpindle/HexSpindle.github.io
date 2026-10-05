@@ -4,7 +4,7 @@ import { crcHex, CRC8 } from './crc8_checksum.js';
 import { CRC16 } from './crc16_checksum.js';
 import { CRC24 } from './crc24_checksum.js';
 import { CRC64 } from './crc64_checksum.js';
-import { fletcher } from './fletcher8_checksum.js';
+import { fletcher, fletcher8 } from './fletcher8_checksum.js';
 import { adler32 } from './adler32_checksum.js';
 
 // Mirrors core/checksums.py's CRC[32] catalogue (the single-variant crc32_checksum.js op only covers
@@ -31,7 +31,7 @@ module('Generate all checksums', 'Computes every supported CRC / Fletcher / Adle
     for (const table of CRC_BY_WIDTH) {
       for (const [n, p] of Object.entries(table)) rows.push([n, crcHex(data, p)]);
     }
-    for (const wbits of FLETCHER_WORD_BITS) rows.push([`Fletcher-${wbits * 2}`, fletcher(data, wbits)]);
+    for (const wbits of FLETCHER_WORD_BITS) rows.push([`Fletcher-${wbits * 2}`, wbits === 4 ? fletcher8(data) : fletcher(data, wbits)]);
     rows.push(['Adler-32', adler32(data).toString(16).padStart(8, '0')]);
     return rows.map(([k, v]) => (names ? `${k}: ` : '') + v).join('\n');
   });

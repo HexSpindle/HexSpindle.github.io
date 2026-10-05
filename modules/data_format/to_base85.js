@@ -1,5 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
+import { resolveAlphabet } from '../../core/codec.js';
 
 export const Z85 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#';
 export const STD = Array.from({ length: 85 }, (_, i) => String.fromCharCode(33 + i)).join('');
@@ -48,6 +49,7 @@ export function a85Encode(data) {
 module('To Base85', 'Encodes data as Base85 / Ascii85 (standard, Z85 or IPv6 alphabet).',
   [A.combo('Alphabet', PRESETS), A.boolean('Include <~ ~> delimiters (standard)', false)],
   (data, alphabet, delims) => {
+    alphabet = resolveAlphabet(alphabet, 85);
     if (alphabet === STD) {
       const out = a85Encode(data);
       return delims ? '<~' + out + '~>' : out;

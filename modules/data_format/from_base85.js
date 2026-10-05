@@ -1,5 +1,6 @@
 import { module } from './_cat.js';
 import { A } from '../../core/registry.js';
+import { resolveAlphabet } from '../../core/codec.js';
 import { decodeLatin1 } from '../../core/util.js';
 import { PRESETS, STD } from './to_base85.js';
 
@@ -46,6 +47,7 @@ export function a85Decode(t) {
 module('From Base85', 'Decodes Base85 / Ascii85 data.',
   [A.combo('Alphabet', PRESETS), A.boolean('Remove non-alphabet chars', true)],
   (data, alphabet, remove) => {
+    alphabet = resolveAlphabet(alphabet, 85);
     let t = decodeLatin1(data).trim();
     if (alphabet === STD) {
       if (t.startsWith('<~')) t = t.slice(2);
