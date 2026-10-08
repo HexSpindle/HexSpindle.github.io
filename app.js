@@ -131,7 +131,7 @@ const CAT_HUE = { data_format: 190, encryption_encoding: 320, public_key: 270, a
 // given category falls into a trailing "Other" group; categories with no entry stay flat (as before).
 const SUBCATS = {
   forensics: [
-  ['Windows Event Logs (EVTX)', ['EVTX to JSON', 'EVTX to XML', 'Windows EVTX Metadata Inspector']],
+  ['Windows Event Logs (EVTX)', ['EVTX to JSON', 'EVTX to XML', 'Windows EVTX Metadata Inspector', 'Windows Event Log Summary', 'Windows Event Log Filter', 'Windows Event Log Integrity Analyzer', 'Windows Account & Group Changes', 'Windows Scheduled Task Event Analyzer', 'Windows Process Execution Events', 'Sysmon Persistence Event Analyzer', 'Windows SMB Share Event Analyzer']],
   ['Windows Artifacts & Execution History', ["Windows Prefetch Parser", "NTFS MFT Parser", "NTFS Attribute Inspector", "NTFS Alternate Data Streams Analyzer", "USN Journal Parser", "Windows Registry Hive Inspector", "Amcache Parser", "ShimCache Parser", "UserAssist Decoder", "BAM/DAM Parser", "Windows LNK Parser", "Jump List Parser", "ShellBags Parser", "Windows Recycle Bin Parser", "Zone.Identifier ADS Parser", "OpenSave MRU Analyzer", "RecentDocs Analyzer", "Run Key Analyzer", "Windows Services Registry Analyzer", "Startup Artifact Correlator"]],
   ['Malware & Binary Analysis', ["PE Import Hash (imphash)", "PE Rich Header Parser", "PE Authenticode Inspector", "PE Section Analyzer", "PE Packer Heuristics", "PE Resource Inspector", ".NET Assembly Metadata Parser", ".NET User String Extractor", "Mach-O Header Parser", "Mach-O Code Signature Inspector", "ELF Symbol and Relocation Parser", "ELF Notes and Build-ID Extractor", "Java JAR Metadata Analyzer", "Android APK Manifest Analyzer", "DEX Metadata Parser", "Suspicious Script Analyzer", "Embedded Configuration Extractor"]],
   ['Incident Response & Log Analysis', ["Windows Event ID Explainer", "Sysmon Event Normalizer", "Windows Logon Analyzer", "Kerberos Event Analyzer", "RDP Activity Analyzer", "Windows Service Installation Detector", "Scheduled Task XML Parser", "PowerShell Script Block Analyzer", "Defender Event Log Analyzer", "IIS Log Parser", "Apache/Nginx Access Log Analyzer", "Linux Auth Log Analyzer", "Linux Auditd Parser", "macOS Unified Log JSON Analyzer", "AWS CloudTrail Analyzer", "Azure/Entra Sign-in Log Analyzer", "Microsoft 365 Audit Log Analyzer", "Timeline Builder", "IOC Extractor with Context", "IOC Deduplicator and Normalizer", "Sigma Rule Evaluator (Subset)"]],
@@ -1130,7 +1130,15 @@ function renderTabs() {
 }
 function closeTab(i) { S.inputs.splice(i, 1); S.tab = Math.min(S.tab, S.inputs.length - 1); renderInput(); persist(); scheduleBake(true); }
 function setInputBytes(u8, name, enc) {
-  const inp = cur(); inp.bytes = u8; if (name) inp.name = name; inp.big = u8.length > (1 << 20);
+  const inp = cur(); inp.bytes = u8; if (name) inp.name = name;
+  // Large binary artifacts should use the bounded preview instead of rendering
+  // hundreds of thousands of control pictures in the textarea. Keep the full
+  // Uint8Array available to the recipe engine for forensic processing.
+  const probe = u8.subarray(0, Math.min(u8.length, 4096));
+  let controls = 0;
+  for (const b of probe) if (b < 9 || (b > 13 && b < 32) || b === 127) controls++;
+  inp.big = u8.length > (1 << 20) ||
+    (u8.length > (256 << 10) && controls > probe.length * 0.05);
   if (enc) inp.enc = enc; renderInput(); S.inspect = null; scheduleBake(true); persist();
 }
 async function loadFiles(files) {
