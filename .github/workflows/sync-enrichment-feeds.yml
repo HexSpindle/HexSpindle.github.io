@@ -6,6 +6,10 @@ on:
     - cron: '17 5 * * *'
     # ARIN extended statistics are frequently published 09:00–13:00 UTC; later window.
     - cron: '17 14 * * *'
+    # Verify GeoLite2 City (publish only when redistribution rights are confirmed).
+    - cron: '43 16 * * 2,5'
+    # Catch-up after the MaxMind release-day deadline (US Eastern).
+    - cron: '43 6 * * 3,6'
   workflow_dispatch:
   push:
     branches: [main]
@@ -40,6 +44,10 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           IPINFO_LITE_TOKEN: ${{ secrets.IPINFO_LITE_TOKEN }}
           ABUSECH_AUTH_KEY: ${{ secrets.ABUSECH_AUTH_KEY }}
+          MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
+          MAXMIND_PUBLIC_MIRROR_ALLOWED: ${{ vars.MAXMIND_PUBLIC_MIRROR_ALLOWED }}
+          MAXMIND_REFRESH_NOW: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '43 16 * * 2,5' || github.event.schedule == '43 6 * * 3,6' }}
           ABUSECH_PUBLIC_MIRROR_ALLOWED: ${{ vars.ABUSECH_PUBLIC_MIRROR_ALLOWED }}
         run: |
           if [ "$EVENT_NAME" = "push" ]; then
