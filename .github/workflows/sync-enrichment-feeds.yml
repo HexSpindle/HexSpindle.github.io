@@ -1,0 +1,64 @@
+name: HexSpindle feed sync and Pages deployment
+
+on:
+  schedule:
+    # SANS Daily Sources is generated near 04:00 UTC, recommended fetch 04:30–05:30 UTC.
+    - cron: '17 5 * * *'
+    # ARIN extended statistics are frequently published 09:00–13:00 UTC; later window.
+    - cron: '17 14 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: hexspindle-feed-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Stage existing site without repository history
+        run: |
+          mkdir -p "$RUNNER_TEMP/hexspindle-site"
+          rsync -a --exclude=.git --exclude=.github --exclude=tools --exclude=tests \
+            --exclude=node_modules --exclude=data/feeds ./ "$RUNNER_TEMP/hexspindle-site/"
+          touch "$RUNNER_TEMP/hexspindle-site/.nojekyll"
+      - name: Synchronize feeds (schedule/manual) or reuse live snapshot (code push)
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          IPINFO_LITE_TOKEN: ${{ secrets.IPINFO_LITE_TOKEN }}
+        run: |
+          if [ "$EVENT_NAME" = "push" ]; then
+            python3 tools/sync_enrichment_feeds.py "$RUNNER_TEMP/hexspindle-site/data/feeds" --prefer-published
+          else
+            python3 tools/sync_enrichment_feeds.py "$RUNNER_TEMP/hexspindle-site/data/feeds"
+          fi
+      - name: Inspect published sizes
+        run: du -h "$RUNNER_TEMP/hexspindle-site/data/feeds/"*
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload complete site with current feeds
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/hexspindle-site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
