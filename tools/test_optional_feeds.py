@@ -1,10 +1,51 @@
 #!/usr/bin/env python3
 """Isolated tests for abuse.ch exports; never contact network providers."""
-import gzip,hashlib,io,json,pathlib,tempfile,unittest,zipfile
+import gzip,hashlib,io,json,pathlib,tempfile,unittest,zipfile,tarfile
 from sync_abusech_feeds import publish, csv_rows, normalize
 from sync_enrichment_feeds import write_manifest
+from sync_geolite_city import process as city_process, carry_forward as city_carry, DATASET as CITY_ID
 
 class OptionalFeedTests(unittest.TestCase):
+    def test_maxmind_verify_only_publish_and_carry_forward(self):
+        # Synthetic archive; never downloads provider data or needs credentials.
+        raw=b'A'*(5_200_000-32)+b'\xab\xcd\xefMaxMind.com'+b'\x00'*19
+        epoch=1791072000
+        meta={'database_type':'GeoLite2-City','build_epoch':epoch,'mmdb_format_version':'2.0','ip_version':6}
+        archive_io=io.BytesIO()
+        with tarfile.open(fileobj=archive_io,mode='w:gz') as tf:
+            entry=tarfile.TarInfo('GeoLite2-City_TEST/GeoLite2-City.mmdb')
+            entry.size=len(raw)
+            tf.addfile(entry,io.BytesIO(raw))
+        calls=[]
+        def fake_fetch(account,key):
+            calls.append((account,key))
+            return archive_io.getvalue(), 'Fri, 09 Oct 2026 00:00:00 GMT'
+        def fake_inspector(_):return meta
+        with tempfile.TemporaryDirectory() as td:
+            output=pathlib.Path(td)
+            result,check=city_process('acct','secret',False,output,fake_fetch,fake_inspector)
+            self.assertIsNone(result)
+            self.assertEqual(check['status'],'verified_not_saved')
+            self.assertEqual(list(output.iterdir()),[])
+            result,check=city_process('acct','secret',True,output,fake_fetch,fake_inspector)
+            self.assertEqual(result['database_name'],'GeoLite2-City.mmdb')
+            self.assertIn('database_updated_date',result)
+            self.assertIn(CITY_ID,{'maxmind_geolite2_city':result})
+            source=output/'geolite2-city.mmdb.gz'
+            self.assertEqual(gzip.decompress(source.read_bytes()),raw)
+            with tempfile.TemporaryDirectory() as next_td:
+                restored=city_carry(pathlib.Path(next_td),result,fetcher=lambda _:source.read_bytes(),inspector=fake_inspector)
+                self.assertEqual(restored['sha256'],result['sha256'])
+                self.assertEqual((pathlib.Path(next_td)/source.name).read_bytes(),source.read_bytes())
+            self.assertEqual(len(calls),2)
+
+    def test_maxmind_absent_secrets_do_not_download(self):
+        with tempfile.TemporaryDirectory() as td:
+            result,status=city_process('','',False,pathlib.Path(td),archive_loader=lambda *_:self.fail('Unexpected download'))
+            self.assertIsNone(result)
+            self.assertEqual(status['status'],'missing_secrets')
+            self.assertEqual(list(pathlib.Path(td).iterdir()),[])
+
     def test_manifest_distinguishes_unpublished_from_synced(self):
         with tempfile.TemporaryDirectory() as td:
             target=pathlib.Path(td)

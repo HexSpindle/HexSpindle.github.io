@@ -188,6 +188,28 @@ def reuse_live_snapshot(dest: pathlib.Path, base_url='https://hexspindle.github.
         raise
     if manifest.get('schema_version')!=1 or not isinstance(manifest.get('datasets'),dict):
         raise ValueError('Published manifest has an unexpected structure')
+    # A revoked public-mirror permission must remove MaxMind from the NEXT Pages artifact,
+    # including ordinary code-push deployments that reuse other published feeds.
+    from sync_geolite_city import DATASET as CITY_ID
+    if os.getenv('MAXMIND_PUBLIC_MIRROR_ALLOWED','').strip().lower() != 'true':
+        manifest['datasets'].pop(CITY_ID, None)
+        manifest.setdefault('unavailable',{})[CITY_ID] = ('MaxMind GeoLite2 City automatic public database distribution is disabled. '
+            'Choose your own MMDB file in IP GeoLocation.')
+    elif CITY_ID in manifest['datasets']:
+        manifest.get('unavailable', {}).pop(CITY_ID, None)
+    # Code-push deployments MUST respect revoked abuse.ch mirroring permission too.
+    # Otherwise --prefer-published would silently republish yesterday's licensed
+    # full exports after the maintainer disables the Actions variable.
+    abusech_ids = ('abusech_threatfox', 'abusech_urlhaus')
+    if os.getenv('ABUSECH_PUBLIC_MIRROR_ALLOWED','').strip().lower() != 'true':
+        for kind in abusech_ids:
+            manifest['datasets'].pop(kind, None)
+            manifest.setdefault('unavailable',{})[kind] = (
+                'Public authenticated abuse.ch export mirroring is disabled; enable only with redistribution authorization.')
+    else:
+        for kind in abusech_ids:
+            if kind in manifest['datasets']:
+                manifest.get('unavailable',{}).pop(kind,None)
     for kind,info in manifest['datasets'].items():
         relative=info.get('path','')
         if not re.fullmatch(r'data/feeds/[a-z0-9_.-]+\.gz',relative):
@@ -257,20 +279,49 @@ def main():
         metadata['rir_delegations']=info
         lite = sync_ipinfo_lite(os.getenv('IPINFO_LITE_TOKEN', '').strip(),temp,dest)
         if lite: metadata['ipinfo_lite'] = lite
+        from sync_geolite_city import DATASET as CITY_ID, process as city_process, carry_forward
+        maxmind_allowed = os.getenv('MAXMIND_PUBLIC_MIRROR_ALLOWED','').strip().lower() == 'true'
+        maxmind_refresh = os.getenv('MAXMIND_REFRESH_NOW','').strip().lower() == 'true'
+        maxmind_account = os.getenv('MAXMIND_ACCOUNT_ID','').strip()
+        maxmind_key = os.getenv('MAXMIND_LICENSE_KEY','').strip()
+        unavailable = {}
+        if maxmind_refresh:
+            # Tue/Fri 16:43 UTC or manual run: verify even when publication is disabled.
+            city_info, check = city_process(maxmind_account,maxmind_key,maxmind_allowed,dest)
+            print('MaxMind GeoLite2 City:', check['status'],
+                  check.get('database_name',''), check.get('database_updated_date',''), flush=True)
+            if city_info: metadata[CITY_ID] = city_info
+            if check['status']=='missing_secrets' and maxmind_allowed:
+                raise RuntimeError('Public MaxMind mirroring enabled but download secrets are not configured')
+        elif maxmind_allowed:
+            # Daily syncs on other days must retain Friday's last successful public version.
+            try:
+                req=urllib.request.Request('https://hexspindle.github.io/data/feeds/manifest.json',headers=HEADERS)
+                with urllib.request.urlopen(req,timeout=45) as r: old=json.load(r)
+                previous=old.get('datasets',{}).get(CITY_ID)
+            except urllib.error.HTTPError as exc:
+                if exc.code!=404: raise
+                previous=None
+            if previous:
+                metadata[CITY_ID]=carry_forward(dest,previous)
+                print('MaxMind GeoLite2 City: retained prior validated release',metadata[CITY_ID].get('database_updated_date',''),flush=True)
+        if CITY_ID not in metadata:
+            unavailable[CITY_ID] = ('No public MaxMind GeoLite2 City database is available. '
+                'Select your own MMDB file. Public redistribution requires separate authorization.'
+                if not maxmind_allowed else 'GeoLite2 City not published yet; run the feed workflow manually to refresh.')
         # No abuse.ch exports are published without explicit written-rights acknowledgement.
         from sync_abusech_feeds import publish as publish_abusech
         abuse_key = os.getenv('ABUSECH_AUTH_KEY', '').strip()
         mirror_allowed = os.getenv('ABUSECH_PUBLIC_MIRROR_ALLOWED', '').strip().lower() == 'true'
-        unavailable = {}
         if not mirror_allowed:
             reason = ('Authenticated abuse.ch exports are not publicly mirrored. '
                       'Public redistribution permission must be confirmed before enabling publishing.')
             print('::warning title=abuse.ch publishing disabled::' + reason, flush=True)
-            unavailable = {kind: reason for kind in ('abusech_threatfox', 'abusech_urlhaus')}
+            unavailable.update({kind: reason for kind in ('abusech_threatfox', 'abusech_urlhaus')})
         elif not abuse_key:
             reason = 'ABUSECH_AUTH_KEY Actions secret is missing.'
             print('::warning title=abuse.ch key missing::' + reason, flush=True)
-            unavailable = {kind: reason for kind in ('abusech_threatfox', 'abusech_urlhaus')}
+            unavailable.update({kind: reason for kind in ('abusech_threatfox', 'abusech_urlhaus')})
         metadata.update(publish_abusech(dest, abuse_key, mirror_allowed))
     write_manifest(dest, metadata, unavailable)
     print('Published:', [(k, v['compressed_bytes']) for k,v in metadata.items()], flush=True)
