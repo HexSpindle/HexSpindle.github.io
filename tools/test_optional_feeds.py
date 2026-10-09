@@ -2,8 +2,20 @@
 """Isolated tests for abuse.ch exports; never contact network providers."""
 import gzip,hashlib,io,json,pathlib,tempfile,unittest,zipfile
 from sync_abusech_feeds import publish, csv_rows, normalize
+from sync_enrichment_feeds import write_manifest
 
 class OptionalFeedTests(unittest.TestCase):
+    def test_manifest_distinguishes_unpublished_from_synced(self):
+        with tempfile.TemporaryDirectory() as td:
+            target=pathlib.Path(td)
+            reason='Public redistribution not authorized'
+            write_manifest(target, {'sans_intelfeed': {'path':'data/feeds/test.gz'}},
+                           {'abusech_threatfox':reason,'abusech_urlhaus':reason})
+            manifest=json.loads((target/'manifest.json').read_text())
+            self.assertEqual(manifest['schema_version'],1)
+            self.assertNotIn('abusech_threatfox',manifest['datasets'])
+            self.assertEqual(manifest['unavailable']['abusech_urlhaus'],reason)
+
     def test_permission_gate_and_exports(self):
         raw_threat=b'# ThreatFox export\nioc,ioc_type,threat_type,malware_printable,confidence_level\n198.51.100.7:443,ip:port,botnet_cc,FakeExample,75\n'
         contents=io.BytesIO()

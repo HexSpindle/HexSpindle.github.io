@@ -168,10 +168,11 @@ def sync_ipinfo_lite(secret: str, temp: pathlib.Path, dest: pathlib.Path):
         raise RuntimeError('Could not retrieve configured IPinfo Lite database: ' +
                            str(exc).replace(secret, '[REDACTED]')) from None
 
-def write_manifest(output, datasets):
+def write_manifest(output, datasets, unavailable=None):
     manifest = {'schema_version':1, 'generated_at':NOW(), 'attribution':{
       'sans': 'SANS Technology Institute, Internet Storm Center — https://isc.sans.edu',
       'rir': 'RIR extended delegation statistics, https://www.nro.net'}, 'datasets':datasets}
+    if unavailable: manifest['unavailable'] = unavailable
     (output/'manifest.json').write_text(json.dumps(manifest, indent=2, sort_keys=True)+'\n', encoding='utf-8')
 
 def reuse_live_snapshot(dest: pathlib.Path, base_url='https://hexspindle.github.io/'):
@@ -258,9 +259,20 @@ def main():
         if lite: metadata['ipinfo_lite'] = lite
         # No abuse.ch exports are published without explicit written-rights acknowledgement.
         from sync_abusech_feeds import publish as publish_abusech
-        metadata.update(publish_abusech(dest,os.getenv('ABUSECH_AUTH_KEY','').strip(),
-            os.getenv('ABUSECH_PUBLIC_MIRROR_ALLOWED','').strip().lower()=='true'))
-    write_manifest(dest, metadata)
+        abuse_key = os.getenv('ABUSECH_AUTH_KEY', '').strip()
+        mirror_allowed = os.getenv('ABUSECH_PUBLIC_MIRROR_ALLOWED', '').strip().lower() == 'true'
+        unavailable = {}
+        if not mirror_allowed:
+            reason = ('Authenticated abuse.ch exports are not publicly mirrored. '
+                      'Public redistribution permission must be confirmed before enabling publishing.')
+            print('::warning title=abuse.ch publishing disabled::' + reason, flush=True)
+            unavailable = {kind: reason for kind in ('abusech_threatfox', 'abusech_urlhaus')}
+        elif not abuse_key:
+            reason = 'ABUSECH_AUTH_KEY Actions secret is missing.'
+            print('::warning title=abuse.ch key missing::' + reason, flush=True)
+            unavailable = {kind: reason for kind in ('abusech_threatfox', 'abusech_urlhaus')}
+        metadata.update(publish_abusech(dest, abuse_key, mirror_allowed))
+    write_manifest(dest, metadata, unavailable)
     print('Published:', [(k, v['compressed_bytes']) for k,v in metadata.items()], flush=True)
 
 if __name__=='__main__': main()
