@@ -1,0 +1,23 @@
+name: MaxMind private GeoLite2 City refresh
+on:
+  schedule:
+    # GeoLite2 City: Tuesdays and Fridays; source gives no guaranteed release hour.
+    - cron: '43 16 * * 2,5'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  refresh-private-city:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate and optionally save to private S3
+        env:
+          MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
+          PRIVATE_MAXMIND_S3_BUCKET: ${{ secrets.PRIVATE_MAXMIND_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+        run: python3 tools/sync_private_maxmind.py

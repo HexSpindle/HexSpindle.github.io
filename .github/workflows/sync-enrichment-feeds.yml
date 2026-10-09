@@ -33,10 +33,14 @@ jobs:
           rsync -a --exclude=.git --exclude=.github --exclude=tools --exclude=tests \
             --exclude=node_modules --exclude=data/feeds ./ "$RUNNER_TEMP/hexspindle-site/"
           touch "$RUNNER_TEMP/hexspindle-site/.nojekyll"
+      - name: Verify optional provider parsers (offline fixtures)
+        run: python3 -m unittest discover -s tools -p test_optional_feeds.py -v
       - name: Synchronize feeds (schedule/manual) or reuse live snapshot (code push)
         env:
           EVENT_NAME: ${{ github.event_name }}
           IPINFO_LITE_TOKEN: ${{ secrets.IPINFO_LITE_TOKEN }}
+          ABUSECH_AUTH_KEY: ${{ secrets.ABUSECH_AUTH_KEY }}
+          ABUSECH_PUBLIC_MIRROR_ALLOWED: ${{ vars.ABUSECH_PUBLIC_MIRROR_ALLOWED }}
         run: |
           if [ "$EVENT_NAME" = "push" ]; then
             python3 tools/sync_enrichment_feeds.py "$RUNNER_TEMP/hexspindle-site/data/feeds" --prefer-published
