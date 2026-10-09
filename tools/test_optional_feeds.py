@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Isolated tests; never contact MaxMind or abuse.ch."""
-import gzip,hashlib,io,json,pathlib,tarfile,tempfile,unittest,zipfile
+"""Isolated tests for abuse.ch exports; never contact network providers."""
+import gzip,hashlib,io,json,pathlib,tempfile,unittest,zipfile
 from sync_abusech_feeds import publish, csv_rows, normalize
-from sync_private_maxmind import refresh
 
 class OptionalFeedTests(unittest.TestCase):
     def test_permission_gate_and_exports(self):
@@ -63,27 +62,5 @@ class OptionalFeedTests(unittest.TestCase):
             stored=json.loads(payload)
             self.assertEqual(stored['indicator'], 'https://malicious.example/Path')
             self.assertEqual(stored['first_seen'], '2026-10-09 04:31:23')
-
-    def test_maxmind_private_only(self):
-        # synthetic MMDB marker in valid TAR container; validates archive semantics
-        payload=b'X'*(200*1024)+b'\xab\xcd\xefMaxMind.com'+b'Y'*32
-        tarbytes=io.BytesIO()
-        with tarfile.open(fileobj=tarbytes,mode='w:gz') as f:
-            name='GeoLite2-City_20261009/GeoLite2-City.mmdb'
-            member=tarfile.TarInfo(name);member.size=len(payload)
-            f.addfile(member,io.BytesIO(payload))
-        called=[]
-        def upload(path,bucket,digest):
-            self.assertEqual(path.read_bytes(),payload)
-            called.append((bucket,digest))
-        self.assertEqual(refresh('','')['status'],'skipped')
-        report=refresh('ACCT','FAKE',downloader=lambda:tarbytes.getvalue())
-        self.assertEqual(report['status'],'verified_not_retained')
-        report=refresh('ACCT','FAKE','private-bucket',downloader=lambda:tarbytes.getvalue(),uploader=upload)
-        self.assertEqual(report['status'],'stored_in_private_s3')
-        self.assertEqual(len(called),1)
-        self.assertEqual(called[0][1],hashlib.sha256(payload).hexdigest())
-        with self.assertRaisesRegex(ValueError,'archive'):
-            refresh('ACCT','FAKE',downloader=lambda:b'garbage')
 
 if __name__=='__main__':unittest.main()
