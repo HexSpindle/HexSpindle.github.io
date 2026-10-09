@@ -256,6 +256,10 @@ def main():
         metadata['rir_delegations']=info
         lite = sync_ipinfo_lite(os.getenv('IPINFO_LITE_TOKEN', '').strip(),temp,dest)
         if lite: metadata['ipinfo_lite'] = lite
+        # No abuse.ch exports are published without explicit written-rights acknowledgement.
+        from sync_abusech_feeds import publish as publish_abusech
+        metadata.update(publish_abusech(dest,os.getenv('ABUSECH_AUTH_KEY','').strip(),
+            os.getenv('ABUSECH_PUBLIC_MIRROR_ALLOWED','').strip().lower()=='true'))
     write_manifest(dest, metadata)
     print('Published:', [(k, v['compressed_bytes']) for k,v in metadata.items()], flush=True)
 
