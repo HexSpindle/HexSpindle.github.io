@@ -175,6 +175,86 @@ def write_manifest(output, datasets, unavailable=None):
     if unavailable: manifest['unavailable'] = unavailable
     (output/'manifest.json').write_text(json.dumps(manifest, indent=2, sort_keys=True)+'\n', encoding='utf-8')
 
+
+def _city_failure_description(error):
+    """Display only explicitly safe messages; never print a secret or signed URL."""
+    message = str(error)
+    if message.startswith(('MaxMind HTTP ', 'MaxMind network/TLS error',
+                           'MaxMind download redirected to an unexpected destination')):
+        return message[:240]
+    return 'MaxMind download or database validation failed (no secrets or redirect URLs logged)'
+
+
+def _previous_city_metadata():
+    """Read the last published public MaxMind metadata (never a private MMDB)."""
+    from sync_geolite_city import DATASET
+    req = urllib.request.Request('https://hexspindle.github.io/data/feeds/manifest.json',headers=HEADERS)
+    with urllib.request.urlopen(req,timeout=45) as response:
+        manifest=json.load(response)
+    if manifest.get('schema_version') != 1 or not isinstance(manifest.get('datasets'),dict):
+        raise ValueError('Previous Pages manifest is invalid')
+    return manifest['datasets'].get(DATASET)
+
+
+def sync_maxmind_optional(dest, refresh, permitted, account, key,
+                          process_func=None, carry_func=None, previous_loader=None):
+    """Isolate optional MaxMind errors so SANS/RIR/IPinfo/abuse.ch still publish.
+
+    Never keep or republish a City database if public distribution is disabled.
+    When enabled, a failed refresh may reuse a previously validated version, but
+    not if its MMDB build time is already 30 days old.
+    Returns (published info or None, unavailable reason or None).
+    """
+    from sync_geolite_city import process, carry_forward
+    process_func = process if process_func is None else process_func
+    carry_func = carry_forward if carry_func is None else carry_func
+    previous_loader = _previous_city_metadata if previous_loader is None else previous_loader
+
+    info = None
+    reason = None
+    if refresh:
+        try:
+            info, check = process_func(account, key, permitted, dest)
+            print('MaxMind GeoLite2 City:', check['status'],
+                  check.get('database_name',''), check.get('database_updated_date',''), flush=True)
+            if check['status'] == 'missing_secrets':
+                reason = 'MaxMind refresh skipped: MAXMIND_ACCOUNT_ID or MAXMIND_LICENSE_KEY is missing'
+                print('::warning title=MaxMind credentials missing::' + reason, flush=True)
+        except Exception as exc:
+            reason = _city_failure_description(exc)
+            print('::warning title=Optional MaxMind refresh failed::' + reason, flush=True)
+    if info:
+        return info, None
+    if not permitted:
+        return None, ('Automatic public GeoLite2 City distribution is disabled. '
+                      'Choose your own MMDB file in IP GeoLocation.')
+
+    # An authorized previous public release should survive a temporary refresh
+    # error, so Friday's City dataset stays available on Monday. Never reuse a
+    # stale release beyond 30 days based on its MMDB build timestamp.
+    try:
+        previous = previous_loader()
+        if previous:
+            build_at = previous.get('database_build_at','')
+            build = dt.datetime.fromisoformat(build_at.replace('Z','+00:00'))
+            if build.tzinfo is None:
+                raise ValueError('Previous MMDB build date has no timezone')
+            age = dt.datetime.now(UTC) - build.astimezone(UTC)
+            if age >= dt.timedelta(days=30) or age < -dt.timedelta(days=1):
+                raise ValueError('Previous GeoLite2 City release is too old or has an invalid build date')
+            info = carry_func(dest,previous)
+            print('MaxMind GeoLite2 City: retained last validated public release',
+                  info.get('database_updated_date',''),flush=True)
+            return info,None
+    except urllib.error.HTTPError as exc:
+        if exc.code != 404:
+            print('::warning title=MaxMind snapshot unavailable::Previously published feed manifest could not be fetched',flush=True)
+    except Exception:
+        print('::warning title=MaxMind snapshot unavailable::No valid recent public City release can be reused',flush=True)
+
+    return None, (reason or 'GeoLite2 City is not currently published.') + \
+        ' Choose your own MMDB file in IP GeoLocation.'
+
 def reuse_live_snapshot(dest: pathlib.Path, base_url='https://hexspindle.github.io/'):
     """For code pushes, reuse already-public feeds without re-fetching SANS/RIR providers."""
     url=base_url.rstrip('/') + '/data/feeds/manifest.json'
@@ -279,36 +359,18 @@ def main():
         metadata['rir_delegations']=info
         lite = sync_ipinfo_lite(os.getenv('IPINFO_LITE_TOKEN', '').strip(),temp,dest)
         if lite: metadata['ipinfo_lite'] = lite
-        from sync_geolite_city import DATASET as CITY_ID, process as city_process, carry_forward
+        from sync_geolite_city import DATASET as CITY_ID
         maxmind_allowed = os.getenv('MAXMIND_PUBLIC_MIRROR_ALLOWED','').strip().lower() == 'true'
         maxmind_refresh = os.getenv('MAXMIND_REFRESH_NOW','').strip().lower() == 'true'
         maxmind_account = os.getenv('MAXMIND_ACCOUNT_ID','').strip()
         maxmind_key = os.getenv('MAXMIND_LICENSE_KEY','').strip()
         unavailable = {}
-        if maxmind_refresh:
-            # Tue/Fri 16:43 UTC or manual run: verify even when publication is disabled.
-            city_info, check = city_process(maxmind_account,maxmind_key,maxmind_allowed,dest)
-            print('MaxMind GeoLite2 City:', check['status'],
-                  check.get('database_name',''), check.get('database_updated_date',''), flush=True)
-            if city_info: metadata[CITY_ID] = city_info
-            if check['status']=='missing_secrets' and maxmind_allowed:
-                raise RuntimeError('Public MaxMind mirroring enabled but download secrets are not configured')
-        elif maxmind_allowed:
-            # Daily syncs on other days must retain Friday's last successful public version.
-            try:
-                req=urllib.request.Request('https://hexspindle.github.io/data/feeds/manifest.json',headers=HEADERS)
-                with urllib.request.urlopen(req,timeout=45) as r: old=json.load(r)
-                previous=old.get('datasets',{}).get(CITY_ID)
-            except urllib.error.HTTPError as exc:
-                if exc.code!=404: raise
-                previous=None
-            if previous:
-                metadata[CITY_ID]=carry_forward(dest,previous)
-                print('MaxMind GeoLite2 City: retained prior validated release',metadata[CITY_ID].get('database_updated_date',''),flush=True)
-        if CITY_ID not in metadata:
-            unavailable[CITY_ID] = ('No public MaxMind GeoLite2 City database is available. '
-                'Select your own MMDB file. Public redistribution requires separate authorization.'
-                if not maxmind_allowed else 'GeoLite2 City not published yet; run the feed workflow manually to refresh.')
+        # Optional provider errors must not abort the entire Pages deployment.
+        # Tue/Fri or manual: verify even if public mirroring is disabled.
+        city_info, city_unavailable = sync_maxmind_optional(
+            dest,maxmind_refresh,maxmind_allowed,maxmind_account,maxmind_key)
+        if city_info: metadata[CITY_ID] = city_info
+        if city_unavailable: unavailable[CITY_ID] = city_unavailable
         # No abuse.ch exports are published without explicit written-rights acknowledgement.
         from sync_abusech_feeds import publish as publish_abusech
         abuse_key = os.getenv('ABUSECH_AUTH_KEY', '').strip()

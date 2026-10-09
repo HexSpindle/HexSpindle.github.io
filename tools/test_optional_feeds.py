@@ -1,11 +1,80 @@
 #!/usr/bin/env python3
 """Isolated tests for abuse.ch exports; never contact network providers."""
 import gzip,hashlib,io,json,pathlib,tempfile,unittest,zipfile,tarfile
+from unittest.mock import patch
 from sync_abusech_feeds import publish, csv_rows, normalize
-from sync_enrichment_feeds import write_manifest
-from sync_geolite_city import process as city_process, carry_forward as city_carry, DATASET as CITY_ID
+from sync_enrichment_feeds import write_manifest, sync_maxmind_optional
+from sync_geolite_city import (process as city_process, carry_forward as city_carry,
+                               fetch_archive, _MaxMindSafeRedirect, DATASET as CITY_ID, URL)
+import urllib.error
+import urllib.request
+import datetime as dt
 
 class OptionalFeedTests(unittest.TestCase):
+    def test_maxmind_redirect_does_not_forward_authorization(self):
+        auth='Basic DO-NOT-LEAK'
+        req=urllib.request.Request(URL,headers={'Authorization':auth,'User-Agent':'HexSpindle'})
+        target=('https://mm-prod-geoip-databases.'
+                'a2649acb697e2c09b632799562c076f2.r2.cloudflarestorage.com/'
+                'signed-file?secret-signed-url=never-print')
+        redirected=_MaxMindSafeRedirect().redirect_request(req,None,302,'Found',{},target)
+        self.assertIsNotNone(redirected)
+        self.assertIsNone(redirected.get_header('Authorization'))
+        self.assertEqual(req.get_header('Authorization'),auth)
+        with self.assertRaisesRegex(RuntimeError,'unexpected destination'):
+            _MaxMindSafeRedirect().redirect_request(req,None,302,'Found',{},
+                'https://untrusted.example/leak')
+        with self.assertRaisesRegex(RuntimeError,'unexpected destination'):
+            _MaxMindSafeRedirect().redirect_request(req,None,302,'Found',{},
+                'http://download.maxmind.com/insecure')
+
+    def test_maxmind_http_status_diagnostic_has_no_credentials(self):
+        class FailedOpener:
+            def __init__(self,code):self.code=code
+            def open(self,request,timeout):
+                raise urllib.error.HTTPError('https://private.example/signed-very-secret',
+                    self.code,'failure',{},None)
+        for code,label in [(401,'authentication'),(403,'access denied'),(429,'rate limit'),(503,'service')]:
+            with self.subTest(status=code):
+                with patch('sync_geolite_city.urllib.request.build_opener',return_value=FailedOpener(code)):
+                    with self.assertRaises(RuntimeError) as failure:
+                        fetch_archive('123456','NEVER-SHOW-THIS-KEY')
+                self.assertIn('HTTP '+str(code),str(failure.exception))
+                self.assertIn(label,str(failure.exception))
+                self.assertNotIn('NEVER-SHOW-THIS-KEY',str(failure.exception))
+                self.assertNotIn('signed-very-secret',str(failure.exception))
+
+    def test_maxmind_failure_does_not_block_publishing(self):
+        def unavailable(*_):raise RuntimeError('MaxMind HTTP 401: authentication failed')
+        with tempfile.TemporaryDirectory() as td:
+            dest=pathlib.Path(td)
+            info,reason=sync_maxmind_optional(dest,True,False,'account','license',
+                process_func=unavailable,previous_loader=lambda:self.fail('Do not fetch prior if disabled'))
+            self.assertIsNone(info)
+            self.assertIn('disabled',reason)
+            self.assertEqual(list(dest.iterdir()),[])
+            recent=(dt.datetime.now(dt.timezone.utc)-dt.timedelta(days=3)).isoformat()
+            previous={'database_build_at':recent,'database_updated_date':recent[:10]}
+            calls=[]
+            def restored(_,data):
+                calls.append(data)
+                return {'sha256':'valid-mock-sha','database_updated_date':data['database_updated_date']}
+            info,reason=sync_maxmind_optional(dest,True,True,'account','license',
+                process_func=unavailable,previous_loader=lambda:previous,carry_func=restored)
+            self.assertIsNone(reason)
+            self.assertEqual(info['sha256'],'valid-mock-sha')
+            self.assertEqual(len(calls),1)
+            info,reason=sync_maxmind_optional(dest,True,True,'account','license',
+                process_func=unavailable,previous_loader=lambda:None)
+            self.assertIsNone(info)
+            self.assertIn('HTTP 401',reason)
+            old=(dt.datetime.now(dt.timezone.utc)-dt.timedelta(days=40)).isoformat()
+            info,reason=sync_maxmind_optional(dest,False,True,'account','license',
+                previous_loader=lambda:{'database_build_at':old},
+                carry_func=lambda *_:self.fail('Must not publish stale MaxMind data'))
+            self.assertIsNone(info)
+            self.assertIn('not currently published',reason)
+
     def test_maxmind_verify_only_publish_and_carry_forward(self):
         # Synthetic archive; never downloads provider data or needs credentials.
         raw=b'A'*(5_200_000-32)+b'\xab\xcd\xefMaxMind.com'+b'\x00'*19

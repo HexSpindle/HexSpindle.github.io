@@ -5,6 +5,8 @@ The default verify-only mode never writes the licensed MMDB to the deployed site
 Set MAXMIND_PUBLIC_MIRROR_ALLOWED=true ONLY with redistribution authorization.
 """
 import base64, datetime as dt, gzip, hashlib, io, json, pathlib, re, shutil, subprocess, tarfile, tempfile, urllib.request
+import urllib.error
+from urllib.parse import urlsplit
 
 URL = 'https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz'
 SAFE_URL = 'https://download.maxmind.com/geoip/databases/GeoLite2-City/download'
@@ -14,6 +16,39 @@ DATASET = 'maxmind_geolite2_city'
 MAX_ARCHIVE = 160 * 1024 * 1024
 MAX_MMDB = 150 * 1024 * 1024
 UTC = dt.timezone.utc
+_ALLOWED_REDIRECT_HOSTS = frozenset({
+    'download.maxmind.com',
+    'updates.maxmind.com',
+    # Official MaxMind R2 presigned-download host (not an arbitrary Cloudflare tenant).
+    'mm-prod-geoip-databases.a2649acb697e2c09b632799562c076f2.r2.cloudflarestorage.com',
+})
+
+class _MaxMindSafeRedirect(urllib.request.HTTPRedirectHandler):
+    """Follow the official storage redirect without leaking Basic Auth to R2.
+
+    urllib's default HTTPRedirectHandler forwards request.headers unchanged,
+    including Authorization, when redirecting between unrelated domains.
+    """
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        target = urlsplit(newurl)
+        if target.scheme.lower() != 'https' or target.hostname not in _ALLOWED_REDIRECT_HOSTS:
+            raise RuntimeError('MaxMind download redirected to an unexpected destination')
+        redirected = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if redirected and urlsplit(req.full_url).netloc.lower() != target.netloc.lower():
+            redirected.remove_header('Authorization')
+        return redirected
+
+
+def _http_diagnostic(status):
+    """Human-readable, credential-free error classification for GitHub Actions."""
+    return {
+        400: 'invalid download request; verify the GeoLite2 City permalink',
+        401: 'authentication failed; verify MaxMind Account ID and License Key',
+        403: 'access denied; verify GeoLite2 City entitlement, key permissions, and redirects',
+        404: 'GeoLite2 City binary download permalink not found',
+        429: 'download rate limit reached; retry later',
+    }.get(status, 'temporary MaxMind or storage service error' if 500 <= status <= 599
+          else 'unexpected HTTP response')
 
 def now():
     return dt.datetime.now(UTC).isoformat(timespec='seconds').replace('+00:00', 'Z')
@@ -24,15 +59,20 @@ def fetch_archive(account, key):
     auth = base64.b64encode(f'{account}:{key}'.encode()).decode()
     req = urllib.request.Request(URL, headers={'Authorization':'Basic '+auth, 'Accept-Encoding':'identity',
         'User-Agent':'HexSpindle-FeedSync/1.0'})
+    opener = urllib.request.build_opener(_MaxMindSafeRedirect)
     try:
-        with urllib.request.urlopen(req, timeout=180) as response:
+        with opener.open(req, timeout=180) as response:
             if getattr(response,'status',200) != 200: raise ValueError('HTTP error')
             archive = response.read(MAX_ARCHIVE + 1)
             if len(archive) > MAX_ARCHIVE: raise ValueError('MaxMind archive size limit exceeded')
+            if len(archive) < 1024: raise ValueError('MaxMind returned an incomplete archive')
             modified = response.headers.get('Last-Modified')
-    except Exception:
-        # Never include auth, redirect URL or exception details in logs.
-        raise RuntimeError('MaxMind download failed. Check access and credentials.') from None
+    except urllib.error.HTTPError as error:
+        # Never log the exception itself: it may contain a signed R2 URL.
+        raise RuntimeError(f'MaxMind HTTP {error.code}: {_http_diagnostic(error.code)}') from None
+    except (urllib.error.URLError, OSError, TimeoutError):
+        raise RuntimeError('MaxMind network/TLS error; check access to MaxMind and its Cloudflare R2 download host') from None
+    # Deliberately let the static size and redirect validation messages through.
     return archive, modified
 
 def unpack_city(archive):
