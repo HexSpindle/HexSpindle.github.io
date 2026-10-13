@@ -1,15 +1,15 @@
 {
   "name": "HexSpindle",
-  "sourceCommit": "1a20d1b93eca25d62308f60ecd23bccf327d0e81",
+  "sourceCommit": "78357f964dec622c023ebb3634b6f5a4bc7b7099",
   "esbuild": "0.28.2",
   "entry": "HexSpindle.js",
   "startup": [
     "HexSpindle.js",
-    "HexSpindle.chunk-LQLYAZUZ.js"
+    "HexSpindle.chunk-UWRYVFDL.js"
   ],
   "chunks": [
-    "HexSpindle._magic_lib-R6UERXSE.js",
-    "HexSpindle.chunk-LQLYAZUZ.js",
+    "HexSpindle._magic_lib-6O543AYS.js",
+    "HexSpindle.chunk-UWRYVFDL.js",
     "HexSpindle.js"
   ],
   "verbatimModules": 26,
@@ -30,19 +30,19 @@
       "sha256": "7eb9b28e4a94ac3b63c402a8a62d9da57df1aefd4412422b147bd28a98d60398"
     },
     {
-      "path": "HexSpindle._magic_lib-R6UERXSE.js",
+      "path": "HexSpindle._magic_lib-6O543AYS.js",
       "bytes": 460121,
-      "sha256": "c68428d5240f816be1dad68abade5d000282813df5e5e3f76da6c3deeab71dfe"
+      "sha256": "d8a857d0257ca8d095ed9c78d197ac9986ba73791375cb0726cee21fe622c704"
     },
     {
-      "path": "HexSpindle.chunk-LQLYAZUZ.js",
-      "bytes": 20080,
-      "sha256": "42b98e519681289faab5787b034d9a91e6f01fa1108cc26ddd145166e7837ab8"
+      "path": "HexSpindle.chunk-UWRYVFDL.js",
+      "bytes": 20222,
+      "sha256": "976522438a9c2349723bc3a0a8c2790873575034922000486499899ad1df41f1"
     },
     {
       "path": "HexSpindle.js",
-      "bytes": 2111850,
-      "sha256": "695679d77e3b618c0556310c4448cd840bf98044c76def2035e7699fb4c7afce"
+      "bytes": 2140695,
+      "sha256": "b384c2c34a941d46686a0c9567c24b8eaee79a878f9c7892324290271774b5c8"
     },
     {
       "path": "LICENSE",
@@ -87,7 +87,7 @@
     {
       "path": "index.html",
       "bytes": 11269,
-      "sha256": "26bb6390d27069b4efd5bb4b078be37486b5edbd967d35ca9c56771b1b0ea8d9"
+      "sha256": "edf214fc35bce88f5d1edfad8b1b065320bde311fa194c14af20d182dfdffe25"
     },
     {
       "path": "licenses/Apache-2.0.txt",
