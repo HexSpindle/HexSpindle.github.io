@@ -1,0 +1,138 @@
+Third-party code bundled into HexSpindle.js and its HexSpindle.*.js chunks
+
+HexSpindle's own code is MIT licensed (see LICENSE). The components below are compiled into the bundle;
+their original header comments are reproduced here because minification removes ordinary comments.
+Libraries loaded on demand are shipped unmodified under modules/ with their headers intact.
+Full attribution for every component: THIRD_PARTY_NOTICES.md. Licence texts: licenses/.
+
+------------------------------------------------------------------------------
+modules/code_tidy/_vkbeautify.js
+Licence texts: licenses/MIT.txt
+
+/*!
+ * Portions derived from vkBeautify.
+ * Copyright (c) 2012 Vadim Kiryukhin.
+ * License: MIT
+ *
+ * Adapted for HexSpindle.
+ * Full license and attribution notices: /THIRD_PARTY_NOTICES.md
+ */
+
+------------------------------------------------------------------------------
+modules/code_tidy/_words.js
+Licence texts: licenses/MIT.txt
+
+/*!
+ * Portions derived from Lodash.
+ * Copyright OpenJS Foundation and other contributors.
+ * Based in part on Underscore.js by Jeremy Ashkenas,
+ * DocumentCloud and Investigative Reporters & Editors.
+ * License: MIT
+ *
+ * Adapted for HexSpindle.
+ * Full license and attribution notices: /THIRD_PARTY_NOTICES.md
+ */
+
+------------------------------------------------------------------------------
+modules/compression/_fzstd.mjs
+Licence texts: licenses/MIT.txt
+
+// Vendored from the `fzstd` npm package's ESM build (esm/index.mjs), version 0.1.1, MIT licensed
+// (Copyright (c) 2020 Arjun Barrett; https://github.com/101arrowz/fzstd). A pure-JS Zstandard
+// decoder supporting all block types (Raw, RLE and Huffman/FSE-compressed). Unmodified apart from
+// this header comment.
+// Some numerical data is initialized as -1 even when it doesn't need initialization to help the JIT infer types
+// aliases for shorter compressed code (most minifers don't do this)
+// Full third-party license and attribution notices: /THIRD_PARTY_NOTICES.md
+
+------------------------------------------------------------------------------
+modules/compression/_lzstring.js
+Licence texts: licenses/MIT.txt
+
+/*!
+ * Portions derived from LZ-String.
+ * Copyright (c) 2013 Pieroxy.
+ * License: MIT
+ *
+ * Adapted for HexSpindle.
+ * Full license and attribution notices: /THIRD_PARTY_NOTICES.md
+ */
+
+------------------------------------------------------------------------------
+modules/date_time/_momentfmt.js
+Licence texts: licenses/MIT.txt
+
+/*!
+ * Portions ported from Moment.js and Moment-Timezone.
+ * Copyright JS Foundation and other contributors.
+ * License: MIT
+ *
+ * Adapted for HexSpindle's dependency-free date/time operations.
+ * Full license and attribution notices: /THIRD_PARTY_NOTICES.md
+ */
+
+------------------------------------------------------------------------------
+modules/multimedia/_jimp.js
+Licence texts: licenses/MIT.txt
+
+/*!
+ * Portions ported from Jimp 1.6 and tinycolor2.
+ * Licenses: MIT
+ *
+ * Only the image primitives and colour-processing paths required by
+ * HexSpindle are included and have been adapted for browser-native buffers.
+ * Full copyright, license and attribution notices:
+ * /THIRD_PARTY_NOTICES.md
+ */
+
+------------------------------------------------------------------------------
+modules/multimedia/_qrimage.js
+Licence texts: licenses/MIT.txt
+
+// Vendored qr-image 3.2.0 (MIT, Copyright (c) 2013 Yandex LLC; https://github.com/alexeyten/qr-image).
+// Matrix builder and SVG writer only; Buffer replaced by a Uint8Array shim.
+// Full third-party license and attribution notices: /THIRD_PARTY_NOTICES.md
+
+------------------------------------------------------------------------------
+modules/other/_magic_lib.mjs
+Licence texts: licenses/Apache-2.0.txt, licenses/MIT.txt
+
+/*!
+ * Portions adapted from GCHQ CyberChef's Magic, Stream,
+ * file-type and character-encoding components.
+ * Copyright Crown Copyright and respective CyberChef contributors.
+ * License: Apache-2.0
+ *
+ * Also contains gamma and chi-squared components licensed under MIT.
+ * Modified and bundled for HexSpindle.
+ *
+ * Full copyright, Apache-2.0, MIT and attribution notices:
+ * /THIRD_PARTY_NOTICES.md
+ */
+
+------------------------------------------------------------------------------
+modules/public_key/_asn1hex.js
+Licence texts: licenses/MIT.txt
+
+/** A port of jsrsasign's ASN1HEX helpers and OID/DN tables (MIT, Copyright (c) Kenji Urushima). */
+// Full third-party license and attribution notices: /THIRD_PARTY_NOTICES.md
+
+------------------------------------------------------------------------------
+modules/public_key/_x509_ext.js
+Licence texts: licenses/MIT.txt
+
+/** A port of parts of jsrsasign's X509 / X509CRL / CSRUtil (MIT, Copyright (c) Kenji Urushima). */
+// Full third-party license and attribution notices: /THIRD_PARTY_NOTICES.md
+
+------------------------------------------------------------------------------
+modules/utils/_xmldom_serialize.js
+Licence texts: licenses/MIT.txt
+
+/*!
+ * Portions derived from @xmldom/xmldom XML serialization logic.
+ * License: MIT
+ *
+ * Adapted for HexSpindle.
+ * Full copyright, license and attribution notices:
+ * /THIRD_PARTY_NOTICES.md
+ */
