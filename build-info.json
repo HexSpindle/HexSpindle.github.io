@@ -1,6 +1,6 @@
 {
   "name": "HexSpindle",
-  "sourceCommit": "0b31dc39b7d7e7a6063a8336e2c2dfac55fa6bb4",
+  "sourceCommit": "ccb44a7ca98d184325a14819542097e33e68277c",
   "esbuild": "0.28.2",
   "entry": "HexSpindle.js",
   "startup": [
