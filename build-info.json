@@ -1,6 +1,6 @@
 {
   "name": "HexSpindle",
-  "sourceCommit": "16182bb1953ff713bc1d9c87a0ecde44db4d599e",
+  "sourceCommit": "f9a9bcbae29879c673974490c652f57ad050092a",
   "esbuild": "0.28.2",
   "entry": "HexSpindle.js",
   "startup": [
@@ -12,7 +12,7 @@
     "HexSpindle.chunk-UWRYVFDL.js",
     "HexSpindle.js"
   ],
-  "verbatimModules": 26,
+  "verbatimModules": 29,
   "files": [
     {
       "path": ".nojekyll",
@@ -21,8 +21,8 @@
     },
     {
       "path": "DATA_SOURCE_NOTICES.md",
-      "bytes": 4084,
-      "sha256": "91236d936400e3122c16f435862da78d89fc305bb85d84f70f9dea1e13de0ed0"
+      "bytes": 6040,
+      "sha256": "007ab3f78efd8cc0c0f4c2aad88f756f8f7456d72a4dc2a6fa63626b4468b32f"
     },
     {
       "path": "HexSpindle.LICENSES.txt",
@@ -41,8 +41,8 @@
     },
     {
       "path": "HexSpindle.js",
-      "bytes": 2307984,
-      "sha256": "382bbb9abfb56cc9abda45b4c56d8dfbc7e5f4cd1e477eb962ecb2fdb7751f49"
+      "bytes": 2316683,
+      "sha256": "6d12f13e33926327bff0e782fe34876157f89578845f2bc1fc2ce036bb428e1b"
     },
     {
       "path": "LICENSE",
@@ -51,8 +51,8 @@
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
-      "bytes": 20187,
-      "sha256": "0a2868a60d31e6350f833e0ead796436c9bd3cf8ea8954a82c8ee7874b30ed2a"
+      "bytes": 20991,
+      "sha256": "f290e7013cbe7fca0bf0ab70c751fd9e17256444294c6b1b1c188f2aa8c299af"
     },
     {
       "path": "analytics/client.js",
@@ -175,9 +175,24 @@
       "sha256": "c90ab2a87a8175f61fae28b4e0f2975928f5d636676252a0d94e67173b209c25"
     },
     {
+      "path": "modules/forensics/_attack_data.mjs",
+      "bytes": 403568,
+      "sha256": "c948c6483ab85cca198ca833a74193c90362fc222e48354afa6b32da68799016"
+    },
+    {
+      "path": "modules/forensics/_capstone.mjs",
+      "bytes": 2432147,
+      "sha256": "3b96b212017249f909e9fd5a861a453ec8281639287b768be96b4721936184a3"
+    },
+    {
       "path": "modules/forensics/_libyara.mjs",
       "bytes": 1182877,
       "sha256": "273185d0d99bbc497f787cea9842c3266a3683c8bece012e814cd11f50dde4bc"
+    },
+    {
+      "path": "modules/forensics/_oui_data.mjs",
+      "bytes": 2414763,
+      "sha256": "fc9566f69331b1665a066f22058ffabea2d313d34ee2b41285575c95a6b448f2"
     },
     {
       "path": "modules/hashing/_hashes_lib.mjs",
