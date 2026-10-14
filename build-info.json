@@ -1,6 +1,6 @@
 {
   "name": "HexSpindle",
-  "sourceCommit": "f68d7590575b84b8dc9fbdd7e278ae40821ae589",
+  "sourceCommit": "8f65c1ae0a55e8000fba782418737945af565121",
   "esbuild": "0.28.2",
   "entry": "HexSpindle.js",
   "startup": [
@@ -41,8 +41,8 @@
     },
     {
       "path": "HexSpindle.js",
-      "bytes": 2324294,
-      "sha256": "c054856ab90ed8e04aa7014450b690487d9be9e587a74e2b61be369a188e1a05"
+      "bytes": 2333843,
+      "sha256": "c5020f399c4bc97b019c0173ee2759bc7bf225deefb7ae59ff27c013af670652"
     },
     {
       "path": "LICENSE",
@@ -51,8 +51,8 @@
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
-      "bytes": 20992,
-      "sha256": "d4b15d37fdb0d2185b2a0078334d7013f12da5b9da6d33ebced0eab8b00f50f3"
+      "bytes": 21143,
+      "sha256": "1d2c5c33d6d3688ce584dedd25a8aa44f1f1c0b2ada86faf2c5f4a2ca98e7262"
     },
     {
       "path": "analytics/client.js",
@@ -181,8 +181,8 @@
     },
     {
       "path": "modules/forensics/_capstone.mjs",
-      "bytes": 2432147,
-      "sha256": "3b96b212017249f909e9fd5a861a453ec8281639287b768be96b4721936184a3"
+      "bytes": 2435107,
+      "sha256": "0d1100fe57e8c1096025856f7b9f2df6538e245e7790f96e4a36b233775a648c"
     },
     {
       "path": "modules/forensics/_libyara.mjs",
