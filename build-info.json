@@ -1,6 +1,6 @@
 {
   "name": "HexSpindle",
-  "sourceCommit": "8f65c1ae0a55e8000fba782418737945af565121",
+  "sourceCommit": "d61f18704df4281332d883fc70ce63cdb1d0da3c",
   "esbuild": "0.28.2",
   "entry": "HexSpindle.js",
   "startup": [
@@ -56,8 +56,8 @@
     },
     {
       "path": "analytics/client.js",
-      "bytes": 8632,
-      "sha256": "91aa8a1dfa87f032c3e636789187e371502ca54eaa6ef7ee72d48c1e4f8e2124"
+      "bytes": 8473,
+      "sha256": "1ef851041ce90b8ccbacf4fb134d71e7f1f79fde2813ad94dd3b18163260dae5"
     },
     {
       "path": "analytics/privacy.html",
